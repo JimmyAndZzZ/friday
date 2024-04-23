@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * 中断异常
  */
-public class TransactionException extends RuntimeException {
+public class ScheduleException extends RuntimeException {
 
     /**
      * 错误异常Code SystemErrorCodeEnum code 一一对应
@@ -17,29 +17,29 @@ public class TransactionException extends RuntimeException {
      */
     private String message;
 
-    public TransactionException(String message) {
+    public ScheduleException(String message) {
         super(message);
         this.message = message;
     }
 
 
-    public TransactionException(int code, String desc, Exception e) {
+    public ScheduleException(int code, String desc, Exception e) {
         super(e);
         this.code = code;
         this.message = desc;
     }
 
-    public TransactionException(int code, String desc) {
+    public ScheduleException(int code, String desc) {
         super(desc);
         this.code = code;
         this.message = desc;
     }
 
-    public TransactionException() {
+    public ScheduleException() {
         super();
     }
 
-    public TransactionException(Throwable cause) {
+    public ScheduleException(Throwable cause) {
         super(cause);
     }
 }
