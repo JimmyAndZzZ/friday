@@ -1,0 +1,12 @@
+package com.jimmy.friday.boot.other;
+
+public interface ApiConstants {
+
+    String CONTEXT_PARAM_FILE_PATH = "API_CONTEXT_PARAM_FILE_PATH_";
+
+    String CONTEXT_INCREMENT_COUNT = "API_CONTEXT_INCREMENT_COUNT_";
+
+    String CONTEXT_PARAM_FILE_NAME = "API_CONTEXT_PARAM_FILE_NAME_";
+
+    String CONTEXT_PARAM_TRACE_ID = "API_CONTEXT_PARAM_TRACE_ID_";
+}

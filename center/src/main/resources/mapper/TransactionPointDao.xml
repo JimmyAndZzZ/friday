@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.TransactionPointDao">
+
+    <update id="updateStatus" >
+        update transaction_point
+        set status=#{update}
+        where id = #{id}
+          and status = #{expect}
+    </update>
+
+    <update id="updateTimeout" >
+        update transaction_point
+        set timeout=#{timeout},
+            timeout_timestamp=#{timeoutTimestamp}
+        where id = #{id}
+          and timeout_timestamp > #{timeoutTimestamp}
+          and status = '0'
+    </update>
+
+</mapper>
+

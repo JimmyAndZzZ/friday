@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.HawkEyeTopologyModuleDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.HawkEyeTopologyModule" id="HawkEyeTopologyModuleMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="machine" column="machine" jdbcType="VARCHAR"/>
+        <result property="module" column="module" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+</mapper>
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.GatewayAccountDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.GatewayAccount" id="GatewayAccountMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="uid" column="uid" jdbcType="VARCHAR"/>
+        <result property="seckey" column="seckey" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="lvl" column="lvl" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="balance" column="balance" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <update id="deductBalance">
+        update gateway_account
+        set balance=balance - #{cost}
+        where uid = #{uid}
+          and balance >= #{cost}
+    </update>
+
+    <update id="rechargeBalance">
+        update gateway_account
+        set balance=balance + #{cost}
+        where uid = #{uid}
+    </update>
+
+</mapper>
+

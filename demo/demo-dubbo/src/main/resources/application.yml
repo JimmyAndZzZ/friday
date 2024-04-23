@@ -1,0 +1,26 @@
+# 开发环境配置
+server:
+  # 服务端口
+  port: 1235
+
+dubbo:
+  registry:
+    protocol: zookeeper
+    address: zookeeper://127.0.0.1:2181?backup=127.0.0.1:2181
+    id: demo-provider
+  protocol:
+    port: 20890
+    name: dubbo
+    id: dubbo
+    status: server
+  application:
+    qos:
+      port: 22222
+      enable: true
+    name: demo-provider
+    id: demo-provider
+  metadata-report:
+    address: zookeeper://127.0.0.1:2181
+  scan:
+    basePackages: com.jimmy.friday.demo.service.impl
+

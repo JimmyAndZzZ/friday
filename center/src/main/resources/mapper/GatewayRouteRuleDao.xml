@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.GatewayRouteRuleDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.GatewayRouteRule" id="GatewayRouteRuleMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="serviceId" column="service_id" jdbcType="INTEGER"/>
+        <result property="methodId" column="method_id" jdbcType="INTEGER"/>
+        <result property="version" column="version" jdbcType="VARCHAR"/>
+        <result property="enabled" column="enabled" jdbcType="VARCHAR"/>
+        <result property="force" column="force" jdbcType="VARCHAR"/>
+        <result property="priority" column="priority" jdbcType="INTEGER"/>
+        <result property="consumerCondition" column="consumer_condition" jdbcType="VARCHAR"/>
+        <result property="providerCondition" column="provider_condition" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ss_gateway.gateway_route_rule(service_id, method_id, version, enabled, force, priority, consumer_condition, provider_condition)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.serviceId}, #{entity.methodId}, #{entity.version}, #{entity.enabled}, #{entity.force}, #{entity.priority}, #{entity.consumerCondition}, #{entity.providerCondition})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ss_gateway.gateway_route_rule(service_id, method_id, version, enabled, force, priority, consumer_condition, provider_condition)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.serviceId}, #{entity.methodId}, #{entity.version}, #{entity.enabled}, #{entity.force}, #{entity.priority}, #{entity.consumerCondition}, #{entity.providerCondition})
+        </foreach>
+        on duplicate key update
+         service_id = values(service_id) , method_id = values(method_id) , version = values(version) , enabled = values(enabled) , force = values(force) , priority = values(priority) , consumer_condition = values(consumer_condition) , provider_condition = values(provider_condition)     </insert>
+
+</mapper>
+

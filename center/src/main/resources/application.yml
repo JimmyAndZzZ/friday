@@ -1,0 +1,128 @@
+# 开发环境配置
+server:
+  # 服务端口
+  port: 8241
+  servlet:
+    # 项目contextPath
+    context-path: /
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+    # tomcat最大线程数，默认为200
+    max-threads: 800
+    # Tomcat启动初始化的线程数，默认值25
+    min-spare-threads: 30
+
+spring:
+  redis:
+    timeout: 60000
+    database: 0
+    cluster:
+      nodes:
+        - 127.0.0.1:7000
+        - 127.0.0.1:7001
+        - 127.0.0.1:7002
+        - 127.0.0.1:7003
+        - 127.0.0.1:7004
+        - 127.0.0.1:7005
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1
+        namespace: 4c2b45d3-7be5-42c3-bfb5-8428b70d6e07
+        group: GROUP
+    consul:
+      host: localhost
+      port: 8600
+      #    #是否启用spring cloud consul，默认true
+      enabled: false
+      discovery:
+        # 健康检查 一定要配置 结合 spring-boot-starter-actuator 使用
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        enabled: true
+        register: false    #是否将自身服务注册到consul中
+        hostname: 127.0.0.1
+        serviceName: ${spring.application.name}
+        tags: dev
+        instanceId: ${spring.application.name}-${spring.cloud.client.ip-address}-${server.port}-${spring.profiles.active}
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size:  200MB
+      max-request-size:  200MB
+  rabbitmq:
+    host: 127.0.0.1
+    username: admin
+    password: admin
+    port: 5672
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 10 # Minimum number of consumers.
+        max-concurrency: 30 # Maximum number of consumers.
+        prefetch: 10
+        retry:
+          enabled: true #是否开启消费者重试（为false时关闭消费者重试，这时消费端代码异常会一直重复收到消息）
+          max-attempts: 3 #重试次数
+          initial-interval: 5000ms
+        acknowledge-mode: manual        #消费方手动ack
+      direct:
+        acknowledge-mode: manual        #消费方手动ack
+    publisher-returns: true             #发送方的return与confirm模式保证信息发出成功
+    publisher-confirms: true            #发送方的return与confirm模式保证信息发出成功
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari.minimum-idle: 5
+    hikari.idle-timeout: 180000
+    hikari.maximum-pool-size: 20
+    hikari.auto-commit: true
+    hikari.max-lifetime: 1800000
+    hikari.connection-timeout: 30000
+    hikari.connection-test-query: SELECT 1
+dubbo:
+  protocol:
+    port: 20890
+    name: dubbo
+    id: dubbo
+    status: server
+  application:
+    qos:
+      port: 22222
+      enable: true
+    name: center-consumer
+    id: center-consumer
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Dao.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    refresh: true
+    db-config:
+      id-type: auto
+      field-strategy: not_empty
+      db-column-underline: true
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      db-type: mysql
+
+
+friday:
+  center:
+    temp-path: /tmp
+    kafka-server: 127.0.0.1:9092
+    protocol-type: kafka
+    protocol:
+      ip: 127.0.0.1
+      port: 9092

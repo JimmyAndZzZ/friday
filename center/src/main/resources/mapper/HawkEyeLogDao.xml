@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.HawkEyeLogDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.HawkEyeLog" id="HawkEyeLogMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="agentLog" column="log_message" jdbcType="VARCHAR"/>
+        <result property="className" column="class_name" jdbcType="VARCHAR"/>
+        <result property="methodName" column="method_name" jdbcType="VARCHAR"/>
+        <result property="traceId" column="trace_id" jdbcType="VARCHAR"/>
+        <result property="spanId" column="span_id" jdbcType="VARCHAR"/>
+        <result property="level" column="level" jdbcType="VARCHAR"/>
+        <result property="param" column="param" jdbcType="VARCHAR"/>
+        <result property="result" column="result" jdbcType="VARCHAR"/>
+        <result property="moduleName" column="module_name" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="modifyDate" column="modify_date" jdbcType="TIMESTAMP"/>
+        <result property="isLog" column="is_log" jdbcType="VARCHAR"/>
+        <result property="appId" column="app_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+</mapper>
+

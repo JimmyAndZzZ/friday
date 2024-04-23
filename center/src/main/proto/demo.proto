@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.jimmy.friday.center.proto";
+option java_outer_classname = "PyStreamProto";
+
+package gw;
+service DemoGatewayService {
+  rpc call(GwPyRequest) returns (GwPyReply) {}
+  rpc asyncCall(GwPyRequest) returns (stream GwPyReply) {}
+}
+
+message GwPyRequest {
+  map<string, string> args = 2;
+}
+
+message GwPyReply {
+  enum STS{
+    PROGRESS = 0;
+    FINISH = 1;
+    FAIL = 2;
+    PENDING = 3;
+  }
+
+  int32 ret = 2;
+  STS sts = 3;
+  map<string, string> message = 4;
+  int32 progressRate = 5;
+}

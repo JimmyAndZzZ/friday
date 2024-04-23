@@ -1,0 +1,38 @@
+# 开发环境配置
+server:
+  # 服务端口
+  port: 1238
+
+#mybatis
+spring:
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  application:
+    name: consumer-simple
+  # ????
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: 4c2b45d3-7be5-42c3-bfb5-8428b70d6e07
+        group: GROUP
+    consul:
+      host: localhost
+      port: 8600
+        #    #是否启用spring cloud consul，默认true
+      enabled: false
+      discovery:
+          # 健康检查 一定要配置 结合 spring-boot-starter-actuator 使用
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        enabled: true
+        register: false    #是否将自身服务注册到consul中
+        hostname: 127.0.0.1
+        serviceName: ${spring.application.name}
+        tags: dev
+        instanceId: ${spring.application.name}-${spring.cloud.client.ip-address}-${server.port}-${spring.profiles.active}  # 服务id

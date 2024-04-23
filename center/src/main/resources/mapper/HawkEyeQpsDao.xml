@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.HawkEyeQpsDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.HawkEyeQps" id="HawkEyeQpsMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="moduleName" column="module_name" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="requestPoint" column="request_point" jdbcType="VARCHAR"/>
+        <result property="requestAttachment" column="request_attachment" jdbcType="VARCHAR"/>
+        <result property="protocol" column="protocol" jdbcType="VARCHAR"/>
+    </resultMap>
+
+</mapper>
+

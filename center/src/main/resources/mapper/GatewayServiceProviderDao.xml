@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.GatewayServiceProviderDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.GatewayServiceProvider" id="GatewayServiceProviderMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="providerId" column="provider_id" jdbcType="INTEGER"/>
+        <result property="serviceId" column="service_id" jdbcType="INTEGER"/>
+        <result property="port" column="port" jdbcType="INTEGER"/>
+        <result property="weight" column="weight" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <update id="updateStatus">
+        update gateway_service_provider
+        set status=#{status}
+        where id = #{id}
+    </update>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ss_gateway.gateway_service_provider(provider_id, service_id, port, weight, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.providerId}, #{entity.serviceId}, #{entity.port}, #{entity.weight}, #{entity.status})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into ss_gateway.gateway_service_provider(provider_id, service_id, port, weight, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.providerId}, #{entity.serviceId}, #{entity.port}, #{entity.weight}, #{entity.status})
+        </foreach>
+        on duplicate key update
+        provider_id = values(provider_id) , service_id = values(service_id) , port = values(port) , weight =
+        values(weight) , status = values(status)
+    </insert>
+
+</mapper>
+

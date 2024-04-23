@@ -1,0 +1,30 @@
+package com.jimmy.friday.boot.message.gateway;
+
+import com.jimmy.friday.boot.base.Message;
+import com.jimmy.friday.boot.core.gateway.Service;
+import com.jimmy.friday.boot.enums.EventTypeEnum;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class ServiceRegister implements Message {
+
+    private String id;
+
+    private List<Service> services;
+
+    public ServiceRegister(String id, List<Service> services) {
+        this.id = id;
+        this.services = services;
+    }
+
+    public ServiceRegister() {
+
+    }
+
+    @Override
+    public EventTypeEnum type() {
+        return EventTypeEnum.SERVICE_REGISTER;
+    }
+}
