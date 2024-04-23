@@ -1,5 +1,6 @@
 package com.jimmy.friday.framework.bootstrap;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.enums.TransactionPropagationEnum;
@@ -7,6 +8,7 @@ import com.jimmy.friday.boot.enums.TransactionTypeEnum;
 import com.jimmy.friday.framework.annotation.Transactional;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.base.TransactionConnectionProxy;
+import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.transaction.TransactionContext;
 import com.jimmy.friday.framework.transaction.TransactionSession;
 import com.jimmy.friday.framework.transaction.def.TransactionInfo;
@@ -24,9 +26,12 @@ import java.sql.Connection;
 
 public class TransactionBootstrap implements Bootstrap {
 
+    private final ConfigLoad configLoad;
+
     private final TransactionSession transactionSession;
 
-    public TransactionBootstrap(TransactionSession transactionSession) {
+    public TransactionBootstrap(ConfigLoad configLoad, TransactionSession transactionSession) {
+        this.configLoad = configLoad;
         this.transactionSession = transactionSession;
     }
 
@@ -37,6 +42,11 @@ public class TransactionBootstrap implements Bootstrap {
 
     @Override
     public void bootstrapAfter() throws Exception {
+        String offsetFilePath = configLoad.getOffsetFilePath();
+        if (!FileUtil.exist(offsetFilePath)) {
+            FileUtil.mkdir(offsetFilePath);
+        }
+
         transactionSession.transactionCompensation();
     }
 

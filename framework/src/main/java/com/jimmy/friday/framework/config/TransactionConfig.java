@@ -29,8 +29,8 @@ public class TransactionConfig {
     }
 
     @Bean
-    public TransactionBootstrap transactionBootstrap(TransactionSession transactionSession) {
-        return new TransactionBootstrap(transactionSession);
+    public TransactionBootstrap transactionBootstrap(ConfigLoad configLoad, TransactionSession transactionSession) {
+        return new TransactionBootstrap(configLoad, transactionSession);
     }
 
     @Configuration

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import java.util.HashMap;
 
-public class ScheduleInContext extends HashMap<String,String> {
+public class ScheduleContext extends HashMap<String,String> {
 
     @Getter
     @Setter
