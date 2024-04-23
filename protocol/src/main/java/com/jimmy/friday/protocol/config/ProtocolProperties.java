@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.Map;
 
 @Data
-@ConfigurationProperties(prefix = "gateway.protocol")
+@ConfigurationProperties(prefix = "friday.protocol")
 public class ProtocolProperties {
 
     private Map<ProtocolEnum, ProtocolProperty> protocols = Maps.newHashMap();

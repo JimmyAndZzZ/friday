@@ -9,7 +9,7 @@ import com.google.common.collect.Sets;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.base.Process;
-import com.jimmy.friday.center.config.GatewayConfigProperties;
+import com.jimmy.friday.center.config.FridayConfigProperties;
 import com.jimmy.friday.protocol.connector.KafkaConnector;
 import com.jimmy.friday.protocol.core.InputMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class KafkaManager implements Initialize, Close {
     private Producer<String, String> producer;
 
     @Autowired
-    private GatewayConfigProperties gatewayConfigProperties;
+    private FridayConfigProperties fridayConfigProperties;
 
     public void send(String topic, String message) {
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, null, null, IdUtil.simpleUUID(), message);
@@ -65,7 +65,7 @@ public class KafkaManager implements Initialize, Close {
 
     public void receive(String topic, String groupId, Integer batchSize, Process process) {
         if (topics.add(topic)) {
-            KafkaConnector kafkaConnector = new KafkaConnector(gatewayConfigProperties.getKafkaServer(), topic, null, groupId, batchSize);
+            KafkaConnector kafkaConnector = new KafkaConnector(fridayConfigProperties.getKafkaServer(), topic, null, groupId, batchSize);
             Thread thread = new Thread(() -> process(kafkaConnector, process, true));
             this.connectors.put(kafkaConnector, thread);
             thread.start();
@@ -74,7 +74,7 @@ public class KafkaManager implements Initialize, Close {
 
     @Override
     public void init() throws Exception {
-        String kafkaServer = gatewayConfigProperties.getKafkaServer();
+        String kafkaServer = fridayConfigProperties.getKafkaServer();
         if (StrUtil.isEmpty(kafkaServer)) {
             throw new IllegalArgumentException("未配置kafka地址");
         }

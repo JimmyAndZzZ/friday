@@ -4,7 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.jimmy.friday.center.annotation.Async;
-import com.jimmy.friday.center.config.GatewayConfigProperties;
+import com.jimmy.friday.center.config.FridayConfigProperties;
 import com.jimmy.friday.protocol.config.ProtocolProperty;
 import com.jimmy.friday.protocol.core.Protocol;
 import com.jimmy.friday.protocol.core.ProtocolFactory;
@@ -31,7 +31,7 @@ public class AsyncBeanProcessor implements BeanPostProcessor {
     private ProtocolFactory protocolFactory;
 
     @Autowired
-    private GatewayConfigProperties gatewayConfigProperties;
+    private FridayConfigProperties fridayConfigProperties;
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -56,8 +56,8 @@ public class AsyncBeanProcessor implements BeanPostProcessor {
                     isNeedProxy = true;
                     Class<?> parameterType = parameterTypes[0];
 
-                    ProtocolProperty protocol = gatewayConfigProperties.getProtocol();
-                    ProtocolEnum cacheProtocolType = gatewayConfigProperties.getProtocolType();
+                    ProtocolProperty protocol = fridayConfigProperties.getProtocol();
+                    ProtocolEnum cacheProtocolType = fridayConfigProperties.getProtocolType();
                     BaseRegistered registeredByType = protocolFactory.getRegisteredByType(cacheProtocolType, protocol);
 
                     Protocol info = new Protocol();
@@ -95,7 +95,7 @@ public class AsyncBeanProcessor implements BeanPostProcessor {
                 }
 
                 if (isNeedProxy) {
-                    AsyncCglibProxy asyncCglibProxy = new AsyncCglibProxy(bean, protocolFactory, gatewayConfigProperties);
+                    AsyncCglibProxy asyncCglibProxy = new AsyncCglibProxy(bean, protocolFactory, fridayConfigProperties);
                     //创建加强器
                     Enhancer enhancer = new Enhancer();
                     //为加强器指定要代理的业务类

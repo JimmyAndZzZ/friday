@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 @ConfigurationProperties(prefix = "friday.center")
-public class GatewayConfigProperties {
+public class FridayConfigProperties {
 
     private Integer serverPort = 11211;
 

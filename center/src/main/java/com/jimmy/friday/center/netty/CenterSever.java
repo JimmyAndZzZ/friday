@@ -2,7 +2,7 @@ package com.jimmy.friday.center.netty;
 
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.center.base.Close;
-import com.jimmy.friday.center.config.GatewayConfigProperties;
+import com.jimmy.friday.center.config.FridayConfigProperties;
 import com.jimmy.friday.center.netty.codec.NettyDecoder;
 import com.jimmy.friday.center.netty.codec.NettyEncoder;
 import com.jimmy.friday.center.support.ActionSupport;
@@ -31,7 +31,7 @@ public class CenterSever implements Close {
     private ActionSupport actionSupport;
 
     @Autowired
-    private GatewayConfigProperties gatewayConfigProperties;
+    private FridayConfigProperties fridayConfigProperties;
 
     public void start() {
         ServerBootstrap bootstrap = new ServerBootstrap();
@@ -55,9 +55,9 @@ public class CenterSever implements Close {
 
                         }
                     });
-            ChannelFuture f = bootstrap.bind(gatewayConfigProperties.getServerPort()).sync();
+            ChannelFuture f = bootstrap.bind(fridayConfigProperties.getServerPort()).sync();
 
-            log.info("gateway server start port:{}", gatewayConfigProperties.getServerPort());
+            log.info("gateway server start port:{}", fridayConfigProperties.getServerPort());
 
             f.channel().closeFuture().sync();
         } catch (Exception e) {
