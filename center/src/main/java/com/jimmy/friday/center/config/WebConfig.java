@@ -10,7 +10,7 @@ import javax.servlet.MultipartConfigElement;
 public class WebConfig {
 
     @Bean
-    public MultipartConfigElement multipartConfigElement(GatewayConfigProperties configProperties) {
+    public MultipartConfigElement multipartConfigElement(FridayConfigProperties configProperties) {
         MultipartConfigFactory multipartConfigFactory = new MultipartConfigFactory();
         multipartConfigFactory.setLocation(configProperties.getTempPath());
         return multipartConfigFactory.createMultipartConfig();

@@ -3,7 +3,7 @@ package com.jimmy.friday.center.other;
 import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson.JSON;
 import com.jimmy.friday.center.annotation.Async;
-import com.jimmy.friday.center.config.GatewayConfigProperties;
+import com.jimmy.friday.center.config.FridayConfigProperties;
 import com.jimmy.friday.protocol.base.Output;
 import com.jimmy.friday.protocol.config.ProtocolProperty;
 import com.jimmy.friday.protocol.core.Protocol;
@@ -24,12 +24,12 @@ public class AsyncCglibProxy implements MethodInterceptor {
 
     private final ProtocolFactory protocolFactory;
 
-    private final GatewayConfigProperties gatewayConfigProperties;
+    private final FridayConfigProperties fridayConfigProperties;
 
-    public AsyncCglibProxy(Object target, ProtocolFactory protocolFactory, GatewayConfigProperties gatewayConfigProperties) {
+    public AsyncCglibProxy(Object target, ProtocolFactory protocolFactory, FridayConfigProperties fridayConfigProperties) {
         this.target = target;
         this.protocolFactory = protocolFactory;
-        this.gatewayConfigProperties = gatewayConfigProperties;
+        this.fridayConfigProperties = fridayConfigProperties;
     }
 
     @Override
@@ -43,8 +43,8 @@ public class AsyncCglibProxy implements MethodInterceptor {
             return method.invoke(target, objects);
         }
 
-        ProtocolProperty protocol = gatewayConfigProperties.getProtocol();
-        ProtocolEnum cacheProtocolType = gatewayConfigProperties.getProtocolType();
+        ProtocolProperty protocol = fridayConfigProperties.getProtocol();
+        ProtocolEnum cacheProtocolType = fridayConfigProperties.getProtocolType();
 
         BaseRegistered registeredByType = protocolFactory.getRegisteredByType(cacheProtocolType, protocol);
 

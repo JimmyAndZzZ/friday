@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.ServiceWarnTypeEnum;
-import com.jimmy.friday.center.config.GatewayConfigProperties;
+import com.jimmy.friday.center.config.FridayConfigProperties;
 import com.jimmy.friday.center.dao.GatewayServiceWarnDao;
 import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceProvider;
@@ -39,7 +39,7 @@ public class GatewayServiceWarnServiceImpl extends ServiceImpl<GatewayServiceWar
     private GatewayServiceService gatewayServiceService;
 
     @Autowired
-    private GatewayConfigProperties gatewayConfigProperties;
+    private FridayConfigProperties fridayConfigProperties;
 
     @Autowired
     private GatewayServiceProviderService gatewayServiceProviderService;
@@ -90,7 +90,7 @@ public class GatewayServiceWarnServiceImpl extends ServiceImpl<GatewayServiceWar
         gatewayServiceWarn.setMessage(content);
         this.save(gatewayServiceWarn);
 
-        String remindUrl = gatewayConfigProperties.getRemindUrl();
+        String remindUrl = fridayConfigProperties.getRemindUrl();
         if (StrUtil.isNotEmpty(remindUrl)) {
             String title = "服务异常:" + serviceWarnType.getMessage();
 
