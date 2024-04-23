@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 @Slf4j
-@Component
+@Component("fridayTransactionManager")
 public class TransactionManager {
 
     private static final int DEFAULT_TIME_OUT = 300;
