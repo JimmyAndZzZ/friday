@@ -1,11 +1,29 @@
 package com.jimmy.friday.framework.utils;
 
+import com.google.common.collect.Maps;
 import org.springframework.cglib.proxy.Enhancer;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 public class ClassUtil {
 
+    private static final Map<String, Class<?>> CLASS_CACHE = Maps.newHashMap();
+
     private ClassUtil() {
 
+    }
+
+    public static Class<?> loadClass(String className) throws ClassNotFoundException {
+        Class<?> clazz = CLASS_CACHE.get(className);
+        if (clazz != null) {
+            return clazz;
+        }
+
+        clazz = Class.forName(className);
+        CLASS_CACHE.put(className, clazz);
+        return clazz;
     }
 
     public static boolean classEquals(Class<?> source, Class<?> target) {
