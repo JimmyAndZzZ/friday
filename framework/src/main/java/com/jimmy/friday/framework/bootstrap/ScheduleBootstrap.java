@@ -51,7 +51,6 @@ public class ScheduleBootstrap implements Bootstrap {
                 this.loadBeanDefinition(beanDefinition);
             }
         }
-
     }
 
     @Override
@@ -106,5 +105,4 @@ public class ScheduleBootstrap implements Bootstrap {
             }
         }
     }
-
 }

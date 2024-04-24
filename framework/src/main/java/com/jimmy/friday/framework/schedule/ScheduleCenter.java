@@ -1,10 +1,10 @@
 package com.jimmy.friday.framework.schedule;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.exception.ScheduleException;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class ScheduleCenter {
@@ -31,5 +31,7 @@ public class ScheduleCenter {
         scheduleInfo.setSpringBeanId(springBeanId);
     }
 
-
+    public Collection<ScheduleInfo> getSchedules() {
+        return scheduleInfoMap.values();
+    }
 }
