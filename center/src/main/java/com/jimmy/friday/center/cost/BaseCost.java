@@ -24,7 +24,7 @@ public abstract class BaseCost implements Cost {
     protected BigDecimal calculate(String appId, String action, List<GatewayCostStrategyDetails> details, Integer time) {
         BigDecimal total = new BigDecimal(0);
 
-        String key = StrUtil.builder().append(RedisConstants.API_INVOKE_COUNT).append(appId).append(":").append(action).toString();
+        String key = StrUtil.builder().append(RedisConstants.Gateway.API_INVOKE_COUNT).append(appId).append(":").append(action).toString();
 
         for (int i = 0; i < time; i++) {
             Long increment = attachmentCache.increment(key);

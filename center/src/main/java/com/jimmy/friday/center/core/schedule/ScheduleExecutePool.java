@@ -1,11 +1,12 @@
 package com.jimmy.friday.center.core.schedule;
 
 import com.jimmy.friday.center.base.Close;
+import com.jimmy.friday.center.core.AttachmentCache;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -37,8 +38,14 @@ public class ScheduleExecutePool implements Close {
             new LinkedBlockingQueue<>(2000),
             r -> new Thread(r, "friday-schedule-low-" + r.hashCode()));
 
+    @Autowired
+    private AttachmentCache attachmentCache;
+
+
     public void execute(String scheduleId) {
 
+
+        attachmentCache.attachment(scheduleId);
     }
 
     @Override

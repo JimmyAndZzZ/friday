@@ -42,7 +42,7 @@ public class GatewayRouteRuleServiceImpl extends ServiceImpl<GatewayRouteRuleDao
         GatewayService gatewayService = gatewayServiceService.getGatewayService(applicationName, type, version, null);
         GatewayServiceMethod gatewayServiceMethod = gatewayServiceMethodService.queryByMethod(methodCode, methodId, gatewayService.getId());
 
-        List<GatewayRouteRule> cache = attachmentCache.attachmentList(RedisConstants.ROUTE_RULE_CACHE, GatewayRouteRule.class, this::list);
+        List<GatewayRouteRule> cache = attachmentCache.attachmentList(RedisConstants.Gateway.ROUTE_RULE_CACHE, GatewayRouteRule.class, this::list);
         if (CollUtil.isEmpty(cache)) {
             return Lists.newArrayList();
         }
@@ -65,7 +65,7 @@ public class GatewayRouteRuleServiceImpl extends ServiceImpl<GatewayRouteRuleDao
         boolean save = super.save(gatewayRouteRule);
 
         if (save) {
-            this.attachmentCache.attachList(RedisConstants.ROUTE_RULE_CACHE, gatewayRouteRule);
+            this.attachmentCache.attachList(RedisConstants.Gateway.ROUTE_RULE_CACHE, gatewayRouteRule);
         }
 
         return save;

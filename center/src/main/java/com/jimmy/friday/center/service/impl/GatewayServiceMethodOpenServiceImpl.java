@@ -40,7 +40,7 @@ public class GatewayServiceMethodOpenServiceImpl extends ServiceImpl<GatewayServ
 
     @Override
     public GatewayServiceMethodOpen getByCode(String code) {
-        return attachmentCache.attachment(RedisConstants.METHOD_OPEN_CACHE, code, GatewayServiceMethodOpen.class, () -> {
+        return attachmentCache.attachment(RedisConstants.Gateway.METHOD_OPEN_CACHE, code, GatewayServiceMethodOpen.class, () -> {
             QueryWrapper<GatewayServiceMethodOpen> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("code", code);
             return getOne(queryWrapper);
@@ -74,7 +74,7 @@ public class GatewayServiceMethodOpenServiceImpl extends ServiceImpl<GatewayServ
     public boolean save(GatewayServiceMethodOpen gatewayServiceMethodOpen) {
         boolean save = super.save(gatewayServiceMethodOpen);
         if (save) {
-            attachmentCache.attach(RedisConstants.METHOD_OPEN_CACHE, gatewayServiceMethodOpen.getCode(), gatewayServiceMethodOpen);
+            attachmentCache.attach(RedisConstants.Gateway.METHOD_OPEN_CACHE, gatewayServiceMethodOpen.getCode(), gatewayServiceMethodOpen);
         }
 
         return save;
@@ -84,7 +84,7 @@ public class GatewayServiceMethodOpenServiceImpl extends ServiceImpl<GatewayServ
     public boolean updateById(GatewayServiceMethodOpen gatewayServiceMethodOpen) {
         boolean update = super.updateById(gatewayServiceMethodOpen);
         if (update) {
-            attachmentCache.attach(RedisConstants.METHOD_OPEN_CACHE, gatewayServiceMethodOpen.getCode(), gatewayServiceMethodOpen);
+            attachmentCache.attach(RedisConstants.Gateway.METHOD_OPEN_CACHE, gatewayServiceMethodOpen.getCode(), gatewayServiceMethodOpen);
         }
 
         return update;
@@ -95,7 +95,7 @@ public class GatewayServiceMethodOpenServiceImpl extends ServiceImpl<GatewayServ
         GatewayServiceMethodOpen byId = this.getById(id);
         if (byId != null) {
             boolean b = super.removeById(id);
-            attachmentCache.remove(RedisConstants.METHOD_OPEN_CACHE, byId.getCode());
+            attachmentCache.remove(RedisConstants.Gateway.METHOD_OPEN_CACHE, byId.getCode());
             return b;
         }
 

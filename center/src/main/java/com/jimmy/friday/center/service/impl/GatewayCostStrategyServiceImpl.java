@@ -25,7 +25,7 @@ public class GatewayCostStrategyServiceImpl extends ServiceImpl<GatewayCostStrat
 
     @Override
     public GatewayCostStrategy getById(Serializable id) {
-        return attachmentCache.attachment(RedisConstants.COST_STRATEGY_CACHE, id.toString(), GatewayCostStrategy.class, () -> super.getById(id));
+        return attachmentCache.attachment(RedisConstants.Gateway.COST_STRATEGY_CACHE, id.toString(), GatewayCostStrategy.class, () -> super.getById(id));
     }
 
     @Override

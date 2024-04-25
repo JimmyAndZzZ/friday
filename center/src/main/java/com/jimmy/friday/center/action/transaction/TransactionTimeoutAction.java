@@ -68,11 +68,11 @@ public class TransactionTimeoutAction implements Action<TransactionTimeout>, Ini
                 }
             }
 
-            Iterable<String> factsKeys = attachmentCache.keys(RedisConstants.TRANSACTION_FACTS + "*");
+            Iterable<String> factsKeys = attachmentCache.keys(RedisConstants.Transaction.TRANSACTION_FACTS + "*");
             if (CollUtil.isNotEmpty(factsKeys)) {
                 List<String> ids = Lists.newArrayList();
                 for (String factsKey : factsKeys) {
-                    ids.add(StrUtil.removeAll(factsKey, RedisConstants.TRANSACTION_FACTS));
+                    ids.add(StrUtil.removeAll(factsKey, RedisConstants.Transaction.TRANSACTION_FACTS));
                 }
 
                 List<TransactionPoint> expiredTransactions = transactionPointService.getExpiredTransaction(ids);

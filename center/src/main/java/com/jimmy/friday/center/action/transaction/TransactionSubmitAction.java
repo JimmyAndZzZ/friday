@@ -57,7 +57,7 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
         transactionAck.setTransactionId(id);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.TRANSACTION_READ_WRITE_LOCK);
+        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK);
         Lock lock = readWriteLock.writeLock();
 
         try {
@@ -68,8 +68,8 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
                 return;
             }
             //更新缓存
-            attachmentCache.attachString(RedisConstants.TRANSACTION_POINT + id, transactionStatus.getState());
-            attachmentCache.expire(RedisConstants.TRANSACTION_POINT + id, 3L, TimeUnit.DAYS);
+            attachmentCache.attachString(RedisConstants.Transaction.TRANSACTION_POINT + id, transactionStatus.getState());
+            attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + id, 3L, TimeUnit.DAYS);
 
             Collection<TransactionFacts> transactionFacts = transactionManager.getTransactionFacts(id);
             if (CollUtil.isEmpty(transactionFacts)) {

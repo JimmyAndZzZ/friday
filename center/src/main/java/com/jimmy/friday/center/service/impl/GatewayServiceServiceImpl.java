@@ -74,7 +74,7 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceDao, Ga
 
     @Override
     public GatewayService getById(Serializable id) {
-        return attachmentCache.attachment(RedisConstants.GATEWAY_SERVICE_CACHE, id.toString(), GatewayService.class, () -> super.getById(id));
+        return attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_SERVICE_CACHE, id.toString(), GatewayService.class, () -> super.getById(id));
     }
 
     @Override
@@ -98,10 +98,10 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceDao, Ga
         gatewayService.setGroupName(group);
         gatewayService.setCreateDate(new Date());
 
-        boolean b = attachmentCache.putIfAbsent(RedisConstants.GATEWAY_SERVICE_ID_MAPPER, key, YesOrNoEnum.YES.getCode());
+        boolean b = attachmentCache.putIfAbsent(RedisConstants.Gateway.GATEWAY_SERVICE_ID_MAPPER, key, YesOrNoEnum.YES.getCode());
         if (b) {
             this.save(gatewayService);
-            attachmentCache.mapper(RedisConstants.GATEWAY_SERVICE_ID_MAPPER, key, gatewayService.getId());
+            attachmentCache.mapper(RedisConstants.Gateway.GATEWAY_SERVICE_ID_MAPPER, key, gatewayService.getId());
         }
 
         return gatewayService;
@@ -111,7 +111,7 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceDao, Ga
     public GatewayService query(String applicationName, String type, String version) {
         String key = StrUtil.builder().append(applicationName).append(":").append(type).append(":").append(version).toString();
 
-        Object id = attachmentCache.attachment(RedisConstants.GATEWAY_SERVICE_ID_MAPPER, key);
+        Object id = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_SERVICE_ID_MAPPER, key);
         if (id == null || id.toString().equals(YesOrNoEnum.YES.getCode())) {
             QueryWrapper<GatewayService> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("application_name", applicationName);
@@ -123,7 +123,7 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceDao, Ga
                 return null;
             }
 
-            attachmentCache.mapper(RedisConstants.GATEWAY_SERVICE_ID_MAPPER, key, one.getId());
+            attachmentCache.mapper(RedisConstants.Gateway.GATEWAY_SERVICE_ID_MAPPER, key, one.getId());
             return one;
         }
 

@@ -85,14 +85,14 @@ public class GatewayServiceMethodInvokeMetricsServiceImpl extends ServiceImpl<Ga
             queryWrapper.le("create_date", DateUtil.offsetDay(now, -7));
             this.remove(queryWrapper);
 
-            Iterable<String> todayInvokeKeys = attachmentCache.keys(RedisConstants.GATEWAY_METHOD_TODAY_INVOKE_COUNT + "*");
+            Iterable<String> todayInvokeKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + "*");
             if (CollUtil.isNotEmpty(todayInvokeKeys)) {
                 for (String key : todayInvokeKeys) {
                     String attachment = attachmentCache.attachment(key);
                     if (StrUtil.isNotEmpty(attachment)) {
                         attachmentCache.remove(key);
 
-                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.GATEWAY_METHOD_TODAY_INVOKE_COUNT));
+                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT));
                         if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
                             continue;
                         }
@@ -109,12 +109,12 @@ public class GatewayServiceMethodInvokeMetricsServiceImpl extends ServiceImpl<Ga
                 }
             }
 
-            Iterable<String> historyKeys = attachmentCache.keys(RedisConstants.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + "*");
+            Iterable<String> historyKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + "*");
             if (CollUtil.isNotEmpty(historyKeys)) {
                 for (String key : historyKeys) {
                     String attachment = attachmentCache.attachment(key);
                     if (StrUtil.isNotEmpty(attachment)) {
-                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.GATEWAY_METHOD_HISTORY_INVOKE_COUNT));
+                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT));
                         if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
                             attachmentCache.remove(key);
                             continue;

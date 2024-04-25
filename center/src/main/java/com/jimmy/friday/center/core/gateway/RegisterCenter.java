@@ -110,7 +110,7 @@ public class RegisterCenter {
                     String name = entry.getKey();
                     Service service = entry.getValue();
 
-                    String redisKey = this.getServiceRedisKey(RedisConstants.HEARTBEAT_FAIL_COUNT, service);
+                    String redisKey = this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service);
 
                     if (this.invoke.heartbeat(service)) {
                         log.debug("收到心跳响应:{},地址:{},端口:{}", name, service.getIpAddress(), service.getPort());
@@ -197,7 +197,7 @@ public class RegisterCenter {
             }
 
             this.circuitBreakerManager.remove(serviceId);
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
             this.refreshVersion(name);
             this.warn(ServiceWarnTypeEnum.PROVIDER_OFFLINE, service);
         } finally {
@@ -294,7 +294,7 @@ public class RegisterCenter {
 
             this.serviceMap.put(serviceId, service);
             this.suspected.remove(service.getApplicationId());
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
             this.refreshVersion(name);
             this.registerService(service, id);
             return true;
@@ -321,7 +321,7 @@ public class RegisterCenter {
                 exist.setApplicationId(service.getApplicationId());
                 exist.setStatus(ServiceStatusEnum.ALIVE);
                 this.registerService(service, id);
-                this.attachmentCache.remove(RedisConstants.SERVICE_USE_STATUS + exist.getServiceId());
+                this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_USE_STATUS + exist.getServiceId());
                 return;
             }
 
@@ -332,7 +332,7 @@ public class RegisterCenter {
 
             this.serviceMap.put(serviceId, service);
             this.suspected.remove(service.getApplicationId());
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
             this.refreshVersion(name);
             this.registerService(service, id);
         } finally {
@@ -350,11 +350,11 @@ public class RegisterCenter {
     }
 
     public void freeService(String serviceId) {
-        this.attachmentCache.remove(RedisConstants.SERVICE_USE_STATUS + serviceId);
+        this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_USE_STATUS + serviceId);
     }
 
     public Boolean lockService(String serviceId) {
-        return attachmentCache.setIfAbsent(RedisConstants.SERVICE_USE_STATUS + serviceId, YesOrNoEnum.YES.getCode());
+        return attachmentCache.setIfAbsent(RedisConstants.Gateway.SERVICE_USE_STATUS + serviceId, YesOrNoEnum.YES.getCode());
     }
 
     public String getServiceId(String name, String ipAddress, Integer port, String version) {
@@ -405,7 +405,7 @@ public class RegisterCenter {
      * @param id
      */
     private void registerService(Service service, String id) {
-        if (Boolean.TRUE.equals(this.attachmentCache.setIfAbsent(RedisConstants.SERVICE_REGISTER_FLAG + id, YesOrNoEnum.YES.getCode(), 60L, TimeUnit.SECONDS))) {
+        if (Boolean.TRUE.equals(this.attachmentCache.setIfAbsent(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id, YesOrNoEnum.YES.getCode(), 60L, TimeUnit.SECONDS))) {
 
             try {
                 GatewayService gatewayService = this.gatewayServiceService.getGatewayService(service);
@@ -420,7 +420,7 @@ public class RegisterCenter {
                     lock.unlock();
                 }
             } finally {
-                this.attachmentCache.remove(RedisConstants.SERVICE_REGISTER_FLAG + id);
+                this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id);
             }
         }
     }

@@ -35,23 +35,23 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
 
     @Override
     public Long getCurrentOffset(String channelName, String appId) {
-        String attachment = attachmentCache.attachment(RedisConstants.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId);
+        String attachment = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId);
         return StrUtil.isEmpty(attachment) ? 0L : Convert.toLong(attachment, 0L);
     }
 
     @Override
     public void updateCurrentOffset(String channelName, String appId, Long currentOffset) {
-        attachmentCache.attachString(RedisConstants.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId, currentOffset.toString());
+        attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId, currentOffset.toString());
     }
 
     @Override
     public void deleteCurrentOffset(String channelName, String appId) {
-        attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId);
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_CURRENT_OFFSET + channelName + ":" + appId);
     }
 
     @Override
     public List<GatewayPushChannelSub> queryByChannelName(String channelName) {
-        return attachmentCache.attachmentList(RedisConstants.GATEWAY_CHANNEL_SUB + channelName, GatewayPushChannelSub.class, new Obtain<List<GatewayPushChannelSub>>() {
+        return attachmentCache.attachmentList(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + channelName, GatewayPushChannelSub.class, new Obtain<List<GatewayPushChannelSub>>() {
             @Override
             public List<GatewayPushChannelSub> obtain() {
                 QueryWrapper<GatewayPushChannelSub> queryWrapper = new QueryWrapper<>();
@@ -63,7 +63,7 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
 
     @Override
     public GatewayPushChannelSub getById(Serializable id) {
-        return attachmentCache.attachment(RedisConstants.GATEWAY_CHANNEL_CACHE + id, GatewayPushChannelSub.class, () -> GatewayPushChannelSubServiceImpl.super.getById(id));
+        return attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_CHANNEL_CACHE + id, GatewayPushChannelSub.class, () -> GatewayPushChannelSubServiceImpl.super.getById(id));
     }
 
     @Override
@@ -81,8 +81,8 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
             return false;
         }
 
-        attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_CACHE + id);
-        attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_SUB + byId.getChannelName());
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_CACHE + id);
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + byId.getChannelName());
 
         return super.removeById(id);
     }
@@ -91,8 +91,8 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
     public boolean updateById(GatewayPushChannelSub gatewayPushChannelSub) {
         boolean b = super.updateById(gatewayPushChannelSub);
         if (b) {
-            attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_CACHE + gatewayPushChannelSub.getChannelName());
-            attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_SUB + gatewayPushChannelSub.getChannelName());
+            attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_CACHE + gatewayPushChannelSub.getChannelName());
+            attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + gatewayPushChannelSub.getChannelName());
         }
 
         return b;
@@ -110,12 +110,12 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
             return false;
         }
 
-        Lock distributedLock = stripedLock.getDistributedLock(RedisConstants.GATEWAY_CHANNEL_SUB_SAVE_LOCK + accountId + ":" + channelName);
+        Lock distributedLock = stripedLock.getDistributedLock(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB_SAVE_LOCK + accountId + ":" + channelName);
         if (distributedLock.tryLock()) {
             try {
-                attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_SUB + channelName);
+                attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + channelName);
                 boolean save = super.save(gatewayPushChannelSub);
-                attachmentCache.remove(RedisConstants.GATEWAY_CHANNEL_SUB + channelName);
+                attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + channelName);
                 return save;
             } finally {
                 distributedLock.unlock(); // 释放锁

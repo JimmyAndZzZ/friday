@@ -49,25 +49,25 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
 
     @Override
     public Integer getTodayMethodInvokeCount(Long methodId) {
-        String attachment = attachmentCache.attachment(RedisConstants.GATEWAY_METHOD_TODAY_INVOKE_COUNT + methodId);
+        String attachment = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + methodId);
         return Convert.toInt(StrUtil.emptyToDefault(attachment, "0"), 0);
     }
 
     @Override
     public Long getLastInvokeTimestamp(Long methodId) {
-        String attachment = attachmentCache.attachment(RedisConstants.GATEWAY_METHOD_LAST_INVOKE_TIME + methodId);
+        String attachment = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_METHOD_LAST_INVOKE_TIME + methodId);
         return Convert.toLong(StrUtil.emptyToDefault(attachment, "0"), 0L);
     }
 
     @Override
     public Integer getHistoryMethodInvokeCount(Long methodId) {
-        String attachment = attachmentCache.attachment(RedisConstants.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + methodId);
+        String attachment = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + methodId);
         return Convert.toInt(StrUtil.emptyToDefault(attachment, "0"), 0);
     }
 
     @Override
     public GatewayServiceMethod getById(Serializable id) {
-        return attachmentCache.attachment(RedisConstants.SERVICE_METHOD_CACHE, id.toString(), GatewayServiceMethod.class, () -> super.getById(id));
+        return attachmentCache.attachment(RedisConstants.Gateway.SERVICE_METHOD_CACHE, id.toString(), GatewayServiceMethod.class, () -> super.getById(id));
     }
 
     @Override
@@ -103,7 +103,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
             this.removeByIds(gatewayServiceMethods.stream().map(GatewayServiceMethod::getId).collect(Collectors.toList()));
 
             for (GatewayServiceMethod gatewayServiceMethod : gatewayServiceMethods) {
-                attachmentCache.remove(RedisConstants.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString());
+                attachmentCache.remove(RedisConstants.Gateway.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString());
             }
         }
     }
@@ -127,7 +127,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
     public GatewayServiceMethod queryByMethodId(String methodId, Long serviceId) {
         String key = StrUtil.builder().append(serviceId).append(":").append(methodId).toString();
 
-        Object id = attachmentCache.attachment(RedisConstants.SERVICE_METHOD_ID_MAPPER, key);
+        Object id = attachmentCache.attachment(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key);
         if (id == null) {
             QueryWrapper<GatewayServiceMethod> wrapper = new QueryWrapper<>();
             wrapper.eq("method_id", methodId);
@@ -137,13 +137,13 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
                 return null;
             }
 
-            attachmentCache.mapper(RedisConstants.SERVICE_METHOD_ID_MAPPER, key, one.getId());
+            attachmentCache.mapper(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key, one.getId());
             return one;
         }
 
         GatewayServiceMethod gatewayServiceMethod = this.getById(id.toString());
         if (gatewayServiceMethod == null) {
-            attachmentCache.remove(RedisConstants.SERVICE_METHOD_ID_MAPPER, key);
+            attachmentCache.remove(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key);
         }
 
         return gatewayServiceMethod;
@@ -153,7 +153,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
     public GatewayServiceMethod queryByMethodCode(String methodCode, Long serviceId) {
         String key = "MAPPER:METHOD:CODE:" + methodCode;
 
-        Object id = attachmentCache.attachment(RedisConstants.SERVICE_METHOD_ID_MAPPER, key);
+        Object id = attachmentCache.attachment(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key);
         if (id == null) {
             QueryWrapper<GatewayServiceMethod> wrapper = new QueryWrapper<>();
             wrapper.eq("method_code", key);
@@ -163,13 +163,13 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
                 return null;
             }
 
-            attachmentCache.mapper(RedisConstants.SERVICE_METHOD_ID_MAPPER, key, one.getId());
+            attachmentCache.mapper(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key, one.getId());
             return one;
         }
 
         GatewayServiceMethod gatewayServiceMethod = this.getById(id.toString());
         if (gatewayServiceMethod == null) {
-            attachmentCache.remove(RedisConstants.SERVICE_METHOD_ID_MAPPER, key);
+            attachmentCache.remove(RedisConstants.Gateway.SERVICE_METHOD_ID_MAPPER, key);
         }
 
         return gatewayServiceMethod;
@@ -179,7 +179,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
     public boolean save(GatewayServiceMethod gatewayServiceMethod) {
         boolean save = super.save(gatewayServiceMethod);
         if (save) {
-            attachmentCache.attach(RedisConstants.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
+            attachmentCache.attach(RedisConstants.Gateway.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
         }
 
         return save;
@@ -189,7 +189,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
     public boolean updateById(GatewayServiceMethod gatewayServiceMethod) {
         boolean save = super.updateById(gatewayServiceMethod);
         if (save) {
-            attachmentCache.attach(RedisConstants.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
+            attachmentCache.attach(RedisConstants.Gateway.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
         }
 
         return save;
@@ -200,7 +200,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
         boolean save = super.updateBatchById(gatewayServiceMethods);
         if (save) {
             for (GatewayServiceMethod gatewayServiceMethod : gatewayServiceMethods) {
-                attachmentCache.attach(RedisConstants.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
+                attachmentCache.attach(RedisConstants.Gateway.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
             }
         }
 
@@ -212,7 +212,7 @@ public class GatewayServiceMethodServiceImpl extends ServiceImpl<GatewayServiceM
         boolean save = super.saveBatch(gatewayServiceMethods);
         if (save) {
             for (GatewayServiceMethod gatewayServiceMethod : gatewayServiceMethods) {
-                attachmentCache.attach(RedisConstants.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
+                attachmentCache.attach(RedisConstants.Gateway.SERVICE_METHOD_CACHE, gatewayServiceMethod.getId().toString(), gatewayServiceMethod);
             }
         }
 

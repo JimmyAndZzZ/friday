@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -55,39 +53,6 @@ public class OpenController {
 
     @Autowired
     private GatewayCostStrategyDetailsService gatewayCostStrategyDetailsService;
-
-    @GetMapping("/clearCache")
-    @ApiOperation("缓存调用(勿用)")
-    public Result<?> clearCache() {
-        Field[] declaredFields = RedisConstants.class.getDeclaredFields();
-        for (Field field : declaredFields) {
-            if (Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
-                try {
-                    Object value = field.get(null);
-
-                    if (value != null) {
-                        String string = value.toString();
-
-                        if (StrUtil.endWith(string, ":")) {
-                            Iterable<String> keys = attachmentCache.keys(string + "*");
-                            if (CollUtil.isNotEmpty(keys)) {
-                                for (String key : keys) {
-                                    attachmentCache.remove(key);
-                                }
-                            }
-                        } else {
-                            attachmentCache.remove(string);
-                        }
-                    }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
-        return Result.ok();
-    }
 
     @PostMapping("/register/{name}")
     @ApiOperation("注册")
@@ -124,7 +89,7 @@ public class OpenController {
     @GetMapping("/getTodayInvokeCount")
     @ApiOperation("获取今日调用量")
     public Result<?> getTodayInvokeCount(@RequestParam("appId") String appId) {
-        String s = attachmentCache.attachment(RedisConstants.TODAY_INVOKE_COUNT + appId);
+        String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + appId);
         return Result.ok(StrUtil.isEmpty(s) ? 0 : Convert.toInt(s, 0));
     }
 

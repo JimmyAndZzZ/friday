@@ -2,63 +2,69 @@ package com.jimmy.friday.center.utils;
 
 public interface RedisConstants {
 
-    String TRANSACTION_FACTS = "ss:gateway:transaction:facts:";
+    interface Transaction {
+        String TRANSACTION_FACTS = "friday:gateway:transaction:facts:";
 
-    String TRANSACTION_POINT = "ss:gateway:transaction:point:";
+        String TRANSACTION_POINT = "friday:gateway:transaction:point:";
 
-    String HEARTBEAT_FAIL_COUNT = "ss:gateway:heartbeat:fail:count:";
+        String TRANSACTION_READ_WRITE_LOCK = "friday:gateway:transaction:read:write:lock:";
+    }
 
-    String SERVICE_USE_STATUS = "ss:gateway:service:use:status:";
+    interface Gateway {
+        String HEARTBEAT_FAIL_COUNT = "friday:gateway:heartbeat:fail:count:";
 
-    String SERVICE_REGISTER_FLAG = "ss:gateway:service:register:flag:";
+        String SERVICE_USE_STATUS = "friday:gateway:service:use:status:";
 
-    String API_INVOKE_COUNT = "ss:gateway:api:invoke:count:";
+        String SERVICE_REGISTER_FLAG = "friday:gateway:service:register:flag:";
 
-    String METHOD_OPEN_CACHE = "ss:gateway:method:open:cache";
+        String API_INVOKE_COUNT = "friday:gateway:api:invoke:count:";
 
-    String SERVICE_METHOD_CACHE = "ss:gateway:service:method:cache";
+        String METHOD_OPEN_CACHE = "friday:gateway:method:open:cache";
 
-    String SERVICE_PROVIDER_CACHE = "ss:gateway:service:provider:cache";
+        String SERVICE_METHOD_CACHE = "friday:gateway:service:method:cache";
 
-    String GATEWAY_SERVICE_CACHE = "ss:gateway:service:cache";
+        String SERVICE_PROVIDER_CACHE = "friday:gateway:service:provider:cache";
 
-    String GATEWAY_SERVICE_ID_MAPPER = "ss:gateway:service:id:mapper";
+        String GATEWAY_SERVICE_CACHE = "friday:gateway:service:cache";
 
-    String SERVICE_METHOD_ID_MAPPER = "ss:gateway:service:method:id:mapper";
+        String GATEWAY_SERVICE_ID_MAPPER = "friday:gateway:service:id:mapper";
 
-    String ROUTE_RULE_CACHE = "ss:gateway:route:rule";
+        String SERVICE_METHOD_ID_MAPPER = "friday:gateway:service:method:id:mapper";
 
-    String GATEWAY_ACCOUNT_CACHE = "ss:gateway:account:cache:";
+        String ROUTE_RULE_CACHE = "friday:gateway:route:rule";
 
-    String GATEWAY_ACCOUNT_APP_ID_CACHE = "ss:gateway:account:app:id:cache";
+        String GATEWAY_ACCOUNT_CACHE = "friday:gateway:account:cache:";
 
-    String COST_STRATEGY_CACHE = "ss:gateway:account:cache";
+        String GATEWAY_ACCOUNT_APP_ID_CACHE = "friday:gateway:account:app:id:cache";
 
-    String TODAY_COST_AMOUNT = "ss:gateway:today:cost:amount:";
+        String COST_STRATEGY_CACHE = "friday:gateway:account:cache";
 
-    String TODAY_INVOKE_COUNT = "ss:gateway:today:invoke:count:";
+        String TODAY_COST_AMOUNT = "friday:gateway:today:cost:amount:";
 
-    String COST_STRATEGY_DETAILS_CACHE = "ss:gateway:account:details:cache:";
+        String TODAY_INVOKE_COUNT = "friday:gateway:today:invoke:count:";
 
-    String GATEWAY_SERVICE_STATUS_REFRESH_JOB = "ss:gateway:service:status:refresh:job";
+        String COST_STRATEGY_DETAILS_CACHE = "friday:gateway:account:details:cache:";
 
-    String GATEWAY_INVOKE_CALLBACK = "ss:gateway:invoke:callback:";
+        String GATEWAY_INVOKE_CALLBACK = "friday:gateway:invoke:callback:";
 
-    String TRANSACTION_READ_WRITE_LOCK = "ss:gateway:transaction:read:write:lock:";
+        String GATEWAY_CHANNEL_SUB = "friday:gateway:channel:sub:";
 
-    String GATEWAY_CHANNEL_SUB = "ss:gateway:channel:sub:";
+        String GATEWAY_CHANNEL_CACHE = "friday:gateway:channel:cache:";
 
-    String GATEWAY_CHANNEL_CACHE = "ss:gateway:channel:cache:";
+        String GATEWAY_CHANNEL_SUB_SAVE_LOCK = "friday:gateway:channel:sub:save:lock:";
 
-    String GATEWAY_CHANNEL_SUB_SAVE_LOCK = "ss:gateway:channel:sub:save:lock:";
+        String GATEWAY_CHANNEL_CURRENT_OFFSET = "friday:gateway:channel:current:offset:";
 
-    String GATEWAY_CHANNEL_CURRENT_OFFSET = "ss:gateway:channel:current:offset:";
+        String GATEWAY_METHOD_TODAY_INVOKE_COUNT = "friday:gateway:method:today:invoke:count:";
 
-    String GATEWAY_METHOD_TODAY_INVOKE_COUNT = "ss:gateway:method:today:invoke:count:";
+        String GATEWAY_METHOD_HISTORY_INVOKE_COUNT = "friday:gateway:method:history:invoke:count:";
 
-    String GATEWAY_METHOD_HISTORY_INVOKE_COUNT = "ss:gateway:method:history:invoke:count:";
+        String GATEWAY_SERVICE_LAST_INVOKE_TIME = "friday:gateway:service:last:invoke:time:";
 
-    String GATEWAY_METHOD_LAST_INVOKE_TIME = "ss:gateway:method:last:invoke:time:";
+        String GATEWAY_METHOD_LAST_INVOKE_TIME = "friday:gateway:method:last:invoke:time:";
 
-    String GATEWAY_SERVICE_CONSUMER = "ss:gateway:service:consumer:";
+        String GATEWAY_SERVICE_CONSUMER = "friday:gateway:service:consumer:";
+    }
+
+
 }

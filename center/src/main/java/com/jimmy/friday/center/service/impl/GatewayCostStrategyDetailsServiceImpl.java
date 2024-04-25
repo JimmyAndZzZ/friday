@@ -29,7 +29,7 @@ public class GatewayCostStrategyDetailsServiceImpl extends ServiceImpl<GatewayCo
 
     @Override
     public List<GatewayCostStrategyDetails> queryByCostStrategyId(Long costStrategyId) {
-        return attachmentCache.attachmentList(RedisConstants.COST_STRATEGY_DETAILS_CACHE + costStrategyId, GatewayCostStrategyDetails.class, () -> {
+        return attachmentCache.attachmentList(RedisConstants.Gateway.COST_STRATEGY_DETAILS_CACHE + costStrategyId, GatewayCostStrategyDetails.class, () -> {
             QueryWrapper<GatewayCostStrategyDetails> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("strategy_id", costStrategyId);
             return list(queryWrapper);

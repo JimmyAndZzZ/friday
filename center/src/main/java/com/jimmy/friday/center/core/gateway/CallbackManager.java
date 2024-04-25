@@ -31,11 +31,11 @@ public class CallbackManager implements ApplicationListener<NotifyEvent> {
     public void registerCallback(Long traceId, String applicationId) {
         log.info("注册回调:traceId:{},applicationId:{}", traceId, applicationId);
 
-        attachmentCache.attachString(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId, applicationId);
+        attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId, applicationId);
     }
 
     public void cancelCallback(Long traceId) {
-        attachmentCache.remove(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId);
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CallbackManager implements ApplicationListener<NotifyEvent> {
             NotifyTypeEnum notifyType = event.getNotifyType();
             ServiceTypeEnum serviceTypeEnum = event.getServiceTypeEnum();
 
-            String applicationId = attachmentCache.attachment(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId);
+            String applicationId = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId);
             if (StrUtil.isEmpty(applicationId)) {
                 log.error("{}回调应用id为空", traceId);
                 return;

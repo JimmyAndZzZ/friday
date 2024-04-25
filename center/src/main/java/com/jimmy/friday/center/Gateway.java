@@ -310,11 +310,11 @@ public class Gateway {
             //返回值处理
             GatewayResponse gatewayResponse = submit.get();
             //调用统计
-            attachmentCache.increment(RedisConstants.TODAY_INVOKE_COUNT + appId);
-            attachmentCache.increment(RedisConstants.GATEWAY_METHOD_TODAY_INVOKE_COUNT + gatewayServiceMethod.getId());
-            attachmentCache.increment(RedisConstants.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + gatewayServiceMethod.getId());
-            attachmentCache.attachString(RedisConstants.GATEWAY_METHOD_LAST_INVOKE_TIME + gatewayServiceMethod.getId(), String.valueOf(System.currentTimeMillis()));
-
+            attachmentCache.increment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + appId);
+            attachmentCache.increment(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + gatewayServiceMethod.getId());
+            attachmentCache.increment(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + gatewayServiceMethod.getId());
+            attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_METHOD_LAST_INVOKE_TIME + gatewayServiceMethod.getId(), String.valueOf(System.currentTimeMillis()));
+            attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_SERVICE_LAST_INVOKE_TIME + gatewayServiceMethod.getServiceId(), String.valueOf(System.currentTimeMillis()));
 
             if (gatewayResponse.getIsSuccess()) {
                 gatewayInvokeTrace.setIsSuccess(YesOrNoEnum.YES.getCode());
