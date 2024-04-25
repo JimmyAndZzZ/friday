@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
+import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.dao.GatewayAccountInvokeCountDao;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.entity.GatewayAccountInvokeCount;
@@ -26,6 +27,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +38,9 @@ import java.util.stream.Collectors;
  */
 @Service("gatewayAccountInvokeCountService")
 public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAccountInvokeCountDao, GatewayAccountInvokeCount> implements GatewayAccountInvokeCountService, Initialize {
+
+    @Autowired
+    private StripedLock stripedLock;
 
     @Autowired
     private AttachmentCache attachmentCache;
@@ -85,29 +90,36 @@ public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAcc
     @Override
     public void init() throws Exception {
         CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> {
-            int intDate = Integer.parseInt(DateUtil.format(new Date(), "yyyyMMdd"));
+            if (stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
+                try {
 
-            List<GatewayAccountInvokeCount> save = Lists.newArrayList();
+                    int intDate = Integer.parseInt(DateUtil.format(new Date(), "yyyyMMdd"));
 
-            List<GatewayAccount> list = gatewayAccountService.list();
-            for (GatewayAccount gatewayAccount : list) {
-                String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
-                if (StrUtil.isNotEmpty(s)) {
-                    attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                    List<GatewayAccountInvokeCount> save = Lists.newArrayList();
 
-                    Integer anInt = Convert.toInt(s);
-                    if (anInt != null) {
-                        GatewayAccountInvokeCount gatewayAccountInvokeCount = new GatewayAccountInvokeCount();
-                        gatewayAccountInvokeCount.setAccountId(gatewayAccount.getId());
-                        gatewayAccountInvokeCount.setInvokeDate(intDate);
-                        gatewayAccountInvokeCount.setInvokeCount(anInt);
-                        save.add(gatewayAccountInvokeCount);
+                    List<GatewayAccount> list = gatewayAccountService.list();
+                    for (GatewayAccount gatewayAccount : list) {
+                        String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                        if (StrUtil.isNotEmpty(s)) {
+                            attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+
+                            Integer anInt = Convert.toInt(s);
+                            if (anInt != null) {
+                                GatewayAccountInvokeCount gatewayAccountInvokeCount = new GatewayAccountInvokeCount();
+                                gatewayAccountInvokeCount.setAccountId(gatewayAccount.getId());
+                                gatewayAccountInvokeCount.setInvokeDate(intDate);
+                                gatewayAccountInvokeCount.setInvokeCount(anInt);
+                                save.add(gatewayAccountInvokeCount);
+                            }
+                        }
                     }
-                }
-            }
 
-            if (CollUtil.isNotEmpty(save)) {
-                this.saveBatch(save);
+                    if (CollUtil.isNotEmpty(save)) {
+                        this.saveBatch(save);
+                    }
+                } finally {
+                    stripedLock.releaseLock(RedisConstants.Gateway.GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK);
+                }
             }
         });
     }
