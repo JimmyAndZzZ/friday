@@ -3,6 +3,7 @@ package com.jimmy.friday.framework.bootstrap;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
+import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.framework.annotation.Job;
 import com.jimmy.friday.framework.base.Bootstrap;
@@ -91,6 +92,7 @@ public class ScheduleBootstrap implements Bootstrap {
         for (Method method : methods) {
             Job annotation = AnnotationUtils.getAnnotation(method, Job.class);
             if (annotation != null) {
+                Class<?> returnType = method.getReturnType();
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (parameterTypes.length != 1) {
                     throw new ScheduleException("方法:" + method.getName() + "参数长度不符合");
@@ -98,7 +100,11 @@ public class ScheduleBootstrap implements Bootstrap {
 
                 Class<?> parameterType = parameterTypes[0];
                 if (!parameterType.equals(ScheduleContext.class)) {
-                    throw new ScheduleException("方法:" + method.getName() + "参数长度不符合");
+                    throw new ScheduleException("方法:" + method.getName() + "参数类型不符合，入参需要ScheduleContext");
+                }
+
+                if (!returnType.equals(ScheduleResult.class)) {
+                    throw new ScheduleException("方法:" + method.getName() + "返回类型不符合，需要返回ScheduleResult");
                 }
 
                 scheduleCenter.register(beanClassName, method.getName(), annotation.id());

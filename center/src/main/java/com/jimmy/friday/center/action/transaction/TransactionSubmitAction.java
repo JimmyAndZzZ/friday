@@ -12,7 +12,7 @@ import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
 import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.StripedLock;
-import com.jimmy.friday.center.core.TransactionManager;
+import com.jimmy.friday.center.core.transaction.TransactionManager;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.service.TransactionPointService;
 import com.jimmy.friday.center.utils.JsonUtil;

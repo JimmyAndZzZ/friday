@@ -1,6 +1,6 @@
 package com.jimmy.friday.center.controller;
 
-import com.jimmy.friday.center.core.CommandSession;
+import com.jimmy.friday.center.core.agent.CommandSession;
 import com.jimmy.friday.center.support.CommandSupport;
 import com.jimmy.friday.center.vo.ExecuteCommandVO;
 import com.jimmy.friday.center.vo.Result;

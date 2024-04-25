@@ -9,7 +9,7 @@ import com.jimmy.friday.boot.enums.TransactionStatusEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionCompensation;
 import com.jimmy.friday.boot.message.transaction.TransactionNotify;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.TransactionManager;
+import com.jimmy.friday.center.core.transaction.TransactionManager;
 import com.jimmy.friday.center.entity.TransactionPoint;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.service.TransactionPointService;

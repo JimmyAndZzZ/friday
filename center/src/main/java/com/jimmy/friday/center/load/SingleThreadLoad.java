@@ -4,7 +4,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.LoadTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.center.base.Load;
-import com.jimmy.friday.center.core.RegisterCenter;
+import com.jimmy.friday.center.core.gateway.RegisterCenter;
 import com.jimmy.friday.center.support.RegisterSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

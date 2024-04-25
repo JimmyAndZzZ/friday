@@ -4,6 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.framework.utils.ClassUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -76,8 +77,9 @@ public class ScheduleExecutor {
 
         for (Method m : methods) {
             if (methodName.equals(m.getName())) {
+                Class<?> returnType = m.getReturnType();
                 Class<?>[] parameterTypes = m.getParameterTypes();
-                if (parameterTypes.length == 1 && parameterTypes[0].equals(ScheduleContext.class)) {
+                if (parameterTypes.length == 1 && parameterTypes[0].equals(ScheduleContext.class) && returnType.equals(ScheduleResult.class)) {
                     this.method.put(scheduleId, m);
                     return m;
                 }

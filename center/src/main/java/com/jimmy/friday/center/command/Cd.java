@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.core.agent.Command;
 import com.jimmy.friday.boot.enums.CommandTypeEnum;
 import com.jimmy.friday.center.base.Handler;
-import com.jimmy.friday.center.core.CommandSession;
+import com.jimmy.friday.center.core.agent.CommandSession;
 import com.jimmy.friday.center.support.AgentSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

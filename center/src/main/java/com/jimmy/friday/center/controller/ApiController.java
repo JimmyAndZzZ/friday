@@ -3,7 +3,7 @@ package com.jimmy.friday.center.controller;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.api.ApiResponse;
-import com.jimmy.friday.center.core.ApiComponent;
+import com.jimmy.friday.center.core.gateway.ApiComponent;
 import com.jimmy.friday.center.exception.OpenApiException;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;

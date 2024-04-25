@@ -3,7 +3,7 @@ package com.jimmy.friday.center.action.transaction;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionRegister;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.TransactionManager;
+import com.jimmy.friday.center.core.transaction.TransactionManager;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.gateway;
 
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;

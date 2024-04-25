@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.agent;
 
 import cn.hutool.core.util.StrUtil;
 import com.google.common.cache.Cache;

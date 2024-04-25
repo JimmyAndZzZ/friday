@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.gateway;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.cron.CronUtil;

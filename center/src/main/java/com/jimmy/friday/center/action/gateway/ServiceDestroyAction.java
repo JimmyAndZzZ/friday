@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.ServiceDestroy;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.GatewayInvokeFuture;
+import com.jimmy.friday.center.core.gateway.GatewayInvokeFuture;
 import com.jimmy.friday.center.support.RegisterSupport;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;

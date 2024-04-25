@@ -3,7 +3,7 @@ package com.jimmy.friday.center.action.gateway;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.ChannelSub;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.ChannelSubManager;
+import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.service.GatewayAccountService;
 import com.jimmy.friday.center.support.ChannelSupport;

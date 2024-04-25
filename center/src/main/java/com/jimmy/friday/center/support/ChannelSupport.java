@@ -13,7 +13,7 @@ import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.ChannelReceive;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.core.ChannelSubManager;
+import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.core.KafkaManager;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.entity.GatewayPushChannelSub;
