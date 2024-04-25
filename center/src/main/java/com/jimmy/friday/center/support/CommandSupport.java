@@ -13,7 +13,7 @@ import com.jimmy.friday.boot.message.agent.AgentCommand;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.center.base.Handler;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.core.CommandSession;
+import com.jimmy.friday.center.core.agent.CommandSession;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.other.CommandParser;
 import io.netty.channel.Channel;

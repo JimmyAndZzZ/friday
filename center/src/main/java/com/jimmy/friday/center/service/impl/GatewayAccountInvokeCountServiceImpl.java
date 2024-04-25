@@ -51,7 +51,7 @@ public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAcc
         }
 
         Date now = new Date();
-        String today = attachmentCache.attachment(RedisConstants.TODAY_INVOKE_COUNT + appId);
+        String today = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + appId);
 
         QueryWrapper<GatewayAccountInvokeCount> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account_id", gatewayAccount.getId());
@@ -91,9 +91,9 @@ public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAcc
 
             List<GatewayAccount> list = gatewayAccountService.list();
             for (GatewayAccount gatewayAccount : list) {
-                String s = attachmentCache.attachment(RedisConstants.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
                 if (StrUtil.isNotEmpty(s)) {
-                    attachmentCache.remove(RedisConstants.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                    attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
 
                     Integer anInt = Convert.toInt(s);
                     if (anInt != null) {

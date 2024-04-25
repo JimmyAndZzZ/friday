@@ -3,7 +3,7 @@ package com.jimmy.friday.center.action.gateway;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.GatewayInvoke;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.GatewayInvokeFuture;
+import com.jimmy.friday.center.core.gateway.GatewayInvokeFuture;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

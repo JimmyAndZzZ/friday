@@ -8,6 +8,8 @@ import com.jimmy.friday.boot.other.ConfigConstants;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.framework.utils.DockerUtil;
 import io.netty.util.internal.StringUtil;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -33,7 +35,13 @@ public class ConfigLoad {
 
     private InetAddress inetAddress;
 
-    private Set<String> packagesToScan;
+    @Setter
+    @Getter
+    private Set<String> gatewayPackagesToScan;
+
+    @Setter
+    @Getter
+    private Set<String> schedulePackagesToScan;
 
     public ConfigLoad() {
         String property = System.getProperty("gateway.config.path");
@@ -46,14 +54,6 @@ public class ConfigLoad {
         }
 
         this.inetAddress = this.findFirstNonLoopBackAddress();
-    }
-
-    public Set<String> getPackagesToScan() {
-        return packagesToScan;
-    }
-
-    public void setPackagesToScan(Set<String> packagesToScan) {
-        this.packagesToScan = packagesToScan;
     }
 
     public InetAddress getLocalIpAddress() {

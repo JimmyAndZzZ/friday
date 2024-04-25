@@ -130,7 +130,7 @@ public class GatewayServiceProviderServiceImpl extends ServiceImpl<GatewayServic
     private GatewayServiceProvider query(String name, Integer port, String ipAddress, Long serviceId) {
         String key = StrUtil.builder().append(name).append(":").append(ipAddress).append(":").append(port).toString();
 
-        return attachmentCache.attachment(RedisConstants.SERVICE_PROVIDER_CACHE, key, GatewayServiceProvider.class, () -> {
+        return attachmentCache.attachment(RedisConstants.Gateway.SERVICE_PROVIDER_CACHE, key, GatewayServiceProvider.class, () -> {
             QueryWrapper<GatewayServiceProvider> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("port", port);
             queryWrapper.eq("ip_address", ipAddress);

@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.support;
+package com.jimmy.friday.framework.other;
 
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.framework.annotation.EnableGateway;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class MethodScanSupport implements ImportBeanDefinitionRegistrar {
+public class GatewayScanRegistrar implements ImportBeanDefinitionRegistrar {
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
@@ -24,7 +24,7 @@ public class MethodScanSupport implements ImportBeanDefinitionRegistrar {
         Set<String> packagesToScan = getPackagesToScan(importingClassMetadata);
 
         ConfigLoad configLoad = beanFactory.getBean(ConfigLoad.class);
-        configLoad.setPackagesToScan(packagesToScan);
+        configLoad.setGatewayPackagesToScan(packagesToScan);
     }
 
     /**

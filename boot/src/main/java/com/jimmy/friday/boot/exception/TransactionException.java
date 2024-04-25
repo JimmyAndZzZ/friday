@@ -11,11 +11,11 @@ public class TransactionException extends RuntimeException {
      * 错误异常Code SystemErrorCodeEnum code 一一对应
      */
     @Getter
-    protected int code = 500;
+    private int code = 500;
     /**
      * 自己的日常 打log 用
      */
-    protected String message;
+    private String message;
 
     public TransactionException(String message) {
         super(message);

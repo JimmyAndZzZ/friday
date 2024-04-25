@@ -7,7 +7,7 @@
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
 
-    <property name="application_name" value="ss-demo"/>
+    <property name="application_name" value="demo"/>
     <property name="all_file_name"
               value="../logs/${application_name}/${application_name}.%d{yyyy-MM-dd}.%i.log"/>
     <property name="max_history" value="60"/>

@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.transaction;
 
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.Event;
@@ -8,6 +8,8 @@ import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.enums.TransactionStatusEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionAck;
 import com.jimmy.friday.boot.message.transaction.TransactionRefund;
+import com.jimmy.friday.center.core.AttachmentCache;
+import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.TransactionPoint;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.service.TransactionPointService;
@@ -55,12 +57,12 @@ public class TransactionManager {
         transactionAck.setTransactionId(transactionId);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.TRANSACTION_READ_WRITE_LOCK + transactionId);
+        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId);
         Lock lock = readWriteLock.readLock();
         try {
             lock.lock();
 
-            if (attachmentCache.setIfAbsent(RedisConstants.TRANSACTION_POINT + transactionId, TransactionStatusEnum.WAIT.getState())) {
+            if (attachmentCache.setIfAbsent(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, TransactionStatusEnum.WAIT.getState())) {
                 TransactionPoint transactionPoint = new TransactionPoint();
                 transactionPoint.setId(transactionId);
                 transactionPoint.setCreateDate(new Date());
@@ -69,9 +71,9 @@ public class TransactionManager {
                 transactionPoint.setTimeoutTimestamp(transactionFacts.getCurrentTimestamp() + DEFAULT_TIME_OUT * 1000);
                 transactionPointService.save(transactionPoint);
                 //过期时间三天
-                attachmentCache.expire(RedisConstants.TRANSACTION_POINT + transactionId, 3L, TimeUnit.DAYS);
+                attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, 3L, TimeUnit.DAYS);
             } else {
-                String attachment = attachmentCache.attachment(RedisConstants.TRANSACTION_POINT + transactionId);
+                String attachment = attachmentCache.attachment(RedisConstants.Transaction.TRANSACTION_POINT + transactionId);
 
                 TransactionStatusEnum transactionStatusEnum = TransactionStatusEnum.queryByState(attachment);
                 if (transactionStatusEnum == null) {
@@ -90,7 +92,7 @@ public class TransactionManager {
                 }
             }
 
-            attachmentCache.attach(RedisConstants.TRANSACTION_FACTS + transactionId, transactionFacts.getId().toString(), transactionFacts);
+            attachmentCache.attach(RedisConstants.Transaction.TRANSACTION_FACTS + transactionId, transactionFacts.getId().toString(), transactionFacts);
         } catch (Exception e) {
             transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
             throw e;
@@ -102,18 +104,18 @@ public class TransactionManager {
     }
 
     public Collection<TransactionFacts> getTransactionFacts(String id) {
-        return attachmentCache.attachMap(RedisConstants.TRANSACTION_FACTS + id, TransactionFacts.class).values();
+        return attachmentCache.attachMap(RedisConstants.Transaction.TRANSACTION_FACTS + id, TransactionFacts.class).values();
     }
 
     public void removeTransactionFacts(String transactionId, List<Long> factIds) {
         if (CollUtil.isNotEmpty(factIds)) {
             for (Long factId : factIds) {
-                attachmentCache.remove(RedisConstants.TRANSACTION_FACTS + transactionId, factId.toString());
+                attachmentCache.remove(RedisConstants.Transaction.TRANSACTION_FACTS + transactionId, factId.toString());
             }
         }
     }
 
     public void removeTransactionPoint(String transactionId) {
-        attachmentCache.remove(RedisConstants.TRANSACTION_POINT + transactionId);
+        attachmentCache.remove(RedisConstants.Transaction.TRANSACTION_POINT + transactionId);
     }
 }

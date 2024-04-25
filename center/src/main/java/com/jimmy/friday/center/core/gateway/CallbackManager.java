@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.gateway;
 
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.core.Event;
@@ -6,6 +6,7 @@ import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.enums.NotifyTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.message.gateway.InvokeCallback;
+import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.event.NotifyEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.support.RegisterSupport;
@@ -30,11 +31,11 @@ public class CallbackManager implements ApplicationListener<NotifyEvent> {
     public void registerCallback(Long traceId, String applicationId) {
         log.info("注册回调:traceId:{},applicationId:{}", traceId, applicationId);
 
-        attachmentCache.attachString(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId, applicationId);
+        attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId, applicationId);
     }
 
     public void cancelCallback(Long traceId) {
-        attachmentCache.remove(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId);
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class CallbackManager implements ApplicationListener<NotifyEvent> {
             NotifyTypeEnum notifyType = event.getNotifyType();
             ServiceTypeEnum serviceTypeEnum = event.getServiceTypeEnum();
 
-            String applicationId = attachmentCache.attachment(RedisConstants.GATEWAY_INVOKE_CALLBACK + traceId);
+            String applicationId = attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_INVOKE_CALLBACK + traceId);
             if (StrUtil.isEmpty(applicationId)) {
                 log.error("{}回调应用id为空", traceId);
                 return;

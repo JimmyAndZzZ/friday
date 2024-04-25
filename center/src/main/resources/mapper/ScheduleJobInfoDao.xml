@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.ScheduleJobInfoDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.ScheduleJobInfo" id="ScheduleJobInfoMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cron" column="cron" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+        <result property="routeStrategy" column="route_strategy" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="runParam" column="run_param" jdbcType="VARCHAR"/>
+        <result property="blockStrategy" column="block_strategy" jdbcType="VARCHAR"/>
+        <result property="timeout" column="timeout" jdbcType="INTEGER"/>
+        <result property="retryCount" column="retry_count" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="lastTime" column="last_time" jdbcType="INTEGER"/>
+        <result property="nextTime" column="next_time" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+</mapper>
+

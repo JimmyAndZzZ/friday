@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.gateway;
 
 import com.google.common.collect.Lists;
 import com.jimmy.friday.center.base.Hook;

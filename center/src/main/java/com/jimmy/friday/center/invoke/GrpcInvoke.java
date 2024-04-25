@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.message.gateway.Heartbeat;
 import com.jimmy.friday.center.action.gateway.HeartbeatAction;
-import com.jimmy.friday.center.core.RegisterCenter;
+import com.jimmy.friday.center.core.gateway.RegisterCenter;
 import com.jimmy.friday.center.grpc.GrpcFactory;
 import com.jimmy.friday.center.grpc.client.GrpcClient;
 import com.jimmy.friday.center.proto.GwPyReply;

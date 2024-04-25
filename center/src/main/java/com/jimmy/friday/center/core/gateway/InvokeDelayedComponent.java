@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.core;
+package com.jimmy.friday.center.core.gateway;
 
 import com.jimmy.friday.center.entity.GatewayInvokeTrace;
 import com.jimmy.friday.center.service.GatewayAccountService;

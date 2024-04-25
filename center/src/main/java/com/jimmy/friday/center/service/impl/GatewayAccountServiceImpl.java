@@ -54,7 +54,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
 
     @Override
     public GatewayAccount queryByAppId(String appId) {
-        return attachmentCache.attachment(RedisConstants.GATEWAY_ACCOUNT_CACHE, appId, GatewayAccount.class, new Obtain<GatewayAccount>() {
+        return attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_ACCOUNT_CACHE, appId, GatewayAccount.class, new Obtain<GatewayAccount>() {
             @Override
             public GatewayAccount obtain() {
                 QueryWrapper<GatewayAccount> queryWrapper = new QueryWrapper<>();
@@ -66,7 +66,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
 
     @Override
     public String getAppIdById(Long id) {
-        return attachmentCache.attachment(RedisConstants.GATEWAY_ACCOUNT_APP_ID_CACHE, id.toString(), String.class, () -> {
+        return attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_ACCOUNT_APP_ID_CACHE, id.toString(), String.class, () -> {
             GatewayAccount byId = GatewayAccountServiceImpl.super.getById(id);
             return byId != null ? byId.getUid() : null;
         });
@@ -80,9 +80,9 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
             Date now = new Date();
             BigDecimal multiply = cost.multiply(new BigDecimal(1000));
 
-            attachmentCache.increment(RedisConstants.TODAY_COST_AMOUNT + uid, multiply.longValue());
-            attachmentCache.expire(RedisConstants.TODAY_COST_AMOUNT + uid, DateUtil.between(now, DateUtil.endOfDay(now), DateUnit.SECOND), TimeUnit.SECONDS);
-            attachmentCache.remove(RedisConstants.GATEWAY_ACCOUNT_CACHE, uid);
+            attachmentCache.increment(RedisConstants.Gateway.TODAY_COST_AMOUNT + uid, multiply.longValue());
+            attachmentCache.expire(RedisConstants.Gateway.TODAY_COST_AMOUNT + uid, DateUtil.between(now, DateUtil.endOfDay(now), DateUnit.SECOND), TimeUnit.SECONDS);
+            attachmentCache.remove(RedisConstants.Gateway.GATEWAY_ACCOUNT_CACHE, uid);
         }
 
         return b;
@@ -90,7 +90,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
 
     @Override
     public boolean rechargeBalance(BigDecimal cost, String uid) {
-        attachmentCache.remove(RedisConstants.GATEWAY_ACCOUNT_CACHE, uid);
+        attachmentCache.remove(RedisConstants.Gateway.GATEWAY_ACCOUNT_CACHE, uid);
         return gatewayAccountDao.rechargeBalance(cost, uid);
     }
 
@@ -101,15 +101,15 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
             Date now = new Date();
             BigDecimal multiply = cost.multiply(new BigDecimal(1000));
 
-            attachmentCache.decrement(RedisConstants.TODAY_COST_AMOUNT + uid, multiply.longValue());
-            attachmentCache.expire(RedisConstants.TODAY_COST_AMOUNT + uid, DateUtil.between(now, DateUtil.endOfDay(now), DateUnit.SECOND), TimeUnit.SECONDS);
-            attachmentCache.remove(RedisConstants.GATEWAY_ACCOUNT_CACHE, uid);
+            attachmentCache.decrement(RedisConstants.Gateway.TODAY_COST_AMOUNT + uid, multiply.longValue());
+            attachmentCache.expire(RedisConstants.Gateway.TODAY_COST_AMOUNT + uid, DateUtil.between(now, DateUtil.endOfDay(now), DateUnit.SECOND), TimeUnit.SECONDS);
+            attachmentCache.remove(RedisConstants.Gateway.GATEWAY_ACCOUNT_CACHE, uid);
         }
     }
 
     @Override
     public BigDecimal getTodayCostAmount(String uid) {
-        String s = attachmentCache.attachment(RedisConstants.TODAY_COST_AMOUNT + uid);
+        String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_COST_AMOUNT + uid);
         return StrUtil.isEmpty(s) ? new BigDecimal(0) : new BigDecimal(s).divide(new BigDecimal(1000), 2, RoundingMode.HALF_DOWN);
     }
 }

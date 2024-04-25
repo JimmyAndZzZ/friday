@@ -60,11 +60,11 @@ public class GatewayServiceConsumerServiceImpl extends ServiceImpl<GatewayServic
 
         String key = SecureUtil.md5(serviceId + ":" + ipAddress + ":" + appId + ":" + clientName);
 
-        if (attachmentCache.setIfAbsent(RedisConstants.GATEWAY_SERVICE_CONSUMER + key, YesOrNoEnum.YES.getCode(), 30L, TimeUnit.MINUTES)) {
+        if (attachmentCache.setIfAbsent(RedisConstants.Gateway.GATEWAY_SERVICE_CONSUMER + key, YesOrNoEnum.YES.getCode(), 30L, TimeUnit.MINUTES)) {
             GatewayServiceConsumer query = this.query(serviceId, ipAddress, appId, clientName);
 
             if (query != null) {
-                attachmentCache.expire(RedisConstants.GATEWAY_SERVICE_CONSUMER + key, 24L, TimeUnit.HOURS);
+                attachmentCache.expire(RedisConstants.Gateway.GATEWAY_SERVICE_CONSUMER + key, 24L, TimeUnit.HOURS);
 
                 query.setProviderId(providerId);
                 this.updateById(query);

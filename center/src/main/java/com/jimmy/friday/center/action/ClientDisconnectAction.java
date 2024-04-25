@@ -3,7 +3,7 @@ package com.jimmy.friday.center.action;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.ClientDisconnect;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.ChannelSubManager;
+import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;

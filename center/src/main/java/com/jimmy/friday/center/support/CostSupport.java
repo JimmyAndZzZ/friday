@@ -37,7 +37,7 @@ public class CostSupport implements Initialize {
     }
 
     public void rollback(String appId, String action, ApiContext apiContext) {
-        String key = StrUtil.builder().append(RedisConstants.API_INVOKE_COUNT).append(appId).append(":").append(action).toString();
+        String key = StrUtil.builder().append(RedisConstants.Gateway.API_INVOKE_COUNT).append(appId).append(":").append(action).toString();
 
         Integer anInt = apiContext.getInt(ApiConstants.CONTEXT_INCREMENT_COUNT);
         if (anInt != null) {

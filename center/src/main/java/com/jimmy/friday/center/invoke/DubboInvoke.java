@@ -15,7 +15,7 @@ import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.other.AttributeConstants;
 import com.jimmy.friday.boot.other.GlobalConstants;
-import com.jimmy.friday.center.core.GatewaySession;
+import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.ReferenceConfig;

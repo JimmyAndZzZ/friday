@@ -4,7 +4,7 @@ import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.NotifyTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
-import com.jimmy.friday.center.core.GatewaySession;
+import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.event.NotifyEvent;
 import com.jimmy.friday.center.grpc.GrpcErrorMapper;
 import com.jimmy.friday.center.proto.DemoGatewayServiceGrpc;

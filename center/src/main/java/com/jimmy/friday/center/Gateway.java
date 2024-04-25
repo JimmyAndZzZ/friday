@@ -8,7 +8,6 @@ import cn.hutool.crypto.SecureUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.*;
-import com.jimmy.friday.boot.core.gateway.*;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.exception.BusinessException;
@@ -16,6 +15,7 @@ import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.other.ApiConstants;
 import com.jimmy.friday.center.base.Hook;
 import com.jimmy.friday.center.core.*;
+import com.jimmy.friday.center.core.gateway.*;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.entity.GatewayInvokeTrace;
 import com.jimmy.friday.center.entity.GatewayServiceMethod;
@@ -310,11 +310,11 @@ public class Gateway {
             //返回值处理
             GatewayResponse gatewayResponse = submit.get();
             //调用统计
-            attachmentCache.increment(RedisConstants.TODAY_INVOKE_COUNT + appId);
-            attachmentCache.increment(RedisConstants.GATEWAY_METHOD_TODAY_INVOKE_COUNT + gatewayServiceMethod.getId());
-            attachmentCache.increment(RedisConstants.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + gatewayServiceMethod.getId());
-            attachmentCache.attachString(RedisConstants.GATEWAY_METHOD_LAST_INVOKE_TIME + gatewayServiceMethod.getId(), String.valueOf(System.currentTimeMillis()));
-
+            attachmentCache.increment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + appId);
+            attachmentCache.increment(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + gatewayServiceMethod.getId());
+            attachmentCache.increment(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + gatewayServiceMethod.getId());
+            attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_METHOD_LAST_INVOKE_TIME + gatewayServiceMethod.getId(), String.valueOf(System.currentTimeMillis()));
+            attachmentCache.attachString(RedisConstants.Gateway.GATEWAY_SERVICE_LAST_INVOKE_TIME + gatewayServiceMethod.getServiceId(), String.valueOf(System.currentTimeMillis()));
 
             if (gatewayResponse.getIsSuccess()) {
                 gatewayInvokeTrace.setIsSuccess(YesOrNoEnum.YES.getCode());

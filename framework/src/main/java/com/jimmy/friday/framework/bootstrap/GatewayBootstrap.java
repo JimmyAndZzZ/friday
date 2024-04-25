@@ -51,11 +51,6 @@ public class GatewayBootstrap implements Bootstrap {
 
     @Override
     public void bootstrapBefore() throws Exception {
-        String offsetFilePath = configLoad.getOffsetFilePath();
-        if (!FileUtil.exist(offsetFilePath)) {
-            FileUtil.mkdir(offsetFilePath);
-        }
-
         registerSupport.initialize();
 
         GatewayClassPathBeanDefinitionScanner provider = new GatewayClassPathBeanDefinitionScanner(false);
@@ -74,7 +69,7 @@ public class GatewayBootstrap implements Bootstrap {
             }
         }
 
-        for (String packagePath : configLoad.getPackagesToScan()) {
+        for (String packagePath : configLoad.getGatewayPackagesToScan()) {
             //自定义函数参数处理
             Set<BeanDefinition> scanList = provider.findCandidateComponents(packagePath);
             if (CollUtil.isEmpty(scanList)) {
