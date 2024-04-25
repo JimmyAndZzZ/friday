@@ -17,6 +17,8 @@ import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,10 +59,10 @@ public class TransactionManager {
         transactionAck.setTransactionId(transactionId);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId);
-        Lock lock = readWriteLock.readLock();
+        RReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId);
+        RLock lock = readWriteLock.readLock();
         try {
-            lock.lock();
+            lock.lock(120, TimeUnit.SECONDS);
 
             if (attachmentCache.setIfAbsent(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, TransactionStatusEnum.WAIT.getState())) {
                 TransactionPoint transactionPoint = new TransactionPoint();

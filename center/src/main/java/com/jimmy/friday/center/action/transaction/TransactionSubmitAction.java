@@ -20,6 +20,8 @@ import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,11 +59,11 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
         transactionAck.setTransactionId(id);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        ReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK);
-        Lock lock = readWriteLock.writeLock();
+        RReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK);
+        RLock lock = readWriteLock.writeLock();
 
         try {
-            lock.lock();
+            lock.lock(120, TimeUnit.SECONDS);
 
             if (!transactionPointService.updateStatus(transactionStatus, id, TransactionStatusEnum.WAIT)) {
                 log.error("事务状态已更新，当前提交作废:{}", id);

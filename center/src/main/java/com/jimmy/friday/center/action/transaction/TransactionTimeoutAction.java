@@ -13,6 +13,7 @@ import com.jimmy.friday.boot.message.transaction.TransactionTimeout;
 import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
+import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.TransactionPoint;
 import com.jimmy.friday.center.service.TransactionPointService;
 import com.jimmy.friday.center.utils.RedisConstants;
@@ -23,10 +24,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
 public class TransactionTimeoutAction implements Action<TransactionTimeout>, Initialize {
+
+    @Autowired
+    private StripedLock stripedLock;
 
     @Autowired
     private AttachmentCache attachmentCache;
@@ -54,38 +59,44 @@ public class TransactionTimeoutAction implements Action<TransactionTimeout>, Ini
     @Override
     public void init() throws Exception {
         CronUtil.schedule(IdUtil.simpleUUID(), "*/30 * * * * *", () -> {
-            Set<String> process = Sets.newHashSet();
+            if (stripedLock.tryLock(RedisConstants.Transaction.TRANSACTION_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
+                try {
+                    Set<String> process = Sets.newHashSet();
 
-            List<TransactionPoint> timeoutTransaction = transactionPointService.getTimeoutTransaction();
-            if (CollUtil.isNotEmpty(timeoutTransaction)) {
-                for (TransactionPoint transactionPoint : timeoutTransaction) {
-                    if (process.add(transactionPoint.getId())) {
-                        TransactionSubmit transactionSubmit = new TransactionSubmit();
-                        transactionSubmit.setId(transactionPoint.getId());
-                        transactionSubmit.setTransactionStatus(TransactionStatusEnum.TIMEOUT);
-                        transactionSubmitAction.action(transactionSubmit, null);
-                    }
-                }
-            }
-
-            Iterable<String> factsKeys = attachmentCache.keys(RedisConstants.Transaction.TRANSACTION_FACTS + "*");
-            if (CollUtil.isNotEmpty(factsKeys)) {
-                List<String> ids = Lists.newArrayList();
-                for (String factsKey : factsKeys) {
-                    ids.add(StrUtil.removeAll(factsKey, RedisConstants.Transaction.TRANSACTION_FACTS));
-                }
-
-                List<TransactionPoint> expiredTransactions = transactionPointService.getExpiredTransaction(ids);
-                if (CollUtil.isNotEmpty(expiredTransactions)) {
-                    for (TransactionPoint expiredTransaction : expiredTransactions) {
-                        TransactionStatusEnum transactionStatusEnum = TransactionStatusEnum.queryByState(expiredTransaction.getStatus());
-                        if (transactionStatusEnum != null) {
-                            TransactionSubmit transactionSubmit = new TransactionSubmit();
-                            transactionSubmit.setId(expiredTransaction.getId());
-                            transactionSubmit.setTransactionStatus(transactionStatusEnum);
-                            transactionSubmitAction.action(transactionSubmit, null);
+                    List<TransactionPoint> timeoutTransaction = transactionPointService.getTimeoutTransaction();
+                    if (CollUtil.isNotEmpty(timeoutTransaction)) {
+                        for (TransactionPoint transactionPoint : timeoutTransaction) {
+                            if (process.add(transactionPoint.getId())) {
+                                TransactionSubmit transactionSubmit = new TransactionSubmit();
+                                transactionSubmit.setId(transactionPoint.getId());
+                                transactionSubmit.setTransactionStatus(TransactionStatusEnum.TIMEOUT);
+                                transactionSubmitAction.action(transactionSubmit, null);
+                            }
                         }
                     }
+
+                    Iterable<String> factsKeys = attachmentCache.keys(RedisConstants.Transaction.TRANSACTION_FACTS + "*");
+                    if (CollUtil.isNotEmpty(factsKeys)) {
+                        List<String> ids = Lists.newArrayList();
+                        for (String factsKey : factsKeys) {
+                            ids.add(StrUtil.removeAll(factsKey, RedisConstants.Transaction.TRANSACTION_FACTS));
+                        }
+
+                        List<TransactionPoint> expiredTransactions = transactionPointService.getExpiredTransaction(ids);
+                        if (CollUtil.isNotEmpty(expiredTransactions)) {
+                            for (TransactionPoint expiredTransaction : expiredTransactions) {
+                                TransactionStatusEnum transactionStatusEnum = TransactionStatusEnum.queryByState(expiredTransaction.getStatus());
+                                if (transactionStatusEnum != null) {
+                                    TransactionSubmit transactionSubmit = new TransactionSubmit();
+                                    transactionSubmit.setId(expiredTransaction.getId());
+                                    transactionSubmit.setTransactionStatus(transactionStatusEnum);
+                                    transactionSubmitAction.action(transactionSubmit, null);
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    stripedLock.releaseLock(RedisConstants.Transaction.TRANSACTION_TIMEOUT_JOB_LOCK);
                 }
             }
         });

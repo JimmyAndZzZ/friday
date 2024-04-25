@@ -3,14 +3,31 @@ package com.jimmy.friday.center.utils;
 public interface RedisConstants {
 
     interface Transaction {
-        String TRANSACTION_FACTS = "friday:gateway:transaction:facts:";
 
-        String TRANSACTION_POINT = "friday:gateway:transaction:point:";
+        String TRANSACTION_FACTS = "friday:transaction:facts:";
 
-        String TRANSACTION_READ_WRITE_LOCK = "friday:gateway:transaction:read:write:lock:";
+        String TRANSACTION_POINT = "friday:transaction:point:";
+
+        String TRANSACTION_READ_WRITE_LOCK = "friday:transaction:read:write:lock:";
+
+        String TRANSACTION_TIMEOUT_JOB_LOCK = "friday:transaction:timeout:job:lock";
     }
 
+    interface Schedule {
+
+        String SCHEDULE_EXECUTE_COUNT = "friday:schedule:execute:count:";
+
+        String SCHEDULE_EXECUTE_FAIL_COUNT = "friday:schedule:execute:fail:count:";
+
+    }
+
+
     interface Gateway {
+
+        String GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK = "friday:gateway:account:invoke:job:lock";
+
+        String GATEWAY_INVOKE_METRICS_JOB_LOCK = "friday:gateway:invoke:metrics:job:lock";
+
         String HEARTBEAT_FAIL_COUNT = "friday:gateway:heartbeat:fail:count:";
 
         String SERVICE_USE_STATUS = "friday:gateway:service:use:status:";

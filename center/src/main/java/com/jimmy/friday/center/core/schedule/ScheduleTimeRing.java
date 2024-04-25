@@ -18,7 +18,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class ScheduleTimeRing implements Initialize, Close {
 
-    private final ConcurrentMap<Integer, List<Integer>> ringData = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Integer, List<String>> ringData = new ConcurrentHashMap<>();
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -30,16 +30,18 @@ public class ScheduleTimeRing implements Initialize, Close {
                     //整秒休眠
                     ThreadUtil.sleep(1000 - System.currentTimeMillis() % 1000);
 
-                    List<Integer> ringItemData = new ArrayList<>();
+                    List<String> ringItemData = new ArrayList<>();
                     int nowSecond = Calendar.getInstance().get(Calendar.SECOND);   // 避免处理耗时太长，跨过刻度，向前校验一个刻度；
                     for (int i = 0; i < 2; i++) {
-                        List<Integer> tmpData = ringData.remove((nowSecond + 60 - i) % 60);
+                        List<String> tmpData = ringData.remove((nowSecond + 60 - i) % 60);
                         if (tmpData != null) {
                             ringItemData.addAll(tmpData);
                         }
                     }
-                } catch (Exception e) {
 
+
+                } catch (Exception e) {
+                    log.error("时间轮运行失败", e);
                 }
             }
         });
