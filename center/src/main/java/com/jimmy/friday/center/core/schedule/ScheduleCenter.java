@@ -2,6 +2,7 @@ package com.jimmy.friday.center.core.schedule;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Initialize;
@@ -62,7 +63,6 @@ public class ScheduleCenter implements Initialize, Close {
 
                     for (ScheduleJobInfo scheduleJobInfo : scheduleJobInfos) {
                         Integer id = scheduleJobInfo.getId();
-                        String cron = scheduleJobInfo.getCron();
                         Long nextTime = scheduleJobInfo.getNextTime();
                         String redisKey = RedisConstants.Schedule.SCHEDULE_EXECUTE_JOB_LOCK + id + ":" + nextTime;
 
@@ -71,21 +71,24 @@ public class ScheduleCenter implements Initialize, Close {
                                 if (scheduleJobInfoService.needExecute(id, nextTime)) {
                                     // 超过轮训周期
                                     if (nowTime > nextTime + PRE_READ_MS) {
-                                        //todo
-                                    }
-                                } else if (nowTime > nextTime) {
-                                    //todo
-                                    Long next = this.getNextTimeCatchException(cron, id);
-                                    if (next == null) {
-                                        continue;
-                                    }
-                                    //时间范围内触发直接丢时间轮
-                                    if (nowTime + PRE_READ_MS > next) {
-                                        //todo
+                                        scheduleExecutePool.execute(scheduleJobInfo);
 
+                                        this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
+                                    } else if (nowTime > nextTime) {
+                                        scheduleExecutePool.execute(scheduleJobInfo);
+
+                                        this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
+                                        //时间范围内触发直接丢时间轮
+                                        if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJobInfo.getStatus()) && nowTime + PRE_READ_MS > scheduleJobInfo.getNextTime()) {
+                                            scheduleTimeRing.push(scheduleJobInfo);
+
+                                            this.updateScheduleJobInfo(scheduleJobInfo, scheduleJobInfo.getNextTime());
+                                        }
+                                    } else {
+                                        scheduleTimeRing.push(scheduleJobInfo);
+
+                                        this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
                                     }
-                                } else {
-                                    
                                 }
                             } finally {
                                 stripedLock.releaseLock(redisKey);
@@ -109,30 +112,37 @@ public class ScheduleCenter implements Initialize, Close {
         executor.shutdown();
     }
 
-    /**
-     * 获取下次执行时间
-     *
-     * @param cron
-     * @param id
-     * @return
-     */
-    private Long getNextTimeCatchException(String cron, Integer id) {
-        try {
-            Date next = this.generateNextTime(cron, System.currentTimeMillis());
-            if (next != null) {
-                return next.getTime();
-            }
 
-            scheduleJobInfoService.updateExecuteTime(0L, 0L, id);
+    /**
+     * 刷新定时器信息
+     *
+     * @param scheduleJobInfo
+     */
+    private void updateScheduleJobInfo(ScheduleJobInfo scheduleJobInfo, Long lastTime) {
+        Integer id = scheduleJobInfo.getId();
+        String cron = scheduleJobInfo.getCron();
+        if (StrUtil.isEmpty(cron)) {
+            scheduleJobInfo.setStatus(ScheduleStatusEnum.CLOSE.getCode());
+
+            log.error("定时器:{},cron表达式为空", scheduleJobInfo.getId());
             scheduleJobInfoService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
-            return null;
-        } catch (ParseException e) {
-            scheduleJobInfoService.updateExecuteTime(0L, 0L, id);
+            return;
+        }
+
+        Long nextTime = this.generateNextTime(cron, lastTime);
+        if (nextTime != null) {
+            scheduleJobInfo.setLastTime(scheduleJobInfo.getNextTime());
+            scheduleJobInfo.setNextTime(nextTime);
+
+            scheduleJobInfoService.updateExecuteTime(scheduleJobInfo.getNextTime(), nextTime, id);
+        } else {
+            log.error("定时器:{},获取下次执行时间失败", id);
+
+            scheduleJobInfo.setStatus(ScheduleStatusEnum.CLOSE.getCode());
+
             scheduleJobInfoService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
-            return null;
         }
     }
-
 
     /**
      * 获取下次执行时间
@@ -142,7 +152,12 @@ public class ScheduleCenter implements Initialize, Close {
      * @return
      * @throws Exception
      */
-    private Date generateNextTime(String cron, Long lastTime) throws ParseException {
-        return new CronExpression(cron).getNextValidTimeAfter(new Date(lastTime));
+    private Long generateNextTime(String cron, Long lastTime) {
+        try {
+            Date nextValidTimeAfter = new CronExpression(cron).getNextValidTimeAfter(new Date(lastTime));
+            return nextValidTimeAfter != null ? nextValidTimeAfter.getTime() : null;
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }
