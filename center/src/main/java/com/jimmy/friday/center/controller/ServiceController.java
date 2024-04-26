@@ -21,6 +21,7 @@ import com.jimmy.friday.center.service.*;
 import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.vo.*;
+import com.jimmy.friday.center.vo.gateway.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

@@ -22,7 +22,7 @@ import com.jimmy.friday.center.entity.GatewayServiceMethodInvokeMetrics;
 import com.jimmy.friday.center.service.GatewayServiceMethodInvokeMetricsService;
 import com.jimmy.friday.center.service.GatewayServiceMethodService;
 import com.jimmy.friday.center.utils.RedisConstants;
-import com.jimmy.friday.center.vo.MetricsVO;
+import com.jimmy.friday.center.vo.gateway.MetricsVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

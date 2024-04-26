@@ -19,7 +19,7 @@ import com.jimmy.friday.center.entity.GatewayAccountInvokeCount;
 import com.jimmy.friday.center.service.GatewayAccountInvokeCountService;
 import com.jimmy.friday.center.service.GatewayAccountService;
 import com.jimmy.friday.center.utils.RedisConstants;
-import com.jimmy.friday.center.vo.InvokeCountVO;
+import com.jimmy.friday.center.vo.gateway.InvokeCountVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
