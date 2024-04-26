@@ -19,6 +19,8 @@ public interface RedisConstants {
 
         String SCHEDULE_EXECUTE_FAIL_COUNT = "friday:schedule:execute:fail:count:";
 
+        String SCHEDULE_EXECUTE_JOB_LOCK = "friday:schedule:execute:job:lock:";
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.jimmy.friday.center.invoke;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -95,16 +96,18 @@ public class DubboInvoke extends BaseInvoke {
 
             ArrayList<Object> array = Lists.newArrayList();
             ArrayList<String> types = Lists.newArrayList();
-            if (MapUtil.isNotEmpty(args)) {
-                List<Param> params = method.getParams();
 
+            List<Param> params = method.getParams();
+            if (CollUtil.isNotEmpty(params)) {
                 for (Param param : params) {
-                    String value = args.get(param.getName());
-                    if (StrUtil.isNotEmpty(value)) {
-                        String paramType = param.getType();
-                        JSONValidator.Type type = JSONValidator.from(value).getType();
+                    String name = param.getName();
+                    String paramType = param.getType();
 
-                        types.add(paramType);
+                    types.add(paramType);
+
+                    String value = args.get(name);
+                    if (StrUtil.isNotEmpty(value)) {
+                        JSONValidator.Type type = JSONValidator.from(value).getType();
 
                         switch (type) {
                             case Array:

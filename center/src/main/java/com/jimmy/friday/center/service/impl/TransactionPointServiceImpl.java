@@ -21,17 +21,14 @@ import java.util.List;
 @Service("transactionPointService")
 public class TransactionPointServiceImpl extends ServiceImpl<TransactionPointDao, TransactionPoint> implements TransactionPointService {
 
-    @Autowired
-    private TransactionPointDao transactionPointDao;
-
     @Override
     public boolean updateStatus(TransactionStatusEnum update, String id, TransactionStatusEnum expect) {
-        return transactionPointDao.updateStatus(update.getState(), id, expect.getState());
+        return baseMapper.updateStatus(update.getState(), id, expect.getState());
     }
 
     @Override
     public boolean updateTimeout(Integer timeout, String id, Long timeoutTimestamp) {
-        return transactionPointDao.updateTimeout(timeout, id, timeoutTimestamp);
+        return baseMapper.updateTimeout(timeout, id, timeoutTimestamp);
     }
 
     @Override

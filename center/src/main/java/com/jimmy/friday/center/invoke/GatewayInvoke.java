@@ -1,7 +1,6 @@
 package com.jimmy.friday.center.invoke;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Param;
@@ -64,10 +63,6 @@ public class GatewayInvoke extends BaseInvoke {
 
         List<Param> params = method.getParams();
         if (CollUtil.isNotEmpty(params)) {
-            if (MapUtil.isEmpty(args)) {
-                throw new GatewayException("参数为空");
-            }
-
             for (Param param : params) {
                 String name = param.getName();
                 message.addInvokeParam(name, param.getType(), args.get(name));

@@ -4,6 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Initialize;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ public class ScheduleTimeRing implements Initialize, Close {
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
+    @Autowired
+    private ScheduleExecutePool scheduleExecutePool;
+
     @Override
     public void init() throws Exception {
         executor.submit((Runnable) () -> {
@@ -39,7 +43,9 @@ public class ScheduleTimeRing implements Initialize, Close {
                         }
                     }
 
+                    for (String ringItemDatum : ringItemData) {
 
+                    }
                 } catch (Exception e) {
                     log.error("时间轮运行失败", e);
                 }
