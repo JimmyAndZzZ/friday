@@ -34,9 +34,6 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
     @Autowired
     private AttachmentCache attachmentCache;
 
-    @Autowired
-    private GatewayAccountDao gatewayAccountDao;
-
     @Override
     public GatewayAccount register(String name) {
         GatewayAccount gatewayAccount = new GatewayAccount();
@@ -74,7 +71,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
 
     @Override
     public boolean deductBalance(BigDecimal cost, String uid) {
-        boolean b = gatewayAccountDao.deductBalance(cost, uid);
+        boolean b = baseMapper.deductBalance(cost, uid);
 
         if (b && cost.compareTo(new BigDecimal(0)) > 0) {
             Date now = new Date();
@@ -91,7 +88,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
     @Override
     public boolean rechargeBalance(BigDecimal cost, String uid) {
         attachmentCache.remove(RedisConstants.Gateway.GATEWAY_ACCOUNT_CACHE, uid);
-        return gatewayAccountDao.rechargeBalance(cost, uid);
+        return baseMapper.rechargeBalance(cost, uid);
     }
 
     @Override

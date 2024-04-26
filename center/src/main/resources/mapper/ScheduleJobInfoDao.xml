@@ -19,6 +19,19 @@
         <result property="nextTime" column="next_time" jdbcType="INTEGER"/>
     </resultMap>
 
+    <update id="updateExecuteTime" >
+        update schedule_job_info
+        set last_time=#{lastTime},
+            next_time=#{nextTime}
+        where id=#{id}
+    </update>
+
+    <update id="updateStatus" >
+        update schedule_job_info
+        set status=#{status}
+        where id=#{id}
+    </update>
+
 
 </mapper>
 

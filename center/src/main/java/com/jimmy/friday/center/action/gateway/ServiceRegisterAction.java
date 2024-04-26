@@ -8,7 +8,7 @@ import com.jimmy.friday.boot.message.gateway.ServiceRegister;
 import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.event.CallbackEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
-import com.jimmy.friday.center.support.RegisterSupport;
+import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

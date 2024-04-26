@@ -22,11 +22,11 @@ import com.jimmy.friday.center.entity.GatewayServiceMethod;
 import com.jimmy.friday.center.entity.GatewayServiceProvider;
 import com.jimmy.friday.center.event.InvokeEvent;
 import com.jimmy.friday.center.exception.FallbackException;
-import com.jimmy.friday.center.invoke.GatewayInvoke;
+import com.jimmy.friday.center.core.gateway.invoke.GatewayInvoke;
 import com.jimmy.friday.center.service.*;
-import com.jimmy.friday.center.support.InvokeSupport;
-import com.jimmy.friday.center.support.LoadSupport;
-import com.jimmy.friday.center.support.RegisterSupport;
+import com.jimmy.friday.center.core.gateway.support.InvokeSupport;
+import com.jimmy.friday.center.core.gateway.support.LoadSupport;
+import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.utils.RedisConstants;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 public class Gateway {
 
     @Autowired
-    private RouteElect routeElect;
+    private GatewayRouteElect gatewayRouteElect;
 
     @Autowired
     private LoadSupport loadSupport;
@@ -69,7 +69,7 @@ public class Gateway {
     private RegisterSupport registerSupport;
 
     @Autowired
-    private CallbackManager callbackManager;
+    private GatewayCallbackManager gatewayCallbackManager;
 
     @Autowired
     private AttachmentCache attachmentCache;
@@ -78,10 +78,10 @@ public class Gateway {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private RateLimiterManager rateLimiterManager;
+    private GatewayRateLimiterManager gatewayRateLimiterManager;
 
     @Autowired
-    private CircuitBreakerManager circuitBreakerManager;
+    private GatewayCircuitBreakerManager gatewayCircuitBreakerManager;
 
     @Autowired
     private GatewayAccountService gatewayAccountService;
@@ -125,7 +125,7 @@ public class Gateway {
             throw new GatewayException("服务提供列表为空");
         }
 
-        serviceList = routeElect.route(serviceList, gatewayRequest);
+        serviceList = gatewayRouteElect.route(serviceList, gatewayRequest);
 
         if (CollUtil.isEmpty(serviceList)) {
             throw new GatewayException("服务提供列表为空");
@@ -221,20 +221,20 @@ public class Gateway {
                 }
 
                 isSync = false;
-                callbackManager.registerCallback(id, applicationId);
+                gatewayCallbackManager.registerCallback(id, applicationId);
             }
             //勾子释放服务
             if (isSync) {
                 GatewaySession.addHook(() -> center.releaseService(service.getServiceId()));
             }
             //服务限流key为服务名:服务类型:服务版本:方法code
-            RateLimiter rateLimiter = rateLimiterManager.getRateLimiter(service.getName() + ":" + service.getType() + ":" + service.getVersion() + ":" + gatewayServiceMethod.getMethodCode());
+            RateLimiter rateLimiter = gatewayRateLimiterManager.getRateLimiter(service.getName() + ":" + service.getType() + ":" + service.getVersion() + ":" + gatewayServiceMethod.getMethodCode());
 
             log.info("开始调用服务,id:{}", id);
 
             service.use();
             //断路器包装
-            CheckedFunction0<GatewayResponse> circuitBreakerFunction = CircuitBreaker.decorateCheckedSupplier(circuitBreakerManager.getCircuitBreaker(service.getServiceId()), () -> {
+            CheckedFunction0<GatewayResponse> circuitBreakerFunction = CircuitBreaker.decorateCheckedSupplier(gatewayCircuitBreakerManager.getCircuitBreaker(service.getServiceId()), () -> {
                 try {
                     return GatewayResponse.ok(invokeSupport.invoke(service, method, arguments));
                 } catch (Exception e) {
@@ -329,7 +329,7 @@ public class Gateway {
             return gatewayResponse;
         } catch (Throwable e) {
             if (!isSync) {
-                callbackManager.cancelCallback(id);
+                gatewayCallbackManager.cancelCallback(id);
             }
 
             gatewayInvokeTrace.setErrorMessage(e.getMessage());

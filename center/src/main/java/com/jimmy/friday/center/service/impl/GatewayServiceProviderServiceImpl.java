@@ -36,12 +36,9 @@ public class GatewayServiceProviderServiceImpl extends ServiceImpl<GatewayServic
     @Autowired
     private GatewayServiceService gatewayServiceService;
 
-    @Autowired
-    private GatewayServiceProviderDao gatewayServiceProviderDao;
-
     @Override
     public boolean updateStatus(String status, Long id) {
-        return gatewayServiceProviderDao.updateStatus(status, id);
+        return baseMapper.updateStatus(status, id);
     }
 
     @Override
