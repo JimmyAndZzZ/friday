@@ -5,7 +5,7 @@ import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.ChannelAck;
 import com.jimmy.friday.boot.message.gateway.ChannelPush;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.support.ChannelSupport;
+import com.jimmy.friday.center.core.gateway.support.ChannelSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;

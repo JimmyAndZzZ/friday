@@ -9,7 +9,7 @@ import com.jimmy.friday.boot.message.gateway.InvokeCallback;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.event.NotifyEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
-import com.jimmy.friday.center.support.RegisterSupport;
+import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.Channel;

@@ -3,7 +3,7 @@ package com.jimmy.friday.center.other;
 import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.center.core.gateway.RegisterCenter;
 import com.jimmy.friday.center.event.SuspectedFailEvent;
-import com.jimmy.friday.center.support.RegisterSupport;
+import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

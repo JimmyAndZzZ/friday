@@ -3,7 +3,7 @@ package com.jimmy.friday.center.action.agent;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.agent.AgentShutdown;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.support.AgentSupport;
+import com.jimmy.friday.center.core.agent.support.AgentSupport;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

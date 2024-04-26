@@ -6,7 +6,7 @@ import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.service.GatewayAccountService;
-import com.jimmy.friday.center.support.ChannelSupport;
+import com.jimmy.friday.center.core.gateway.support.ChannelSupport;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

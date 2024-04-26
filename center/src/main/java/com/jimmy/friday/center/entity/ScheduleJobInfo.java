@@ -45,5 +45,7 @@ public class ScheduleJobInfo {
     private Long lastTime;
     //下次执行时间
     private Long nextTime;
+
+    private String applicationName;
 }
 

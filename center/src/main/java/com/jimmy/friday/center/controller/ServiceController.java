@@ -18,7 +18,7 @@ import com.jimmy.friday.center.Gateway;
 import com.jimmy.friday.center.core.gateway.RegisterCenter;
 import com.jimmy.friday.center.entity.*;
 import com.jimmy.friday.center.service.*;
-import com.jimmy.friday.center.support.RegisterSupport;
+import com.jimmy.friday.center.core.gateway.support.RegisterSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.vo.*;
 import io.swagger.annotations.Api;

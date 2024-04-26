@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 public class ScheduleInvoke implements Message {
 
-    private String id;
+    private String scheduleId;
 
     private Long traceId;
 
