@@ -44,7 +44,12 @@ public class ScheduleExecutePool implements Close {
             executor = this.lowPool;
         }
 
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        });
     }
 
     @Override

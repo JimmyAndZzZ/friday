@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Component
-public class RateLimiterManager {
+public class GatewayRateLimiterManager {
 
     private final ConcurrentMap<String, RateLimiter> rateLimiterMap = Maps.newConcurrentMap();
 

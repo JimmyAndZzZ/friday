@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class CallbackManager implements ApplicationListener<NotifyEvent> {
+public class GatewayCallbackManager implements ApplicationListener<NotifyEvent> {
 
     @Autowired
     private AttachmentCache attachmentCache;

@@ -38,7 +38,10 @@ public enum EventTypeEnum {
     CHANNEL_CANCEL_SUB("channelCancelSub","频道取消订阅"),
     CHANNEL_RECEIVE("channelReceive","频道接收"),
     CHANNEL_ACK("channelAck","频道消息确认"),
-    SCHEDULE_REGISTER("scheduleRegister","调度注册");
+    SCHEDULE_REGISTER("scheduleRegister","调度注册"),
+    SCHEDULE_INVOKE("scheduleInvoke","调度运行"),
+    SCHEDULE_ACK("scheduleAck","调度确认"),
+    SCHEDULE_RESULT("scheduleResult","调度结果");
 
     private String code;
 

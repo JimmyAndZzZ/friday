@@ -9,7 +9,7 @@ import com.jimmy.friday.boot.enums.ServiceStatusEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
-import com.jimmy.friday.center.core.gateway.CircuitBreakerManager;
+import com.jimmy.friday.center.core.gateway.GatewayCircuitBreakerManager;
 import com.jimmy.friday.center.core.gateway.RegisterCenter;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.GatewayService;
@@ -51,7 +51,7 @@ public class RegisterSupport implements Initialize {
     private GatewayServiceService gatewayServiceService;
 
     @Autowired
-    private CircuitBreakerManager circuitBreakerManager;
+    private GatewayCircuitBreakerManager gatewayCircuitBreakerManager;
 
     @Autowired
     private GatewayServiceMethodService gatewayServiceMethodService;
@@ -76,7 +76,7 @@ public class RegisterSupport implements Initialize {
                 attachmentCache,
                 gatewayServiceProviderService,
                 gatewayServiceMethodService,
-                circuitBreakerManager,
+                gatewayCircuitBreakerManager,
                 gatewayServiceService,
                 gatewayServiceMethodParamService);
         RegisterCenter put = registerCenterMap.putIfAbsent(serviceType, registerCenter);

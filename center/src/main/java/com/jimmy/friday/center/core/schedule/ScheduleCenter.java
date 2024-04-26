@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
-import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.ScheduleJobInfo;
@@ -16,23 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class ScheduleCenter implements Initialize, Close {
+public class ScheduleCenter implements Initialize {
 
     private static final int READ_COUNT = 200;
 
     private static final long PRE_READ_MS = 5000;
-
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     @Autowired
     private StripedLock stripedLock;
@@ -48,7 +41,7 @@ public class ScheduleCenter implements Initialize, Close {
 
     @Override
     public void init() throws Exception {
-        executor.submit((Runnable) () -> {
+        Thread thread = new Thread(() -> {
             while (true) {
                 try {
                     //整秒休眠
@@ -79,7 +72,7 @@ public class ScheduleCenter implements Initialize, Close {
 
                                         this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
                                         //时间范围内触发直接丢时间轮
-                                        if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJobInfo.getStatus()) && nowTime + PRE_READ_MS > scheduleJobInfo.getNextTime()) {
+                                        while (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJobInfo.getStatus()) && nowTime + PRE_READ_MS > scheduleJobInfo.getNextTime()) {
                                             scheduleTimeRing.push(scheduleJobInfo);
 
                                             this.updateScheduleJobInfo(scheduleJobInfo, scheduleJobInfo.getNextTime());
@@ -100,16 +93,14 @@ public class ScheduleCenter implements Initialize, Close {
                 }
             }
         });
+
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @Override
     public int sort() {
         return 1;
-    }
-
-    @Override
-    public void close() {
-        executor.shutdown();
     }
 
 

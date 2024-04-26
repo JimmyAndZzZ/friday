@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Component
-public class CircuitBreakerManager {
+public class GatewayCircuitBreakerManager {
 
     private final ConcurrentMap<String, CircuitBreaker> circuitBreakerMap = Maps.newConcurrentMap();
 

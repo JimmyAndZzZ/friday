@@ -20,11 +20,9 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
 @Component
-public class ScheduleTimeRing implements Initialize, Close {
+public class ScheduleTimeRing implements Initialize {
 
     private final ConcurrentMap<Integer, List<ScheduleJobInfo>> ringData = new ConcurrentHashMap<>();
-
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     @Autowired
     private ScheduleExecutePool scheduleExecutePool;
@@ -40,7 +38,7 @@ public class ScheduleTimeRing implements Initialize, Close {
 
     @Override
     public void init() throws Exception {
-        executor.submit((Runnable) () -> {
+        Thread thread = new Thread(() -> {
             while (true) {
                 try {
                     //整秒休眠
@@ -67,15 +65,13 @@ public class ScheduleTimeRing implements Initialize, Close {
                 }
             }
         });
+
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @Override
     public int sort() {
         return 0;
-    }
-
-    @Override
-    public void close() {
-        executor.shutdown();
     }
 }

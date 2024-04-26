@@ -18,7 +18,6 @@ import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.base.Invoke;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.StripedLock;
-import com.jimmy.friday.center.core.gateway.CircuitBreakerManager;
 import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceMethod;
 import com.jimmy.friday.center.entity.GatewayServiceProvider;
@@ -73,7 +72,7 @@ public class RegisterCenter {
 
     private final GatewayServiceService gatewayServiceService;
 
-    private final CircuitBreakerManager circuitBreakerManager;
+    private final GatewayCircuitBreakerManager gatewayCircuitBreakerManager;
 
     private final GatewayServiceMethodService gatewayServiceMethodService;
 
@@ -81,14 +80,14 @@ public class RegisterCenter {
 
     private final GatewayServiceMethodParamService gatewayServiceMethodParamService;
 
-    public RegisterCenter(ApplicationContext applicationContext, ServiceTypeEnum serviceType, StripedLock stripedLock, Invoke invoke, AttachmentCache attachmentCache, GatewayServiceProviderService gatewayServiceProviderService, GatewayServiceMethodService gatewayServiceMethodService, CircuitBreakerManager circuitBreakerManager, GatewayServiceService gatewayServiceService, GatewayServiceMethodParamService gatewayServiceMethodParamService) {
+    public RegisterCenter(ApplicationContext applicationContext, ServiceTypeEnum serviceType, StripedLock stripedLock, Invoke invoke, AttachmentCache attachmentCache, GatewayServiceProviderService gatewayServiceProviderService, GatewayServiceMethodService gatewayServiceMethodService, GatewayCircuitBreakerManager gatewayCircuitBreakerManager, GatewayServiceService gatewayServiceService, GatewayServiceMethodParamService gatewayServiceMethodParamService) {
         this.invoke = invoke;
         this.id = IdUtil.simpleUUID();
         this.stripedLock = stripedLock;
         this.attachmentCache = attachmentCache;
         this.applicationContext = applicationContext;
         this.process = new AtomicBoolean(false);
-        this.circuitBreakerManager = circuitBreakerManager;
+        this.gatewayCircuitBreakerManager = gatewayCircuitBreakerManager;
         this.gatewayServiceService = gatewayServiceService;
         this.stripedLockName = serviceType.toString() + "Register";
         this.executor = Executors.newScheduledThreadPool(1);
@@ -196,7 +195,7 @@ public class RegisterCenter {
                 }
             }
 
-            this.circuitBreakerManager.remove(serviceId);
+            this.gatewayCircuitBreakerManager.remove(serviceId);
             this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
             this.refreshVersion(name);
             this.warn(ServiceWarnTypeEnum.PROVIDER_OFFLINE, service);

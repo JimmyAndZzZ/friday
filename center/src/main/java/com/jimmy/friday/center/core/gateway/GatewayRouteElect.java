@@ -9,7 +9,6 @@ import com.googlecode.aviator.AviatorEvaluator;
 import com.jimmy.friday.boot.core.gateway.GatewayRequest;
 import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
-import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.entity.GatewayRouteRule;
 import com.jimmy.friday.center.service.GatewayRouteRuleService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class RouteElect {
+public class GatewayRouteElect {
 
     @Autowired
     private GatewayRouteRuleService gatewayRouteRuleService;
