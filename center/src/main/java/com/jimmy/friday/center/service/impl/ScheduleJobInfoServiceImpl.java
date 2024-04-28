@@ -6,7 +6,6 @@ import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
 import com.jimmy.friday.center.dao.ScheduleJobInfoDao;
 import com.jimmy.friday.center.entity.ScheduleJobInfo;
 import com.jimmy.friday.center.service.ScheduleJobInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

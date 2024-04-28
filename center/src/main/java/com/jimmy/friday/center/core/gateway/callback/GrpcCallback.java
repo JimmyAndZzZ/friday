@@ -34,7 +34,7 @@ public class GrpcCallback implements Callback {
     public void register(Service service) {
         GatewayService gatewayService = gatewayServiceService.getGatewayService(service);
 
-        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.Gateway.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
         lock.lock();
         try {
             for (GrpcMethodEnum value : GrpcMethodEnum.values()) {

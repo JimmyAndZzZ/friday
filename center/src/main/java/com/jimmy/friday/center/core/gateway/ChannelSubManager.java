@@ -45,7 +45,7 @@ public class ChannelSubManager {
     }
 
     public void putChannels(String appId, String name) {
-        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.Gateway.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
 
         lock.lock();
 
@@ -67,7 +67,7 @@ public class ChannelSubManager {
             return;
         }
 
-        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.Gateway.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
 
         lock.lock();
 

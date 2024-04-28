@@ -23,6 +23,8 @@ public interface RedisConstants {
 
         String SCHEDULE_EXECUTOR_REGISTER = "friday:schedule:execute:register:";
 
+        String SCHEDULE_EXECUTOR_CACHE = "friday:schedule:execute:cache";
+
         String SCHEDULE_EXECUTOR_APPLICATION_WEIGHT = "friday:schedule:executor:application:weight";
 
         String SCHEDULE_EXECUTOR_LAST_INVOKE_DATE = "friday:schedule:executor:last:invoke:date";
