@@ -1,6 +1,7 @@
 package com.jimmy.friday.center.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -102,9 +103,10 @@ public class GatewayServiceServiceImpl extends ServiceImpl<GatewayServiceDao, Ga
         if (b) {
             this.save(gatewayService);
             attachmentCache.mapper(RedisConstants.Gateway.GATEWAY_SERVICE_ID_MAPPER, key, gatewayService.getId());
+            return gatewayService;
+        }else {
+            return null;
         }
-
-        return gatewayService;
     }
 
     @Override

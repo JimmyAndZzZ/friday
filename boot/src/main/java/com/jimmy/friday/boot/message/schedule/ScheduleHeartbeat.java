@@ -1,13 +1,11 @@
 package com.jimmy.friday.boot.message.schedule;
 
 import com.jimmy.friday.boot.base.Message;
+import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class ScheduleHeartbeat implements Message {
@@ -16,7 +14,7 @@ public class ScheduleHeartbeat implements Message {
 
     private String applicationName;
 
-    private Set<String> running = new HashSet<>();
+    private List<ScheduleRunInfo> scheduleRunInfoList = new ArrayList<>();
 
     @Override
     public EventTypeEnum type() {

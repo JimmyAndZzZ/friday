@@ -26,6 +26,7 @@ import com.jimmy.friday.center.service.GatewayServiceMethodParamService;
 import com.jimmy.friday.center.service.GatewayServiceMethodService;
 import com.jimmy.friday.center.service.GatewayServiceProviderService;
 import com.jimmy.friday.center.service.GatewayServiceService;
+import com.jimmy.friday.center.utils.LockKeyConstants;
 import com.jimmy.friday.center.utils.RedisConstants;
 import com.jimmy.friday.center.vo.gateway.AdjustMethodArgumentVO;
 import com.jimmy.friday.center.vo.gateway.AdjustServiceArgumentVO;
@@ -89,7 +90,7 @@ public class RegisterCenter {
         this.process = new AtomicBoolean(false);
         this.gatewayCircuitBreakerManager = gatewayCircuitBreakerManager;
         this.gatewayServiceService = gatewayServiceService;
-        this.stripedLockName = serviceType.toString() + "Register";
+        this.stripedLockName = serviceType.toString() + LockKeyConstants.GATEWAY_SERVICE_REGISTER;
         this.executor = Executors.newScheduledThreadPool(1);
         this.gatewayServiceMethodService = gatewayServiceMethodService;
         this.gatewayServiceProviderService = gatewayServiceProviderService;
@@ -409,7 +410,11 @@ public class RegisterCenter {
             try {
                 GatewayService gatewayService = this.gatewayServiceService.getGatewayService(service);
 
-                Lock lock = stripedLock.getLocalLock("service", 8, gatewayService.getId());
+                if (gatewayService == null) {
+                    return;
+                }
+
+                Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
                 try {
                     lock.lock();
 

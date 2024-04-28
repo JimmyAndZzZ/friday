@@ -40,6 +40,10 @@ public class GatewayRouteRuleServiceImpl extends ServiceImpl<GatewayRouteRuleDao
     @Override
     public List<GatewayRouteRule> getRouteRules(String applicationName, String type, String version, String methodId, String methodCode) {
         GatewayService gatewayService = gatewayServiceService.getGatewayService(applicationName, type, version, null);
+        if (gatewayService == null) {
+            return Lists.newArrayList();
+        }
+
         GatewayServiceMethod gatewayServiceMethod = gatewayServiceMethodService.queryByMethod(methodCode, methodId, gatewayService.getId());
 
         List<GatewayRouteRule> cache = attachmentCache.attachmentList(RedisConstants.Gateway.ROUTE_RULE_CACHE, GatewayRouteRule.class, this::list);
