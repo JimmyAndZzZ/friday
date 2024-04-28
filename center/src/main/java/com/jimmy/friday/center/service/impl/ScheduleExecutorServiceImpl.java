@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.boot.enums.ScheduleExecutorStatusEnum;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
+import com.jimmy.friday.center.base.Obtain;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.ScheduleExecutorDao;
 import com.jimmy.friday.center.entity.GatewayService;
@@ -58,10 +59,15 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
 
     @Override
     public ScheduleExecutor query(String applicationName, String ip) {
-        QueryWrapper<ScheduleExecutor> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("application_name", applicationName);
-        queryWrapper.eq("ip_address", ip);
-        return this.getOne(queryWrapper);
+        return attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_EXECUTOR_CACHE, applicationName + ":" + ip, ScheduleExecutor.class, new Obtain<ScheduleExecutor>() {
+            @Override
+            public ScheduleExecutor obtain() {
+                QueryWrapper<ScheduleExecutor> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("application_name", applicationName);
+                queryWrapper.eq("ip_address", ip);
+                return getOne(queryWrapper);
+            }
+        });
     }
 }
 

@@ -110,15 +110,19 @@ public class AttachmentCache {
         Objects.requireNonNull(key);
         Objects.requireNonNull(attachment);
 
-        stringRedisTemplate.opsForHash().put(mainKey, key, JsonUtil.toString(attachment));
+        this.attachString(mainKey, key, JsonUtil.toString(attachment));
     }
 
     public void attach(String key, Object attachment) {
-        stringRedisTemplate.opsForValue().set(key, JsonUtil.toString(attachment));
+        this.attachString(key, JsonUtil.toString(attachment));
     }
 
     public void attachString(String key, String attachment) {
         stringRedisTemplate.opsForValue().set(key, attachment);
+    }
+
+    public void attachString(String mainKey, String key, String attachment) {
+        stringRedisTemplate.opsForHash().put(mainKey, key, attachment);
     }
 
     public void mapper(String mainKey, String key, Object value) {
@@ -126,7 +130,7 @@ public class AttachmentCache {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
-        stringRedisTemplate.opsForHash().put(mainKey, key, value.toString());
+        this.attachString(mainKey, key, value.toString());
     }
 
     public boolean setIfAbsent(String key, String attachment) {

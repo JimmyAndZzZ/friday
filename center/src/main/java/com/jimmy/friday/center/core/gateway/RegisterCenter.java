@@ -90,7 +90,7 @@ public class RegisterCenter {
         this.process = new AtomicBoolean(false);
         this.gatewayCircuitBreakerManager = gatewayCircuitBreakerManager;
         this.gatewayServiceService = gatewayServiceService;
-        this.stripedLockName = serviceType.toString() + LockKeyConstants.GATEWAY_SERVICE_REGISTER;
+        this.stripedLockName = serviceType.toString() + LockKeyConstants.Gateway.GATEWAY_SERVICE_REGISTER;
         this.executor = Executors.newScheduledThreadPool(1);
         this.gatewayServiceMethodService = gatewayServiceMethodService;
         this.gatewayServiceProviderService = gatewayServiceProviderService;
@@ -414,7 +414,7 @@ public class RegisterCenter {
                     return;
                 }
 
-                Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
+                Lock lock = stripedLock.getLocalLock(LockKeyConstants.Gateway.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
                 try {
                     lock.lock();
 
