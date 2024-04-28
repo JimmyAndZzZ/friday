@@ -14,7 +14,7 @@ import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.Heartbeat;
 import com.jimmy.friday.boot.other.AttributeConstants;
-import com.jimmy.friday.center.action.gateway.HeartbeatAction;
+import com.jimmy.friday.center.action.gateway.GatewayHeartbeatAction;
 import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -45,11 +45,11 @@ public class SpringCloudInvoke extends BaseInvoke {
     private RestTemplate restTemplate;
 
     @Autowired
-    private HeartbeatAction heartbeatAction;
+    private GatewayHeartbeatAction gatewayHeartbeatAction;
 
     @Override
     public boolean heartbeat(Service service) {
-        Heartbeat heartbeat = heartbeatAction.heartbeat(new Heartbeat(IdUtil.getSnowflake(1, 1).nextId()), service.getApplicationId());
+        Heartbeat heartbeat = gatewayHeartbeatAction.heartbeat(new Heartbeat(IdUtil.getSnowflake(1, 1).nextId()), service.getApplicationId());
         return heartbeat != null;
     }
 

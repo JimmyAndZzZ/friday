@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.process;
+package com.jimmy.friday.framework.process.transaction;
 
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;

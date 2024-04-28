@@ -3,9 +3,7 @@ package com.jimmy.friday.framework.config;
 import com.jimmy.friday.framework.callback.GatewayCallback;
 import com.jimmy.friday.framework.bootstrap.GatewayBootstrap;
 import com.jimmy.friday.framework.core.ConfigLoad;
-import com.jimmy.friday.framework.process.*;
-import com.jimmy.friday.framework.support.*;
-import com.jimmy.friday.framework.process.*;
+import com.jimmy.friday.framework.process.gateway.*;
 import com.jimmy.friday.framework.support.*;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -49,8 +47,8 @@ public class GatewayConfig {
     protected static class ProcessConfig {
 
         @Bean
-        public HeartbeatProcess heartbeatProcess() {
-            return new HeartbeatProcess();
+        public GatewayHeartbeatProcess heartbeatProcess() {
+            return new GatewayHeartbeatProcess();
         }
 
         @Bean

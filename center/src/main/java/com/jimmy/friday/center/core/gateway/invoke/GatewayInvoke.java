@@ -8,7 +8,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.Heartbeat;
-import com.jimmy.friday.center.action.gateway.HeartbeatAction;
+import com.jimmy.friday.center.action.gateway.GatewayHeartbeatAction;
 import com.jimmy.friday.center.core.gateway.GatewayInvokeFuture;
 import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.event.SuspectedFailEvent;
@@ -27,14 +27,14 @@ import java.util.Map;
 public class GatewayInvoke extends BaseInvoke {
 
     @Autowired
-    private HeartbeatAction heartbeatAction;
+    private GatewayHeartbeatAction gatewayHeartbeatAction;
 
     @Autowired
     private ApplicationContext applicationContext;
 
     @Override
     public boolean heartbeat(Service service) {
-        Heartbeat heartbeat = heartbeatAction.heartbeat(new Heartbeat(IdUtil.getSnowflake(1, 1).nextId()), service.getApplicationId());
+        Heartbeat heartbeat = gatewayHeartbeatAction.heartbeat(new Heartbeat(IdUtil.getSnowflake(1, 1).nextId()), service.getApplicationId());
         return heartbeat != null;
     }
 

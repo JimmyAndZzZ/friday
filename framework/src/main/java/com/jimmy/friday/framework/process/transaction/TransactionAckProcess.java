@@ -1,8 +1,8 @@
-package com.jimmy.friday.framework.process;
+package com.jimmy.friday.framework.process.transaction;
 
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.message.transaction.TransactionRefund;
+import com.jimmy.friday.boot.message.transaction.TransactionAck;
 import com.jimmy.friday.framework.base.Process;
 import com.jimmy.friday.framework.transaction.TransactionSession;
 import com.jimmy.friday.framework.utils.JsonUtil;
@@ -10,11 +10,11 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TransactionRefundProcess implements Process {
+public class TransactionAckProcess implements Process {
 
     private TransactionSession transactionSession;
 
-    public TransactionRefundProcess(TransactionSession transactionSession) {
+    public TransactionAckProcess(TransactionSession transactionSession) {
         this.transactionSession = transactionSession;
     }
 
@@ -22,14 +22,12 @@ public class TransactionRefundProcess implements Process {
     public void process(Event event, ChannelHandlerContext ctx) {
         String message = event.getMessage();
 
-        log.info("收到事务提交退回:{}", message);
-
-        TransactionRefund transactionRefund = JsonUtil.parseObject(message, TransactionRefund.class);
-        transactionSession.callback(transactionRefund.getTransactionFacts());
+        TransactionAck transactionSubmitAck = JsonUtil.parseObject(message, TransactionAck.class);
+        transactionSession.notify(transactionSubmitAck.getTraceId(), transactionSubmitAck.getAckTypeEnum());
     }
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.TRANSACTION_REFUND;
+        return EventTypeEnum.TRANSACTION_ACK;
     }
 }

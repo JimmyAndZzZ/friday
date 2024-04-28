@@ -18,7 +18,7 @@ import com.jimmy.friday.framework.annotation.GatewayReference;
 import com.jimmy.friday.framework.base.Register;
 import com.jimmy.friday.framework.other.ConditionContextImpl;
 import com.jimmy.friday.framework.core.ConfigLoad;
-import com.jimmy.friday.framework.process.RpcProtocolInvokeProcess;
+import com.jimmy.friday.framework.process.gateway.RpcProtocolInvokeProcess;
 import com.jimmy.friday.framework.register.BaseRegister;
 import com.jimmy.friday.framework.utils.JsonUtil;
 import org.springframework.beans.BeanUtils;

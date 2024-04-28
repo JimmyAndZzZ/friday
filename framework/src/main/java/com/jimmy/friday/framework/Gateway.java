@@ -13,7 +13,7 @@ import com.jimmy.friday.boot.other.ApiConstants;
 import com.jimmy.friday.boot.other.AttributeConstants;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.framework.core.ConfigLoad;
-import com.jimmy.friday.framework.process.RpcProtocolInvokeProcess;
+import com.jimmy.friday.framework.process.gateway.RpcProtocolInvokeProcess;
 import com.jimmy.friday.framework.support.CallbackSupport;
 import com.jimmy.friday.framework.utils.JsonUtil;
 
