@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.process;
+package com.jimmy.friday.framework.process.gateway;
 
 import cn.hutool.core.util.IdUtil;
 import com.jimmy.friday.boot.core.Event;

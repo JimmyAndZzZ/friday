@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class HeartbeatAction implements Action<Heartbeat> {
+public class GatewayHeartbeatAction implements Action<Heartbeat> {
 
     private final Map<Long, Heartbeat> result = Maps.newConcurrentMap();
 
@@ -45,7 +45,7 @@ public class HeartbeatAction implements Action<Heartbeat> {
                 return null;
             }
 
-            channel.writeAndFlush(new Event(EventTypeEnum.HEARTBEAT, JSON.toJSONString(heartbeat)));
+            channel.writeAndFlush(new Event(EventTypeEnum.GATEWAY_HEARTBEAT, JSON.toJSONString(heartbeat)));
 
             countDownLatch.await(60, TimeUnit.SECONDS);
             //等待超时
@@ -62,6 +62,6 @@ public class HeartbeatAction implements Action<Heartbeat> {
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.HEARTBEAT;
+        return EventTypeEnum.GATEWAY_HEARTBEAT;
     }
 }

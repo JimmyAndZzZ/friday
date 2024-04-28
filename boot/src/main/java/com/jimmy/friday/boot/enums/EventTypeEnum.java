@@ -11,7 +11,7 @@ public enum EventTypeEnum {
     SERVICE_DESTROY("serviceDestroy", "服务下线"),
     SERVICE_RELOAD("serviceReload", "服务重载"),
     AGENT_REGISTER("agentRegister", "agent注册"),
-    HEARTBEAT("heartbeat", "心跳检测"),
+    GATEWAY_HEARTBEAT("heartbeat", "心跳检测"),
     GATEWAY_INVOKE("gatewayInvoke", "网关调用"),
     RPC_PROTOCOL_INVOKE("rpcProtocolInvoke", "RPC调用"),
     INVOKE_CALLBACK("invokeCallback", "调用回调"),
@@ -41,7 +41,8 @@ public enum EventTypeEnum {
     SCHEDULE_REGISTER("scheduleRegister","调度注册"),
     SCHEDULE_INVOKE("scheduleInvoke","调度运行"),
     SCHEDULE_ACK("scheduleAck","调度确认"),
-    SCHEDULE_RESULT("scheduleResult","调度结果");
+    SCHEDULE_RESULT("scheduleResult","调度结果"),
+    SCHEDULE_HEARTBEAT("scheduleHeartbeat","调度心跳");
 
     private String code;
 

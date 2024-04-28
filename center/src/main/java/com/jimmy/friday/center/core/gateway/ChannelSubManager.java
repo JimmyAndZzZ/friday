@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
+import com.jimmy.friday.center.utils.LockKeyConstants;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class ChannelSubManager {
     }
 
     public void putChannels(String appId, String name) {
-        Lock lock = stripedLock.getLocalLock("app", 16, appId + ":" + name);
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
 
         lock.lock();
 
@@ -66,7 +67,7 @@ public class ChannelSubManager {
             return;
         }
 
-        Lock lock = stripedLock.getLocalLock("app", 16, appId + ":" + name);
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_CHANNEL_SUB, 16, appId + ":" + name);
 
         lock.lock();
 

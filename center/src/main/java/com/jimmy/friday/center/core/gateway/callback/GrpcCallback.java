@@ -12,6 +12,7 @@ import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceMethod;
 import com.jimmy.friday.center.service.GatewayServiceMethodService;
 import com.jimmy.friday.center.service.GatewayServiceService;
+import com.jimmy.friday.center.utils.LockKeyConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,7 @@ public class GrpcCallback implements Callback {
     public void register(Service service) {
         GatewayService gatewayService = gatewayServiceService.getGatewayService(service);
 
-        Lock lock = stripedLock.getLocalLock("service", 8, gatewayService.getId());
+        Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
         lock.lock();
         try {
             for (GrpcMethodEnum value : GrpcMethodEnum.values()) {

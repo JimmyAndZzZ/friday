@@ -21,6 +21,6 @@ public class Heartbeat implements Message {
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.HEARTBEAT;
+        return EventTypeEnum.GATEWAY_HEARTBEAT;
     }
 }

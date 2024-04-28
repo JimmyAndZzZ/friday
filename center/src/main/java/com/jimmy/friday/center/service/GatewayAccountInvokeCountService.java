@@ -2,7 +2,7 @@ package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jimmy.friday.center.entity.GatewayAccountInvokeCount;
-import com.jimmy.friday.center.vo.InvokeCountVO;
+import com.jimmy.friday.center.vo.gateway.InvokeCountVO;
 
 import java.util.List;
 

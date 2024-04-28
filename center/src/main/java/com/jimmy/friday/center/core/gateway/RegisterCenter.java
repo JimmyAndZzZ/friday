@@ -26,9 +26,10 @@ import com.jimmy.friday.center.service.GatewayServiceMethodParamService;
 import com.jimmy.friday.center.service.GatewayServiceMethodService;
 import com.jimmy.friday.center.service.GatewayServiceProviderService;
 import com.jimmy.friday.center.service.GatewayServiceService;
+import com.jimmy.friday.center.utils.LockKeyConstants;
 import com.jimmy.friday.center.utils.RedisConstants;
-import com.jimmy.friday.center.vo.AdjustMethodArgumentVO;
-import com.jimmy.friday.center.vo.AdjustServiceArgumentVO;
+import com.jimmy.friday.center.vo.gateway.AdjustMethodArgumentVO;
+import com.jimmy.friday.center.vo.gateway.AdjustServiceArgumentVO;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -89,7 +90,7 @@ public class RegisterCenter {
         this.process = new AtomicBoolean(false);
         this.gatewayCircuitBreakerManager = gatewayCircuitBreakerManager;
         this.gatewayServiceService = gatewayServiceService;
-        this.stripedLockName = serviceType.toString() + "Register";
+        this.stripedLockName = serviceType.toString() + LockKeyConstants.GATEWAY_SERVICE_REGISTER;
         this.executor = Executors.newScheduledThreadPool(1);
         this.gatewayServiceMethodService = gatewayServiceMethodService;
         this.gatewayServiceProviderService = gatewayServiceProviderService;
@@ -109,7 +110,7 @@ public class RegisterCenter {
                     String name = entry.getKey();
                     Service service = entry.getValue();
 
-                    String redisKey = this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service);
+                    String redisKey = this.getServiceRedisKey(service);
 
                     if (this.invoke.heartbeat(service)) {
                         log.debug("收到心跳响应:{},地址:{},端口:{}", name, service.getIpAddress(), service.getPort());
@@ -196,7 +197,7 @@ public class RegisterCenter {
             }
 
             this.gatewayCircuitBreakerManager.remove(serviceId);
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(service));
             this.refreshVersion(name);
             this.warn(ServiceWarnTypeEnum.PROVIDER_OFFLINE, service);
         } finally {
@@ -293,7 +294,7 @@ public class RegisterCenter {
 
             this.serviceMap.put(serviceId, service);
             this.suspected.remove(service.getApplicationId());
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(service));
             this.refreshVersion(name);
             this.registerService(service, id);
             return true;
@@ -331,7 +332,7 @@ public class RegisterCenter {
 
             this.serviceMap.put(serviceId, service);
             this.suspected.remove(service.getApplicationId());
-            this.attachmentCache.remove(this.getServiceRedisKey(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT, service));
+            this.attachmentCache.remove(this.getServiceRedisKey(service));
             this.refreshVersion(name);
             this.registerService(service, id);
         } finally {
@@ -409,7 +410,11 @@ public class RegisterCenter {
             try {
                 GatewayService gatewayService = this.gatewayServiceService.getGatewayService(service);
 
-                Lock lock = stripedLock.getLocalLock("service", 8, gatewayService.getId());
+                if (gatewayService == null) {
+                    return;
+                }
+
+                Lock lock = stripedLock.getLocalLock(LockKeyConstants.GATEWAY_SERVICE_OPERATE, 8, gatewayService.getId());
                 try {
                     lock.lock();
 
@@ -444,7 +449,7 @@ public class RegisterCenter {
      * @param service
      * @return
      */
-    private String getServiceRedisKey(String prefix, Service service) {
-        return StrUtil.builder().append(prefix).append(this.id).append(":").append(service.getType()).append(":").append(service.getName()).toString();
+    private String getServiceRedisKey(Service service) {
+        return StrUtil.builder().append(RedisConstants.Gateway.HEARTBEAT_FAIL_COUNT).append(this.id).append(":").append(service.getType()).append(":").append(service.getName()).toString();
     }
 }
