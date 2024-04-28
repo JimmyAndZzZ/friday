@@ -146,6 +146,14 @@ public class ScheduleSession {
         return this.scheduleExecutorService.query(route.getApplicationName(), route.getIp());
     }
 
+
+    private String getApplicationId(ScheduleExecutor scheduleExecutor) {
+        String ipAddress = scheduleExecutor.getIpAddress();
+        String applicationName = scheduleExecutor.getApplicationName();
+
+
+    }
+
     /**
      * 路由选择
      *
