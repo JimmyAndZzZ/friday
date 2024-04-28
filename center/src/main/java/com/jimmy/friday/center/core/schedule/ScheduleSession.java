@@ -7,10 +7,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.StripedLock;
-import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.service.ScheduleExecutorService;
 import com.jimmy.friday.center.utils.LockKeyConstants;
 import com.jimmy.friday.center.utils.RedisConstants;
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.Lock;
 @Component
 public class ScheduleSession {
 
-    private final Map<String, Executor> executor = Maps.newHashMap();
+    private final Map<String, ScheduleExecutor> executor = Maps.newHashMap();
 
     private final Map<String, List<ScheduleRunInfo>> runInfo = Maps.newHashMap();
 
@@ -60,7 +60,7 @@ public class ScheduleSession {
             Set<String> put = this.session.computeIfAbsent(applicationName, k -> Sets.newHashSet());
             put.add(applicationId);
 
-            Executor exist = this.executor.get(applicationId);
+            ScheduleExecutor exist = this.executor.get(applicationId);
             if (exist != null) {
                 //下线原有
                 this.scheduleExecutorService.offline(exist.getApplicationName(), exist.getIp());
@@ -69,7 +69,7 @@ public class ScheduleSession {
                 exist.setApplicationId(applicationId);
                 exist.setApplicationName(applicationName);
             } else {
-                Executor executor = new Executor();
+                ScheduleExecutor executor = new ScheduleExecutor();
                 executor.setIp(ip);
                 executor.setApplicationId(applicationId);
                 executor.setApplicationName(applicationName);
@@ -125,7 +125,7 @@ public class ScheduleSession {
             return null;
         }
 
-        List<Executor> executors = Lists.newArrayList();
+        List<ScheduleExecutor> executors = Lists.newArrayList();
 
         for (String applicationId : applicationIds) {
             if (CollUtil.isNotEmpty(ignore) && ignore.contains(applicationId)) {
@@ -137,7 +137,7 @@ public class ScheduleSession {
                 continue;
             }
 
-            Executor executor = this.executor.get(applicationId);
+            ScheduleExecutor executor = this.executor.get(applicationId);
             if (executor == null) {
                 continue;
             }
@@ -150,16 +150,9 @@ public class ScheduleSession {
             return null;
         }
 
-        Executor route = this.route(executors);
-        return this.scheduleExecutorService.query(route.getApplicationName(), route.getIp());
-    }
-
-
-    private String getApplicationId(ScheduleExecutor scheduleExecutor) {
-        String ipAddress = scheduleExecutor.getIpAddress();
-        String applicationName = scheduleExecutor.getApplicationName();
-
-
+        ScheduleExecutor route = this.route(executors);
+        route.setId(this.scheduleExecutorService.query(route.getApplicationName(), route.getIp()).getId());
+        return route;
     }
 
     /**
@@ -168,15 +161,15 @@ public class ScheduleSession {
      * @param executors
      * @return
      */
-    private Executor route(List<Executor> executors) {
+    private ScheduleExecutor route(List<ScheduleExecutor> executors) {
         if (executors.size() == 1) {
             return executors.stream().findFirst().get();
         }
         // 计算总权重
-        int totalWeight = executors.stream().mapToInt(Executor::getWeight).sum();
+        int totalWeight = executors.stream().mapToInt(ScheduleExecutor::getWeight).sum();
         // 计算每个执行器被选取的综合概率
         List<Double> probabilities = new ArrayList<>();
-        for (Executor executor : executors) {
+        for (ScheduleExecutor executor : executors) {
             double weightProb = 0.8 * ((double) executor.getWeight() / totalWeight);
             double timeProb = 0.2 * ((double) (System.currentTimeMillis() - executor.getLastInvokeTime()) / System.currentTimeMillis());
             double totalProb = weightProb + timeProb;
@@ -193,19 +186,5 @@ public class ScheduleSession {
         }
 
         return executors.get(executors.size() - 1);
-    }
-
-    @Data
-    private static class Executor implements Serializable {
-
-        private String applicationName;
-
-        private String ip;
-
-        private Long lastInvokeTime;
-
-        private Integer weight;
-
-        private String applicationId;
     }
 }

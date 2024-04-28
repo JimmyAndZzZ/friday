@@ -18,7 +18,7 @@ import java.util.Date;
 public class ScheduleExecutor  {
 
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String status;
 
