@@ -406,7 +406,6 @@ public class RegisterCenter {
      */
     private void registerService(Service service, String id) {
         if (Boolean.TRUE.equals(this.attachmentCache.setIfAbsent(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id, YesOrNoEnum.YES.getCode(), 60L, TimeUnit.SECONDS))) {
-
             try {
                 GatewayService gatewayService = this.gatewayServiceService.getGatewayService(service);
 

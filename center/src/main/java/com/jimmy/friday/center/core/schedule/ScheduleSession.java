@@ -35,9 +35,7 @@ public class ScheduleSession {
 
     private final ConcurrentMap<String, Set<String>> session = Maps.newConcurrentMap();
 
-    private final Cache<String, Long> heartbeatSign = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
+    private final Cache<String, Long> heartbeatSign = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
             .build();
 
     @Autowired
@@ -62,11 +60,21 @@ public class ScheduleSession {
             Set<String> put = this.session.computeIfAbsent(applicationName, k -> Sets.newHashSet());
             put.add(applicationId);
 
-            Executor executor = new Executor();
-            executor.setIp(ip);
-            executor.setApplicationId(applicationId);
-            executor.setApplicationName(applicationName);
-            this.executor.put(applicationId, executor);
+            Executor exist = this.executor.get(applicationId);
+            if (exist != null) {
+                //下线原有
+                this.scheduleExecutorService.offline(exist.getApplicationName(), exist.getIp());
+
+                exist.setIp(ip);
+                exist.setApplicationId(applicationId);
+                exist.setApplicationName(applicationName);
+            } else {
+                Executor executor = new Executor();
+                executor.setIp(ip);
+                executor.setApplicationId(applicationId);
+                executor.setApplicationName(applicationName);
+                this.executor.put(applicationId, executor);
+            }
 
             this.scheduleExecutorService.register(applicationName, ip);
         } finally {
