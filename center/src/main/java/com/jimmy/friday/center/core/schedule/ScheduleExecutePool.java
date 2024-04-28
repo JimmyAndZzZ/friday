@@ -2,7 +2,7 @@ package com.jimmy.friday.center.core.schedule;
 
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.core.AttachmentCache;
-import com.jimmy.friday.center.entity.ScheduleJobInfo;
+import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class ScheduleExecutePool implements Close {
     private AttachmentCache attachmentCache;
 
 
-    public void execute(ScheduleJobInfo scheduleJobInfo) {
-        Integer id = scheduleJobInfo.getId();
+    public void execute(ScheduleJob scheduleJob) {
+        Integer id = scheduleJob.getId();
         //默认用高
         ThreadPoolExecutor executor = this.highPool;
 

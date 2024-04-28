@@ -1,17 +1,17 @@
 package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jimmy.friday.center.entity.ScheduleJobInfo;
+import com.jimmy.friday.center.entity.ScheduleJob;
 
 import java.util.List;
 
 /**
- * (ScheduleJobInfo)表服务接口
+ * (ScheduleJob)表服务接口
  *
  * @author makejava
  * @since 2024-04-24 17:29:27
  */
-public interface ScheduleJobInfoService extends IService<ScheduleJobInfo> {
+public interface ScheduleJobService extends IService<ScheduleJob> {
 
     void updateExecuteTime(Long lastTime, Long nextTime, Integer id);
 
@@ -19,6 +19,6 @@ public interface ScheduleJobInfoService extends IService<ScheduleJobInfo> {
 
     boolean needExecute(Integer id, Long nextTime);
 
-    List<ScheduleJobInfo> queryExecuteJobs(Long time, Integer size);
+    List<ScheduleJob> queryExecuteJobs(Long time, Integer size);
 }
 

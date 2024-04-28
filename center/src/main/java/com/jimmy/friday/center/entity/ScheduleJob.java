@@ -9,13 +9,13 @@ import java.util.Date;
 
 
 /**
- * (ScheduleJobInfo)表实体类
+ * (ScheduleJob)表实体类
  *
  * @author makejava
  * @since 2024-04-24 17:29:27
  */
 @Data
-public class ScheduleJobInfo {
+public class ScheduleJob {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
