@@ -15,4 +15,6 @@ public class ScheduleInfo implements Serializable {
 
     private String scheduleId;
 
+    private String cron;
+
 }

@@ -27,8 +27,6 @@ public class ScheduleJob {
     private Date createDate;
 
     private Date updateDate;
-    //路由策略
-    private String routeStrategy;
     //唯一标识
     private String code;
     //运行参数
@@ -47,5 +45,7 @@ public class ScheduleJob {
     private Long nextTime;
 
     private String applicationName;
+
+    private String isManual;
 }
 

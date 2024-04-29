@@ -1,9 +1,15 @@
 package com.jimmy.friday.center.core.schedule;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.ScheduleJob;
@@ -15,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -34,10 +40,10 @@ public class ScheduleCenter implements Initialize {
     private ScheduleTimeRing scheduleTimeRing;
 
     @Autowired
-    private ScheduleExecutePool scheduleExecutePool;
+    private ScheduleJobService scheduleJobService;
 
     @Autowired
-    private ScheduleJobService scheduleJobService;
+    private ScheduleExecutePool scheduleExecutePool;
 
     @Override
     public void init() throws Exception {
@@ -101,6 +107,62 @@ public class ScheduleCenter implements Initialize {
     @Override
     public int sort() {
         return 1;
+    }
+
+    public void register(Collection<ScheduleInfo> scheduleInfos, String applicationName) {
+        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName, 60L, TimeUnit.SECONDS)) {
+            try {
+                if (CollUtil.isEmpty(scheduleInfos)) {
+                    scheduleJobService.removeByApplicationName(applicationName);
+                    return;
+                }
+
+                Date now = new Date();
+                List<ScheduleJob> insert = Lists.newArrayList();
+                //之前已存在的
+                List<ScheduleJob> scheduleJobs = scheduleJobService.queryByApplicationName(applicationName);
+                Map<String, ScheduleJob> map = CollUtil.isEmpty(scheduleJobs) ? Maps.newHashMap() : scheduleJobs.stream().collect(Collectors.toMap(ScheduleJob::getCode, g -> g));
+
+                for (ScheduleInfo scheduleInfo : scheduleInfos) {
+                    String cron = scheduleInfo.getCron();
+                    String scheduleId = scheduleInfo.getScheduleId();
+
+                    ScheduleJob scheduleJob = map.remove(scheduleId);
+                    if (scheduleJob != null) {
+                        //更新下次执行时间
+                        if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
+                            Long lastTime = scheduleJob.getLastTime();
+                            scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), scheduleJob.getId());
+                        }
+                    } else {
+                        scheduleJob = new ScheduleJob();
+                        scheduleJob.setCron(cron);
+                        scheduleJob.setCreateDate(now);
+                        scheduleJob.setUpdateDate(now);
+                        scheduleJob.setCode(scheduleId);
+                        scheduleJob.setTimeout(0);
+                        scheduleJob.setRetryCount(0);
+                        scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
+                        scheduleJob.setNextTime(this.generateNextTime(cron, System.currentTimeMillis()));
+                        scheduleJob.setApplicationName(applicationName);
+                        scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
+                        insert.add(scheduleJob);
+                    }
+                }
+
+                if (CollUtil.isNotEmpty(insert)) {
+                    scheduleJobService.saveBatch(insert);
+                }
+
+                if (MapUtil.isNotEmpty(map)) {
+                    scheduleJobService.removeByIds(map.values().stream().map(ScheduleJob::getId).collect(Collectors.toSet()));
+                }
+            } catch (Exception e) {
+                log.error("保存调度任务失败", e);
+            } finally {
+                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName);
+            }
+        }
     }
 
 

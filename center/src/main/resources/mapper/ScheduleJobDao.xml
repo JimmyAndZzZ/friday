@@ -22,13 +22,22 @@
     <update id="updateExecuteTime" >
         update schedule_job_info
         set last_time=#{lastTime},
-            next_time=#{nextTime}
+            next_time=#{nextTime},
+            update_date=now()
+        where id=#{id}
+    </update>
+
+    <update id="updateNextExecuteTime" >
+        update schedule_job_info
+        set next_time=#{nextTime},
+            update_date=now()
         where id=#{id}
     </update>
 
     <update id="updateStatus" >
         update schedule_job_info
-        set status=#{status}
+        set status=#{status},
+            update_date=now()
         where id=#{id}
     </update>
 

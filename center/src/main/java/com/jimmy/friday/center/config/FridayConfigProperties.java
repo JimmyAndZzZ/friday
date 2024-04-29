@@ -17,8 +17,6 @@ public class FridayConfigProperties {
 
     private String kafkaServer;
 
-    private String remindUrl;
-
     private ProtocolEnum protocolType = ProtocolEnum.MEMORY;
 
     private ProtocolProperty protocol = new ProtocolProperty();

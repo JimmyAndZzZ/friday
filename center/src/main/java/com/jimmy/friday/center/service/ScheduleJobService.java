@@ -13,6 +13,14 @@ import java.util.List;
  */
 public interface ScheduleJobService extends IService<ScheduleJob> {
 
+    void updateNextExecuteTime(Long nextTime, Integer id);
+
+    void removeByApplicationName(String applicationName);
+
+    List<ScheduleJob> queryByApplicationName(String applicationName);
+
+    ScheduleJob queryByCodeAndApplicationName(String code, String applicationName);
+
     void updateExecuteTime(Long lastTime, Long nextTime, Integer id);
 
     void updateStatus(String status, Integer id);
