@@ -422,6 +422,8 @@ public class RegisterCenter {
                 } finally {
                     lock.unlock();
                 }
+            } catch (Exception e) {
+                log.error("保存服务失败", e);
             } finally {
                 this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id);
             }
