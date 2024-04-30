@@ -21,7 +21,6 @@ public class AckAction implements Action<Ack>, ApplicationContextAware {
     public void action(Ack ack, ChannelHandlerContext channelHandlerContext) {
         AckEvent ackEvent = new AckEvent(applicationContext);
         ackEvent.setId(ack.getId());
-        ackEvent.setAckType(ack.getAckType());
         applicationContext.publishEvent(ackEvent);
     }
 

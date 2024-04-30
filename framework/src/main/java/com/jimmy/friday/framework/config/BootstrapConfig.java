@@ -4,6 +4,7 @@ import com.jimmy.friday.framework.Boot;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.core.DestroyHook;
 import com.jimmy.friday.framework.core.GlobalCache;
+import com.jimmy.friday.framework.process.AckProcess;
 import com.jimmy.friday.framework.support.TransmitSupport;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -12,6 +13,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BootstrapConfig {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AckProcess ackProcess() {
+        return new AckProcess();
+    }
 
     @Bean
     @ConditionalOnMissingBean

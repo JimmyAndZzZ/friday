@@ -3,6 +3,7 @@ package com.jimmy.friday.framework.netty.client;
 import cn.hutool.core.map.MapUtil;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
+import com.jimmy.friday.boot.message.Ack;
 import com.jimmy.friday.boot.message.ClientConnect;
 import com.jimmy.friday.framework.base.Callback;
 import com.jimmy.friday.framework.base.Process;
@@ -16,13 +17,11 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.RejectedExecutionException;
 
 @Slf4j
 @ChannelHandler.Sharable
 public class ClientHandler extends SimpleChannelInboundHandler<Event> {
-
-    private final ExecutorService executorService = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     private final Map<EventTypeEnum, Process> processMap = new HashMap<>();
 
@@ -69,7 +68,13 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         }
 
         try {
-            executorService.submit(() -> {
+            ctx.executor().execute(() -> {
+                if (eventTypeEnum.getIsNeedAck()) {
+                    Ack ack = new Ack();
+                    ack.setId(event.getId());
+                    ctx.writeAndFlush(new Event(EventTypeEnum.ACK, JsonUtil.toString(ack)));
+                }
+
                 Process process = processMap.get(eventTypeEnum);
                 if (process != null) {
                     process.process(event, ctx);

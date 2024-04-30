@@ -3,6 +3,7 @@ package com.jimmy.friday.client.netty.client;
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
+import com.jimmy.friday.boot.message.Ack;
 import com.jimmy.friday.boot.message.ClientConnect;
 import com.jimmy.friday.boot.message.gateway.ChannelSub;
 import com.jimmy.friday.client.base.Handler;
@@ -59,15 +60,23 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Event> {
     protected void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
         String type = event.getType();
 
-        EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(type);
-        if (eventTypeEnum == null) {
-            return;
-        }
+        ctx.executor().execute(() -> {
+            EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(type);
+            if (eventTypeEnum == null) {
+                return;
+            }
 
-        Handler handler = handlerMap.get(eventTypeEnum);
-        if (handler != null) {
-            handler.handler(event, ctx);
-        }
+            if (eventTypeEnum.getIsNeedAck()) {
+                Ack ack = new Ack();
+                ack.setId(event.getId());
+                ctx.writeAndFlush(new Event(EventTypeEnum.ACK, JsonUtil.toString(ack)));
+            }
+
+            Handler handler = handlerMap.get(eventTypeEnum);
+            if (handler != null) {
+                handler.handler(event, ctx);
+            }
+        });
     }
 
     @Override
