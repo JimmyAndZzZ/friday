@@ -4,20 +4,15 @@ import com.jimmy.friday.boot.base.Message;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Data
-public class ScheduleInvoke implements Message {
+public class ScheduleInterrupt implements Message {
 
     private Long traceId;
 
     private String scheduleId;
 
-    private Map<String, String> param = new HashMap<>();
-
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.SCHEDULE_INVOKE;
+        return EventTypeEnum.SCHEDULE_INTERRUPT;
     }
 }
