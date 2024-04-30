@@ -18,11 +18,11 @@ public class ScheduleHeartbeatAction implements Action<ScheduleHeartbeat> {
 
     @Override
     public void action(ScheduleHeartbeat scheduleHeartbeat, ChannelHandlerContext channelHandlerContext) {
-        scheduleSession.heartbeat(scheduleHeartbeat.getApplicationId(), scheduleHeartbeat.getScheduleRunInfoList());
+        scheduleSession.heartbeat(scheduleHeartbeat.getApplicationId(), scheduleHeartbeat.getApplicationName(), scheduleHeartbeat.getScheduleRunInfoList());
     }
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.AGENT_HEARTBEAT;
+        return EventTypeEnum.SCHEDULE_HEARTBEAT;
     }
 }

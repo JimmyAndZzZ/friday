@@ -18,6 +18,7 @@ public class Schedule {
 
     private final Map<Long, CountDownLatch> confirm = Maps.newConcurrentMap();
 
+
     public ScheduleResult submit(String scheduleId, Map<String, String> param) {
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
 

@@ -1,18 +1,19 @@
-package com.jimmy.friday.boot.message.schedule;
+package com.jimmy.friday.boot.message;
 
 import com.jimmy.friday.boot.base.Message;
+import com.jimmy.friday.boot.enums.AckTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import lombok.Data;
 
 @Data
-public class ScheduleAck implements Message {
+public class Ack implements Message {
 
     private String id;
 
-    private Long traceId;
+    private AckTypeEnum ackType;
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.SCHEDULE_ACK;
+        return EventTypeEnum.ACK;
     }
 }

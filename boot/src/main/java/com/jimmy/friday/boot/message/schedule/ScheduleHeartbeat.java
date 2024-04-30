@@ -12,6 +12,8 @@ public class ScheduleHeartbeat implements Message {
 
     private String applicationId;
 
+    private String applicationName;
+
     private List<ScheduleRunInfo> scheduleRunInfoList = new ArrayList<>();
 
     @Override

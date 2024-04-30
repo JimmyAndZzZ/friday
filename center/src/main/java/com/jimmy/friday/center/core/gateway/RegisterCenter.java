@@ -323,6 +323,7 @@ public class RegisterCenter {
                 exist.setApplicationId(service.getApplicationId());
                 exist.setStatus(ServiceStatusEnum.ALIVE);
                 this.registerService(service, id);
+                this.gatewayCircuitBreakerManager.remove(serviceId);
                 this.suspected.remove(service.getApplicationId());
                 this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_USE_STATUS + exist.getServiceId());
                 return;

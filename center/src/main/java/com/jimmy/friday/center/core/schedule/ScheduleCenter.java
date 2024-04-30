@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Initialize;
@@ -136,16 +137,17 @@ public class ScheduleCenter implements Initialize {
                         }
                     } else {
                         scheduleJob = new ScheduleJob();
+                        scheduleJob.setTimeout(0);
                         scheduleJob.setCron(cron);
+                        scheduleJob.setRetryCount(0);
                         scheduleJob.setCreateDate(now);
                         scheduleJob.setUpdateDate(now);
                         scheduleJob.setCode(scheduleId);
-                        scheduleJob.setTimeout(0);
-                        scheduleJob.setRetryCount(0);
-                        scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
-                        scheduleJob.setNextTime(this.generateNextTime(cron, System.currentTimeMillis()));
                         scheduleJob.setApplicationName(applicationName);
                         scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
+                        scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
+                        scheduleJob.setBlockStrategy(BlockHandlerStrategyTypeEnum.SERIAL.getCode());
+                        scheduleJob.setNextTime(this.generateNextTime(cron, System.currentTimeMillis()));
                         insert.add(scheduleJob);
                     }
                 }

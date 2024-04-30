@@ -25,7 +25,6 @@ public class ScheduleExecutePool implements Close {
     @Autowired
     private AttachmentCache attachmentCache;
 
-
     public void execute(ScheduleJob scheduleJob) {
         Integer id = scheduleJob.getId();
         //默认用高
