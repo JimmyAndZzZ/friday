@@ -9,13 +9,13 @@ import java.util.Date;
 
 
 /**
- * (ScheduleJobInfo)表实体类
+ * (ScheduleJob)表实体类
  *
  * @author makejava
  * @since 2024-04-24 17:29:27
  */
 @Data
-public class ScheduleJobInfo {
+public class ScheduleJob {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
@@ -27,8 +27,6 @@ public class ScheduleJobInfo {
     private Date createDate;
 
     private Date updateDate;
-    //路由策略
-    private String routeStrategy;
     //唯一标识
     private String code;
     //运行参数
@@ -47,5 +45,7 @@ public class ScheduleJobInfo {
     private Long nextTime;
 
     private String applicationName;
+
+    private String isManual;
 }
 

@@ -28,6 +28,9 @@ public interface RedisConstants {
         String SCHEDULE_EXECUTOR_APPLICATION_WEIGHT = "friday:schedule:executor:application:weight";
 
         String SCHEDULE_EXECUTOR_LAST_INVOKE_DATE = "friday:schedule:executor:last:invoke:date";
+
+        String SCHEDULE_REGISTER_JOB_LOCK = "friday:schedule:register:job:lock:";
+
     }
 
     interface Gateway {

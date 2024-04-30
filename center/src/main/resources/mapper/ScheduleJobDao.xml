@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.jimmy.friday.center.dao.ScheduleJobInfoDao">
+<mapper namespace="com.jimmy.friday.center.dao.ScheduleJobDao">
 
-    <resultMap type="com.jimmy.friday.center.entity.ScheduleJobInfo" id="ScheduleJobInfoMap">
+    <resultMap type="com.jimmy.friday.center.entity.ScheduleJob" id="ScheduleJobInfoMap">
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="cron" column="cron" jdbcType="VARCHAR"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>
@@ -22,13 +22,22 @@
     <update id="updateExecuteTime" >
         update schedule_job_info
         set last_time=#{lastTime},
-            next_time=#{nextTime}
+            next_time=#{nextTime},
+            update_date=now()
+        where id=#{id}
+    </update>
+
+    <update id="updateNextExecuteTime" >
+        update schedule_job_info
+        set next_time=#{nextTime},
+            update_date=now()
         where id=#{id}
     </update>
 
     <update id="updateStatus" >
         update schedule_job_info
-        set status=#{status}
+        set status=#{status},
+            update_date=now()
         where id=#{id}
     </update>
 

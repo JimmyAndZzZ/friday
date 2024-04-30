@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 
 @Slf4j
 @ChannelHandler.Sharable
-public class GatewayClientHandler extends SimpleChannelInboundHandler<Event> {
+public class ClientHandler extends SimpleChannelInboundHandler<Event> {
 
     private final ExecutorService executorService = new ThreadPoolExecutor(10, 30, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
@@ -28,14 +28,14 @@ public class GatewayClientHandler extends SimpleChannelInboundHandler<Event> {
 
     private ConfigLoad configLoad;
 
-    private GatewayClient gatewayClient;
+    private Client client;
 
     private ApplicationContext applicationContext;
 
-    public GatewayClientHandler(ConfigLoad configLoad, ApplicationContext applicationContext, GatewayClient gatewayClient) {
+    public ClientHandler(ConfigLoad configLoad, ApplicationContext applicationContext, Client client) {
         super();
         this.configLoad = configLoad;
-        this.gatewayClient = gatewayClient;
+        this.client = client;
         this.applicationContext = applicationContext;
     }
 
@@ -83,7 +83,7 @@ public class GatewayClientHandler extends SimpleChannelInboundHandler<Event> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        gatewayClient.connect();
+        client.connect();
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class GatewayClient {
+public class Client {
 
     private String server;
 
@@ -43,7 +43,7 @@ public class GatewayClient {
 
     private AtomicInteger retry = new AtomicInteger(0);
 
-    public GatewayClient(ApplicationContext applicationContext, String server) {
+    public Client(ApplicationContext applicationContext, String server) {
         List<String> split = StrUtil.split(server, ":");
         if (split.size() != 2) {
             throw new GatewayException("配置服务端地址异常");
@@ -72,7 +72,7 @@ public class GatewayClient {
                 ChannelPipeline pipeline = channel.pipeline();
                 pipeline.addLast("decoder", new NettyDecoder(Event.class));
                 pipeline.addLast("encoder", new NettyEncoder(Event.class));
-                pipeline.addLast(new GatewayClientHandler(configLoad, applicationContext, GatewayClient.this));
+                pipeline.addLast(new ClientHandler(configLoad, applicationContext, Client.this));
             }
         });
 

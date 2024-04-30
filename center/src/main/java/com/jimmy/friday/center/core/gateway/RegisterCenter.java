@@ -276,6 +276,8 @@ public class RegisterCenter {
         if (exist != null) {
             exist.setApplicationId(service.getApplicationId());
             exist.setStatus(ServiceStatusEnum.ALIVE);
+
+            this.suspected.remove(service.getApplicationId());
             return false;
         }
 
@@ -321,6 +323,8 @@ public class RegisterCenter {
                 exist.setApplicationId(service.getApplicationId());
                 exist.setStatus(ServiceStatusEnum.ALIVE);
                 this.registerService(service, id);
+                this.gatewayCircuitBreakerManager.remove(serviceId);
+                this.suspected.remove(service.getApplicationId());
                 this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_USE_STATUS + exist.getServiceId());
                 return;
             }
@@ -406,7 +410,6 @@ public class RegisterCenter {
      */
     private void registerService(Service service, String id) {
         if (Boolean.TRUE.equals(this.attachmentCache.setIfAbsent(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id, YesOrNoEnum.YES.getCode(), 60L, TimeUnit.SECONDS))) {
-
             try {
                 GatewayService gatewayService = this.gatewayServiceService.getGatewayService(service);
 
@@ -423,6 +426,8 @@ public class RegisterCenter {
                 } finally {
                     lock.unlock();
                 }
+            } catch (Exception e) {
+                log.error("保存服务失败", e);
             } finally {
                 this.attachmentCache.remove(RedisConstants.Gateway.SERVICE_REGISTER_FLAG + id);
             }

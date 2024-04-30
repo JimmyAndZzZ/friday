@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -58,7 +59,7 @@ public class TransactionTimeoutAction implements Action<TransactionTimeout>, Ini
 
     @Override
     public void init() throws Exception {
-        CronUtil.schedule(IdUtil.simpleUUID(), "*/30 * * * * *", () -> {
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             if (stripedLock.tryLock(RedisConstants.Transaction.TRANSACTION_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
                 try {
                     Set<String> process = Sets.newHashSet();
@@ -99,7 +100,7 @@ public class TransactionTimeoutAction implements Action<TransactionTimeout>, Ini
                     stripedLock.releaseLock(RedisConstants.Transaction.TRANSACTION_TIMEOUT_JOB_LOCK);
                 }
             }
-        });
+        }, 0, 30, TimeUnit.SECONDS);
     }
 
     @Override

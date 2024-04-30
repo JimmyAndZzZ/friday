@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum AckTypeEnum {
 
-    SUCCESS, ERROR
-
+    SUCCESS,
+    ERROR
 }

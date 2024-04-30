@@ -18,6 +18,6 @@ public class ScheduleHeartbeat implements Message {
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.SCHEDULE_INVOKE;
+        return EventTypeEnum.SCHEDULE_HEARTBEAT;
     }
 }

@@ -5,14 +5,14 @@ import com.jimmy.friday.boot.enums.EventTypeEnum;
 import lombok.Data;
 
 @Data
-public class ScheduleAck implements Message {
-
-    private String id;
+public class ScheduleInterrupt implements Message {
 
     private Long traceId;
 
+    private String scheduleId;
+
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.SCHEDULE_ACK;
+        return EventTypeEnum.SCHEDULE_INTERRUPT;
     }
 }

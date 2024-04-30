@@ -1,23 +1,30 @@
 package com.jimmy.friday.center.core.schedule;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
-import com.jimmy.friday.center.entity.ScheduleJobInfo;
+import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.other.CronExpression;
-import com.jimmy.friday.center.service.ScheduleJobInfoService;
+import com.jimmy.friday.center.service.ScheduleJobService;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -34,10 +41,10 @@ public class ScheduleCenter implements Initialize {
     private ScheduleTimeRing scheduleTimeRing;
 
     @Autowired
-    private ScheduleExecutePool scheduleExecutePool;
+    private ScheduleJobService scheduleJobService;
 
     @Autowired
-    private ScheduleJobInfoService scheduleJobInfoService;
+    private ScheduleExecutePool scheduleExecutePool;
 
     @Override
     public void init() throws Exception {
@@ -49,19 +56,19 @@ public class ScheduleCenter implements Initialize {
 
                     long nowTime = System.currentTimeMillis();
 
-                    List<ScheduleJobInfo> scheduleJobInfos = scheduleJobInfoService.queryExecuteJobs(nowTime + PRE_READ_MS, READ_COUNT);
-                    if (CollUtil.isEmpty(scheduleJobInfos)) {
+                    List<ScheduleJob> scheduleJobs = scheduleJobService.queryExecuteJobs(nowTime + PRE_READ_MS, READ_COUNT);
+                    if (CollUtil.isEmpty(scheduleJobs)) {
                         continue;
                     }
 
-                    for (ScheduleJobInfo scheduleJobInfo : scheduleJobInfos) {
+                    for (ScheduleJob scheduleJobInfo : scheduleJobs) {
                         Integer id = scheduleJobInfo.getId();
                         Long nextTime = scheduleJobInfo.getNextTime();
                         String redisKey = RedisConstants.Schedule.SCHEDULE_EXECUTE_JOB_LOCK + id + ":" + nextTime;
 
                         if (stripedLock.tryLock(redisKey, 60L, TimeUnit.SECONDS)) {
                             try {
-                                if (scheduleJobInfoService.needExecute(id, nextTime)) {
+                                if (scheduleJobService.needExecute(id, nextTime)) {
                                     // 超过轮训周期
                                     if (nowTime > nextTime + PRE_READ_MS) {
                                         scheduleExecutePool.execute(scheduleJobInfo);
@@ -103,35 +110,92 @@ public class ScheduleCenter implements Initialize {
         return 1;
     }
 
+    public void register(Collection<ScheduleInfo> scheduleInfos, String applicationName) {
+        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName, 60L, TimeUnit.SECONDS)) {
+            try {
+                if (CollUtil.isEmpty(scheduleInfos)) {
+                    scheduleJobService.removeByApplicationName(applicationName);
+                    return;
+                }
+
+                Date now = new Date();
+                List<ScheduleJob> insert = Lists.newArrayList();
+                //之前已存在的
+                List<ScheduleJob> scheduleJobs = scheduleJobService.queryByApplicationName(applicationName);
+                Map<String, ScheduleJob> map = CollUtil.isEmpty(scheduleJobs) ? Maps.newHashMap() : scheduleJobs.stream().collect(Collectors.toMap(ScheduleJob::getCode, g -> g));
+
+                for (ScheduleInfo scheduleInfo : scheduleInfos) {
+                    String cron = scheduleInfo.getCron();
+                    String scheduleId = scheduleInfo.getScheduleId();
+
+                    ScheduleJob scheduleJob = map.remove(scheduleId);
+                    if (scheduleJob != null) {
+                        //更新下次执行时间
+                        if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
+                            Long lastTime = scheduleJob.getLastTime();
+                            scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), scheduleJob.getId());
+                        }
+                    } else {
+                        scheduleJob = new ScheduleJob();
+                        scheduleJob.setTimeout(0);
+                        scheduleJob.setCron(cron);
+                        scheduleJob.setRetryCount(0);
+                        scheduleJob.setCreateDate(now);
+                        scheduleJob.setUpdateDate(now);
+                        scheduleJob.setCode(scheduleId);
+                        scheduleJob.setApplicationName(applicationName);
+                        scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
+                        scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
+                        scheduleJob.setBlockStrategy(BlockHandlerStrategyTypeEnum.SERIAL.getCode());
+                        scheduleJob.setNextTime(this.generateNextTime(cron, System.currentTimeMillis()));
+                        insert.add(scheduleJob);
+                    }
+                }
+
+                if (CollUtil.isNotEmpty(insert)) {
+                    scheduleJobService.saveBatch(insert);
+                }
+
+                if (MapUtil.isNotEmpty(map)) {
+                    scheduleJobService.removeByIds(map.values().stream().map(ScheduleJob::getId).collect(Collectors.toSet()));
+                }
+            } catch (Exception e) {
+                log.error("保存调度任务失败", e);
+            } finally {
+                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName);
+            }
+        }
+    }
+
 
     /**
      * 刷新定时器信息
      *
-     * @param scheduleJobInfo
+     * @param scheduleJob
      */
-    private void updateScheduleJobInfo(ScheduleJobInfo scheduleJobInfo, Long lastTime) {
-        Integer id = scheduleJobInfo.getId();
-        String cron = scheduleJobInfo.getCron();
+    private void updateScheduleJobInfo(ScheduleJob scheduleJob, Long lastTime) {
+        Integer id = scheduleJob.getId();
+        String cron = scheduleJob.getCron();
         if (StrUtil.isEmpty(cron)) {
-            scheduleJobInfo.setStatus(ScheduleStatusEnum.CLOSE.getCode());
+            scheduleJob.setStatus(ScheduleStatusEnum.CLOSE.getCode());
 
-            log.error("定时器:{},cron表达式为空", scheduleJobInfo.getId());
-            scheduleJobInfoService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
+            log.error("定时器:{},cron表达式为空", scheduleJob.getId());
+            scheduleJobService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
             return;
         }
 
         Long nextTime = this.generateNextTime(cron, lastTime);
         if (nextTime != null) {
-            scheduleJobInfo.setLastTime(scheduleJobInfo.getNextTime());
-            scheduleJobInfo.setNextTime(nextTime);
+            scheduleJob.setLastTime(scheduleJob.getNextTime());
+            scheduleJob.setNextTime(nextTime);
 
-            scheduleJobInfoService.updateExecuteTime(scheduleJobInfo.getNextTime(), nextTime, id);
+            scheduleJobService.updateExecuteTime(scheduleJob.getNextTime(), nextTime, id);
         } else {
             log.error("定时器:{},获取下次执行时间失败", id);
 
-            scheduleJobInfo.setStatus(ScheduleStatusEnum.CLOSE.getCode());
+            scheduleJob.setStatus(ScheduleStatusEnum.CLOSE.getCode());
 
-            scheduleJobInfoService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
+            scheduleJobService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
         }
     }
 

@@ -11,6 +11,8 @@ import java.util.Collection;
 @Data
 public class ScheduleRegister implements Message {
 
+    private String ip;
+
     private String applicationId;
 
     private String applicationName;

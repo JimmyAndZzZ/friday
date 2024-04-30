@@ -1,17 +1,15 @@
 package com.jimmy.friday.center.core.gateway.support;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.cron.CronUtil;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.ServiceStatusEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
+import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.core.gateway.GatewayCircuitBreakerManager;
 import com.jimmy.friday.center.core.gateway.RegisterCenter;
-import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceProvider;
 import com.jimmy.friday.center.service.GatewayServiceMethodParamService;
@@ -27,6 +25,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,7 +91,7 @@ public class RegisterSupport implements Initialize {
 
     @Override
     public void init() throws Exception {
-        CronUtil.schedule(IdUtil.simpleUUID(), "0 */5 * * * ?", () -> {
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             try {
                 List<GatewayServiceProvider> list = gatewayServiceProviderService.list();
                 if (CollUtil.isNotEmpty(list)) {
@@ -133,7 +133,7 @@ public class RegisterSupport implements Initialize {
             } catch (Exception e) {
                 log.error("服务状态刷新失败", e);
             }
-        });
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     @Override

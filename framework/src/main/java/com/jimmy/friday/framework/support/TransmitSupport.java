@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.base.Message;
 import com.jimmy.friday.boot.exception.ConnectionException;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.other.ConfigConstants;
-import com.jimmy.friday.framework.netty.client.GatewayClient;
+import com.jimmy.friday.framework.netty.client.Client;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,13 +22,13 @@ public class TransmitSupport implements ApplicationContextAware {
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    private GatewayClient master;
+    private Client master;
 
     private ConfigLoad configLoad;
 
     private ApplicationContext applicationContext;
 
-    private final List<GatewayClient> backup = new ArrayList<>();
+    private final List<Client> backup = new ArrayList<>();
 
     public TransmitSupport(ConfigLoad configLoad) {
         this.configLoad = configLoad;
@@ -53,15 +53,15 @@ public class TransmitSupport implements ApplicationContextAware {
 
                     for (String string : split) {
                         if (!string.equalsIgnoreCase(masterServer) && repeat.add(string)) {
-                            GatewayClient gatewayClient = new GatewayClient(applicationContext, string);
-                            gatewayClient.init(this.configLoad);
-                            this.backup.add(gatewayClient);
+                            Client client = new Client(applicationContext, string);
+                            client.init(this.configLoad);
+                            this.backup.add(client);
                         }
                     }
                 }
             }
 
-            this.master = new GatewayClient(applicationContext, masterServer);
+            this.master = new Client(applicationContext, masterServer);
             this.master.init(this.configLoad);
         }
     }
@@ -78,9 +78,9 @@ public class TransmitSupport implements ApplicationContextAware {
         }
 
         if (CollUtil.isNotEmpty(backup)) {
-            for (GatewayClient gatewayClient : backup) {
-                if (gatewayClient.getConnectSuccess()) {
-                    gatewayClient.send(message);
+            for (Client client : backup) {
+                if (client.getConnectSuccess()) {
+                    client.send(message);
                     return;
                 }
             }
@@ -95,9 +95,9 @@ public class TransmitSupport implements ApplicationContextAware {
         }
 
         if (CollUtil.isNotEmpty(backup)) {
-            for (GatewayClient gatewayClient : backup) {
-                if (gatewayClient.getConnectSuccess()) {
-                    gatewayClient.send(message);
+            for (Client client : backup) {
+                if (client.getConnectSuccess()) {
+                    client.send(message);
                 }
             }
         }

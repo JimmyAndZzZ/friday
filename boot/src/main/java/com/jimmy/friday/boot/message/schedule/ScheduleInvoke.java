@@ -10,9 +10,9 @@ import java.util.Map;
 @Data
 public class ScheduleInvoke implements Message {
 
-    private String scheduleId;
-
     private Long traceId;
+
+    private String scheduleId;
 
     private Map<String, String> param = new HashMap<>();
 
