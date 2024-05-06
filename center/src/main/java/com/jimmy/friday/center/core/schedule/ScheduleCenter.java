@@ -19,6 +19,7 @@ import com.jimmy.friday.center.service.ScheduleJobService;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -47,7 +48,7 @@ public class ScheduleCenter implements Initialize {
     private ScheduleExecutePool scheduleExecutePool;
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Thread thread = new Thread(() -> {
             while (true) {
                 try {
@@ -62,7 +63,7 @@ public class ScheduleCenter implements Initialize {
                     }
 
                     for (ScheduleJob scheduleJobInfo : scheduleJobs) {
-                        Integer id = scheduleJobInfo.getId();
+                        Long id = scheduleJobInfo.getId();
                         Long nextTime = scheduleJobInfo.getNextTime();
                         String redisKey = RedisConstants.Schedule.SCHEDULE_EXECUTE_JOB_LOCK + id + ":" + nextTime;
 
@@ -137,7 +138,7 @@ public class ScheduleCenter implements Initialize {
                         }
                     } else {
                         scheduleJob = new ScheduleJob();
-                        scheduleJob.setTimeout(0);
+                        scheduleJob.setTimeout(0L);
                         scheduleJob.setCron(cron);
                         scheduleJob.setRetryCount(0);
                         scheduleJob.setCreateDate(now);
@@ -174,7 +175,7 @@ public class ScheduleCenter implements Initialize {
      * @param scheduleJob
      */
     private void updateScheduleJobInfo(ScheduleJob scheduleJob, Long lastTime) {
-        Integer id = scheduleJob.getId();
+        Long id = scheduleJob.getId();
         String cron = scheduleJob.getCron();
         if (StrUtil.isEmpty(cron)) {
             scheduleJob.setStatus(ScheduleStatusEnum.CLOSE.getCode());

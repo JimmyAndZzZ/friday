@@ -37,46 +37,48 @@ public class AgentClientHandler extends SimpleChannelInboundHandler<Event> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
-        String type = event.getType();
-        String message = event.getMessage();
+        ctx.executor().execute(() -> {
+            String type = event.getType();
+            String message = event.getMessage();
 
-        EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(type);
-        if (eventTypeEnum == null) {
-            return;
-        }
+            EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(type);
+            if (eventTypeEnum == null) {
+                return;
+            }
 
-        switch (eventTypeEnum) {
-            case AGENT_COMMAND:
-                AgentCommand agentCommand = JsonUtil.toBean(message, AgentCommand.class);
-                if (agentCommand != null) {
-                    try {
-                        Command command = new Command();
-                        command.setParam(agentCommand.getParam());
-                        command.setCommand(agentCommand.getCommand());
-                        command.setTraceId(agentCommand.getTraceId());
+            switch (eventTypeEnum) {
+                case AGENT_COMMAND:
+                    AgentCommand agentCommand = JsonUtil.toBean(message, AgentCommand.class);
+                    if (agentCommand != null) {
+                        try {
+                            Command command = new Command();
+                            command.setParam(agentCommand.getParam());
+                            command.setCommand(agentCommand.getCommand());
+                            command.setTraceId(agentCommand.getTraceId());
 
-                        CommandWorker commandWorker = CommandSupport.get().getWorker(command.getCommand());
-                        commandWorker.open(command);
-                    } catch (Exception e) {
-                        String errorMessage = e.getMessage();
-                        if (Strings.isNullOrEmpty(errorMessage)) {
-                            errorMessage = e.toString();
+                            CommandWorker commandWorker = CommandSupport.get().getWorker(command.getCommand());
+                            commandWorker.open(command);
+                        } catch (Exception e) {
+                            String errorMessage = e.getMessage();
+                            if (Strings.isNullOrEmpty(errorMessage)) {
+                                errorMessage = e.toString();
+                            }
+
+                            agentCommand.setIsSuccess(false);
+                            agentCommand.setErrorMessage(errorMessage);
+                            ctx.writeAndFlush(new Event(eventTypeEnum, JsonUtil.toString(agentCommand)));
                         }
-
-                        agentCommand.setIsSuccess(false);
-                        agentCommand.setErrorMessage(errorMessage);
-                        ctx.writeAndFlush(new Event(eventTypeEnum, JsonUtil.toString(agentCommand)));
                     }
-                }
 
-                break;
-            case AGENT_HEARTBEAT:
-                AgentHeartbeat heartbeatMessage = JsonUtil.toBean(message, AgentHeartbeat.class);
-                heartbeatMessage.setIp(ConfigLoad.getDefault().get(ConfigConstants.ADDRESS));
-                heartbeatMessage.setName(ConfigLoad.getDefault().getApplicationName());
-                ctx.writeAndFlush(new Event(EventTypeEnum.AGENT_HEARTBEAT, JsonUtil.toString(heartbeatMessage)));
-                break;
-        }
+                    break;
+                case AGENT_HEARTBEAT:
+                    AgentHeartbeat heartbeatMessage = JsonUtil.toBean(message, AgentHeartbeat.class);
+                    heartbeatMessage.setIp(ConfigLoad.getDefault().get(ConfigConstants.ADDRESS));
+                    heartbeatMessage.setName(ConfigLoad.getDefault().getApplicationName());
+                    ctx.writeAndFlush(new Event(EventTypeEnum.AGENT_HEARTBEAT, JsonUtil.toString(heartbeatMessage)));
+                    break;
+            }
+        });
     }
 
     @Override

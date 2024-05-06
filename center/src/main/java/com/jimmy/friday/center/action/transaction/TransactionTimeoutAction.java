@@ -20,6 +20,7 @@ import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class TransactionTimeoutAction implements Action<TransactionTimeout>, Ini
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             if (stripedLock.tryLock(RedisConstants.Transaction.TRANSACTION_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
                 try {

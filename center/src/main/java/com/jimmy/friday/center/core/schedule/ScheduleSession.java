@@ -18,6 +18,7 @@ import com.jimmy.friday.center.utils.LockKeyConstants;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public class ScheduleSession implements Initialize {
     private ScheduleExecutorService scheduleExecutorService;
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         // 定时任务，每隔三分钟执行一次
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             if (MapUtil.isNotEmpty(session)) {

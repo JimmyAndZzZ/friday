@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface ScheduleJobService extends IService<ScheduleJob> {
 
-    void updateNextExecuteTime(Long nextTime, Integer id);
+    void updateNextExecuteTime(Long nextTime, Long id);
 
     void removeByApplicationName(String applicationName);
 
@@ -21,11 +21,11 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     ScheduleJob queryByCodeAndApplicationName(String code, String applicationName);
 
-    void updateExecuteTime(Long lastTime, Long nextTime, Integer id);
+    void updateExecuteTime(Long lastTime, Long nextTime, Long id);
 
-    void updateStatus(String status, Integer id);
+    void updateStatus(String status, Long id);
 
-    boolean needExecute(Integer id, Long nextTime);
+    boolean needExecute(Long id, Long nextTime);
 
     List<ScheduleJob> queryExecuteJobs(Long time, Integer size);
 }

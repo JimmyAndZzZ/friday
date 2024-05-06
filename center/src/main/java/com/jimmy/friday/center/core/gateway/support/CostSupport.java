@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.ChargeTypeEnum;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
-import com.jimmy.friday.center.base.Cost;
+import com.jimmy.friday.center.base.gateway.Cost;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.boot.other.ApiConstants;
@@ -26,9 +26,6 @@ public class CostSupport implements Initialize {
     @Autowired
     private AttachmentCache attachmentCache;
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     public BigDecimal calculate(String chargeType, Long costStrategyId, String appId, String action, ApiContext apiContext) throws Exception {
         ChargeTypeEnum chargeTypeEnum = ChargeTypeEnum.queryByType(chargeType);
 
@@ -46,7 +43,7 @@ public class CostSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, Cost> beansOfType = applicationContext.getBeansOfType(Cost.class);
         beansOfType.values().forEach(bean -> costMap.put(bean.type(), bean));
     }

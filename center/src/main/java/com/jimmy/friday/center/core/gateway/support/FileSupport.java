@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
-import com.jimmy.friday.center.base.File;
+import com.jimmy.friday.center.base.gateway.File;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.utils.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,6 @@ public class FileSupport implements Initialize {
 
     private final Map<String, File> fileMap = Maps.newHashMap();
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     public int getPage(java.io.File file) {
         String s = FileUtil.extName(file);
         File f = fileMap.get(s.toUpperCase());
@@ -31,7 +28,7 @@ public class FileSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, File> beansOfType = applicationContext.getBeansOfType(File.class);
         beansOfType.values().forEach(bean -> {
             List<String> suffix = bean.suffix();

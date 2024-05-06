@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.base;
+package com.jimmy.friday.center.base.gateway;
 
 import java.util.List;
 

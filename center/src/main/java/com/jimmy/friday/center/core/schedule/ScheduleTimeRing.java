@@ -7,6 +7,7 @@ import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ScheduleTimeRing implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Thread thread = new Thread(() -> {
             while (true) {
                 try {

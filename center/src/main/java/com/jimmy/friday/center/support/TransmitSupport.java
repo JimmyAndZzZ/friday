@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class TransmitSupport implements ApplicationListener<AckEvent> {
 
-    private final Map<String, AckTypeEnum> result = Maps.newConcurrentMap();
-
     private final Map<String, CountDownLatch> confirm = Maps.newConcurrentMap();
 
     @Override
@@ -32,7 +30,6 @@ public class TransmitSupport implements ApplicationListener<AckEvent> {
         String id = event.getId();
         CountDownLatch remove = confirm.remove(id);
         if (remove != null) {
-            result.put(id, event.getAckType());
             remove.countDown();
         }
     }
@@ -72,15 +69,6 @@ public class TransmitSupport implements ApplicationListener<AckEvent> {
 
             if (countDownLatch.getCount() != 0L) {
                 throw new TransmitException("消息确认超时");
-            }
-            //判断是否超时
-            AckTypeEnum ackTypeEnum = result.remove(id);
-            if (ackTypeEnum == null) {
-                throw new TransmitException("消息确认结果为空");
-            }
-
-            if (ackTypeEnum.equals(AckTypeEnum.ERROR)) {
-                throw new TransmitException("消息确认失败");
             }
         } catch (InterruptedException interruptedException) {
             throw new TransmitException("发送被中断");

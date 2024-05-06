@@ -26,6 +26,7 @@ import io.netty.channel.Channel;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -105,7 +106,7 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         List<GatewayPushChannelSub> list = gatewayPushChannelSubService.list();
         if (CollUtil.isNotEmpty(list)) {
             Map<Long, List<GatewayPushChannelSub>> collect = list.stream().collect(Collectors.groupingBy(GatewayPushChannelSub::getAccountId));

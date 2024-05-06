@@ -90,7 +90,7 @@ public class RegisterSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             try {
                 List<GatewayServiceProvider> list = gatewayServiceProviderService.list();

@@ -18,7 +18,7 @@ import java.util.Date;
 public class ScheduleJob {
 
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     //任务执行CRON
     private String cron;
 
@@ -34,7 +34,7 @@ public class ScheduleJob {
     //阻塞处理策略
     private String blockStrategy;
     //超时时间
-    private Integer timeout;
+    private Long timeout;
     //重试次数
     private Integer retryCount;
 
@@ -47,5 +47,11 @@ public class ScheduleJob {
     private String applicationName;
 
     private String isManual;
+
+    public ScheduleJob clear() {
+        this.description = null;
+        return this;
+    }
+
 }
 

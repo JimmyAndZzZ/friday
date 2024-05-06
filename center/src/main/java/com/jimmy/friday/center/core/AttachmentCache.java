@@ -70,6 +70,13 @@ public class AttachmentCache {
         stringRedisTemplate.opsForSet().add(key, JsonUtil.toString(attachment));
     }
 
+    public void attachStringList(String key, String attachment) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(attachment);
+
+        stringRedisTemplate.opsForSet().add(key, attachment);
+    }
+
     public <T> List<T> attachmentList(String key, Class<T> clazz) {
         Set<String> members = stringRedisTemplate.opsForSet().members(key);
         if (CollUtil.isEmpty(members)) {
@@ -119,6 +126,14 @@ public class AttachmentCache {
 
     public void attachString(String key, String attachment) {
         stringRedisTemplate.opsForValue().set(key, attachment);
+    }
+
+    public void attachString(String key, String attachment, Long timeout, TimeUnit timeUnit) {
+        if (timeout != null && timeout > 0) {
+            stringRedisTemplate.opsForValue().set(key, attachment, timeout, timeUnit);
+        } else {
+            stringRedisTemplate.opsForValue().set(key, attachment);
+        }
     }
 
     public void attachString(String mainKey, String key, String attachment) {

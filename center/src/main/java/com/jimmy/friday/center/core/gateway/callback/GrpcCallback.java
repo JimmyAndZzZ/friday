@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.GrpcMethodEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
-import com.jimmy.friday.center.base.Callback;
+import com.jimmy.friday.center.base.gateway.Callback;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceMethod;

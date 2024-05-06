@@ -10,8 +10,6 @@ public class Ack implements Message {
 
     private String id;
 
-    private AckTypeEnum ackType;
-
     @Override
     public EventTypeEnum type() {
         return EventTypeEnum.ACK;

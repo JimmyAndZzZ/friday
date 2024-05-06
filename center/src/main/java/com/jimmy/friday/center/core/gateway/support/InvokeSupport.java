@@ -6,9 +6,9 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.base.Invoke;
-import com.jimmy.friday.center.event.InvokeEvent;
+import com.jimmy.friday.center.base.gateway.Invoke;
 import com.jimmy.friday.center.core.gateway.invoke.BaseInvoke;
+import com.jimmy.friday.center.event.InvokeEvent;
 import com.jimmy.friday.center.service.GatewayServiceConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -21,9 +21,6 @@ import java.util.Map;
 public class InvokeSupport implements Invoke, Initialize, ApplicationListener<InvokeEvent> {
 
     private final Map<ServiceTypeEnum, Invoke> invokeMap = Maps.newHashMap();
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     private GatewayServiceConsumerService gatewayServiceConsumerService;
@@ -54,7 +51,7 @@ public class InvokeSupport implements Invoke, Initialize, ApplicationListener<In
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, BaseInvoke> beansOfType = applicationContext.getBeansOfType(BaseInvoke.class);
         beansOfType.values().forEach(bean -> invokeMap.put(bean.type(), bean));
     }

@@ -14,4 +14,14 @@ public enum BlockHandlerStrategyTypeEnum {
     private String code;
 
     private String message;
+
+    public static BlockHandlerStrategyTypeEnum queryByCode(String code) {
+        for (BlockHandlerStrategyTypeEnum value : BlockHandlerStrategyTypeEnum.values()) {
+            if (value.code.equalsIgnoreCase(code)) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 }

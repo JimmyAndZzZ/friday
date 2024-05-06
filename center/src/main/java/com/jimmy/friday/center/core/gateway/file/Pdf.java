@@ -3,7 +3,7 @@ package com.jimmy.friday.center.core.gateway.file;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
-import com.jimmy.friday.center.base.File;
+import com.jimmy.friday.center.base.gateway.File;
 import com.jimmy.friday.center.exception.OpenApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
