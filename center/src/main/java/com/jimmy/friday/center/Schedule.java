@@ -9,12 +9,14 @@ import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.enums.JobRunStatusEnum;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
 import com.jimmy.friday.boot.exception.ScheduleException;
+import com.jimmy.friday.boot.message.schedule.ScheduleInterrupt;
 import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.schedule.ScheduleSession;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
 import com.jimmy.friday.center.service.ScheduleJobLogService;
+import com.jimmy.friday.center.service.ScheduleJobService;
 import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +41,30 @@ public class Schedule {
     private TransmitSupport transmitSupport;
 
     @Autowired
+    private ScheduleJobService scheduleJobService;
+
+    @Autowired
     private ScheduleJobLogService scheduleJobLogService;
 
     public void interrupt(ScheduleJobLog scheduleJobLog) {
+        String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(scheduleJobLog.getExecutorId());
+        if (applicationIdByExecutorId == null) {
+            log.error("调度执行器未连接,{}", scheduleJobLog.getExecutorId());
+            return;
+        }
 
+        Long jobId = scheduleJobLog.getJobId();
+
+        ScheduleJob byId = scheduleJobService.getById(jobId);
+        if (byId == null) {
+            log.error("定时器不存在,{}", jobId);
+            return;
+        }
+
+        ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
+        scheduleInterrupt.setScheduleId(byId.getCode());
+        scheduleInterrupt.setTraceId(scheduleJobLog.getTraceId());
+        transmitSupport.transmit(scheduleInterrupt, applicationIdByExecutorId);
     }
 
     public void callback(ScheduleResult scheduleResult) {

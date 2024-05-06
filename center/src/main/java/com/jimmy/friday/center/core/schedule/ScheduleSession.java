@@ -56,6 +56,26 @@ public class ScheduleSession implements Initialize {
     @Autowired
     private ScheduleExecutorService scheduleExecutorService;
 
+    public String getApplicationIdByExecutorId(Long id) {
+        com.jimmy.friday.center.entity.ScheduleExecutor byId = scheduleExecutorService.getById(id);
+        if (byId == null) {
+            return null;
+        }
+
+        Collection<ScheduleExecutor> values = executor.values();
+        if (CollUtil.isEmpty(values)) {
+            return null;
+        }
+
+        for (ScheduleExecutor value : values) {
+            if (value.getApplicationName().equals(byId.getApplicationName()) && value.getIp().equals(byId.getIpAddress())) {
+                return value.getApplicationId();
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
         // 定时任务，每隔三分钟执行一次
