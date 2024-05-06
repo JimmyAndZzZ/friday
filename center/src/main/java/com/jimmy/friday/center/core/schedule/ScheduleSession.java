@@ -35,8 +35,6 @@ public class ScheduleSession implements Initialize {
 
     private final Map<String, ScheduleExecutor> executor = Maps.newHashMap();
 
-    private final Map<String, List<ScheduleRunInfo>> runInfo = Maps.newHashMap();
-
     private final ConcurrentMap<String, Set<String>> session = Maps.newConcurrentMap();
 
     private final ConcurrentMap<String, AtomicInteger> heartbeatFailCheck = Maps.newConcurrentMap();
@@ -98,7 +96,20 @@ public class ScheduleSession implements Initialize {
 
         this.heartbeatFailCheck.remove(applicationId);
         this.heartbeatSign.put(applicationId, System.currentTimeMillis());
-        this.runInfo.put(applicationId, scheduleRunInfoList);
+
+        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_INFO_LOCK + applicationName, 60L, TimeUnit.SECONDS)) {
+            try {
+                this.attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_INFO + applicationName);
+
+                if (CollUtil.isNotEmpty(scheduleRunInfoList)) {
+                    for (ScheduleRunInfo scheduleRunInfo : scheduleRunInfoList) {
+                        this.attachmentCache.attachList(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_INFO + applicationName, scheduleRunInfo);
+                    }
+                }
+            } finally {
+                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_INFO_LOCK + applicationName);
+            }
+        }
     }
 
     public void connect(String applicationId, String applicationName, String ip) {
@@ -129,10 +140,6 @@ public class ScheduleSession implements Initialize {
         } finally {
             lock.unlock();
         }
-    }
-
-    public List<ScheduleRunInfo> getRealTimeRunInfo(String applicationId) {
-        return this.runInfo.get(applicationId);
     }
 
     public void setWeight(String applicationId, Integer weight) {

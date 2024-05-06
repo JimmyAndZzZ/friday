@@ -24,10 +24,16 @@ public class Schedule {
     @Autowired
     private AttachmentCache attachmentCache;
 
+    public void callback() {
+
+    }
+
+    public boolean isRunning(Long id) {
+        return false;
+    }
+
     public ScheduleResult submit(ScheduleJob scheduleJob) {
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
-
-
 
 
         return null;
