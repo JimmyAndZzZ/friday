@@ -42,7 +42,9 @@ public class ScheduleSession implements Initialize {
 
     private final ConcurrentMap<String, AtomicInteger> heartbeatFailCheck = Maps.newConcurrentMap();
 
-    private final Cache<String, Long> heartbeatSign = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
+    private final Cache<String, Long> heartbeatSign = CacheBuilder
+            .newBuilder()
+            .expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
             .build();
 
     @Autowired

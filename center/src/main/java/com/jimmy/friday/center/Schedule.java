@@ -41,6 +41,10 @@ public class Schedule {
     @Autowired
     private ScheduleJobLogService scheduleJobLogService;
 
+    public void interrupt(ScheduleJobLog scheduleJobLog) {
+
+    }
+
     public void callback(ScheduleResult scheduleResult) {
         ScheduleJobLog scheduleJobLog = scheduleJobLogService.queryByTraceId(scheduleResult.getTraceId());
         if (scheduleJobLog == null) {
@@ -71,6 +75,7 @@ public class Schedule {
 
     public void submit(ScheduleJob scheduleJob) {
         Long id = scheduleJob.getId();
+        Long timeout = scheduleJob.getTimeout();
         String runParam = scheduleJob.getRunParam();
         String applicationName = scheduleJob.getApplicationName();
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
@@ -83,12 +88,16 @@ public class Schedule {
         //保存运行流水
         ScheduleJobLog scheduleJobLog = new ScheduleJobLog();
         scheduleJobLog.setJobId(id);
-        scheduleJobLog.setTimeout(scheduleJob.getTimeout());
         scheduleJobLog.setRunParam(runParam);
         scheduleJobLog.setExecutorId(select.getId());
         scheduleJobLog.setStartDate(System.currentTimeMillis());
         scheduleJobLog.setRunStatus(JobRunStatusEnum.RUNNING.getCode());
         scheduleJobLog.setTraceId(traceId);
+        //计算超时时间
+        if (timeout != null && timeout > 0) {
+            scheduleJobLog.setTimeoutDate(System.currentTimeMillis() + timeout * 1000);
+        }
+
         scheduleJobLogService.save(scheduleJobLog);
 
         ScheduleInvoke invoke = new ScheduleInvoke();
@@ -97,7 +106,7 @@ public class Schedule {
         invoke.setParam(runParam);
 
         try {
-            attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id, traceId.toString(), scheduleJob.getTimeout(), TimeUnit.SECONDS);
+            attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id, traceId.toString(), timeout, TimeUnit.SECONDS);
 
             this.invoke(invoke, select.getApplicationId());
         } catch (Exception e) {

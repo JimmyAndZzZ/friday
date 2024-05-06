@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jimmy.friday.center.dao.ScheduleJobLogDao">
+
+    <resultMap type="com.jimmy.friday.center.entity.ScheduleJobLog" id="ScheduleJobLogMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="jobId" column="job_id" jdbcType="INTEGER"/>
+        <result property="traceId" column="trace_id" jdbcType="INTEGER"/>
+        <result property="executorId" column="executor_id" jdbcType="INTEGER"/>
+        <result property="startDate" column="start_date" jdbcType="INTEGER"/>
+        <result property="runStatus" column="run_status" jdbcType="VARCHAR"/>
+        <result property="errorMessage" column="error_message" jdbcType="VARCHAR"/>
+        <result property="timeout" column="timeout" jdbcType="INTEGER"/>
+        <result property="runParam" column="run_param" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <update id="fail">
+        update schedule_job_log
+        set run_status=#{runStatus},
+            end_date=#{endDate},
+            error_message=#{errorMessage}
+        where id = #{id}
+          and run_status = '0';
+    </update>
+
+</mapper>
+

@@ -3,18 +3,22 @@ package com.jimmy.friday.center.core.schedule;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.cron.CronUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
-import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
-import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
-import com.jimmy.friday.boot.enums.YesOrNoEnum;
+import com.jimmy.friday.boot.enums.*;
+import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.ScheduleJob;
+import com.jimmy.friday.center.entity.ScheduleJobLog;
+import com.jimmy.friday.center.entity.TransactionPoint;
 import com.jimmy.friday.center.other.CronExpression;
+import com.jimmy.friday.center.service.ScheduleJobLogService;
 import com.jimmy.friday.center.service.ScheduleJobService;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +28,9 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,8 +53,33 @@ public class ScheduleCenter implements Initialize {
     @Autowired
     private ScheduleExecutePool scheduleExecutePool;
 
+    @Autowired
+    private ScheduleJobLogService scheduleJobLogService;
+
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
+        //超时扫描
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+            if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
+                try {
+                    List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryTimeout();
+                    if (CollUtil.isNotEmpty(scheduleJobLogs)) {
+                        for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
+                            scheduleJobLog.setEndDate(System.currentTimeMillis());
+                            scheduleJobLog.setRunStatus(JobRunStatusEnum.TIMEOUT.getCode());
+                            scheduleJobLog.setErrorMessage("运行超时");
+                            //乐观锁
+                            if (scheduleJobLogService.fail(scheduleJobLog)) {
+//todo kill
+                            }
+                        }
+                    }
+                } finally {
+                    stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_TIMEOUT_JOB_LOCK);
+                }
+            }
+        }, 0, 30, TimeUnit.SECONDS);
+        //扫描定时器
         Thread thread = new Thread(() -> {
             while (true) {
                 try {
