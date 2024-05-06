@@ -2,7 +2,7 @@ package com.jimmy.friday.center.core.gateway.cost;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.jimmy.friday.center.base.Cost;
+import com.jimmy.friday.center.base.gateway.Cost;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.entity.GatewayCostStrategyDetails;
 import com.jimmy.friday.center.service.GatewayCostStrategyDetailsService;

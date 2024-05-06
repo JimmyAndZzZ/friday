@@ -5,7 +5,7 @@ import com.jimmy.friday.boot.core.gateway.InvokeParam;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
 import com.jimmy.friday.boot.enums.MethodTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
-import com.jimmy.friday.center.base.Collect;
+import com.jimmy.friday.center.base.gateway.Collect;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.utils.Assert;
 import org.springframework.beans.factory.annotation.Autowired;

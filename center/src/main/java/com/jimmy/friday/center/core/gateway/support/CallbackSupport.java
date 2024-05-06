@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.CallbackTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
-import com.jimmy.friday.center.base.Callback;
+import com.jimmy.friday.center.base.gateway.Callback;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.event.CallbackEvent;
 import org.springframework.beans.factory.annotation.Autowired;

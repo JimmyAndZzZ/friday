@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.core.gateway.Service;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.base.Invoke;
+import com.jimmy.friday.center.base.gateway.Invoke;
 import com.jimmy.friday.center.event.InvokeEvent;
 import com.jimmy.friday.center.core.gateway.invoke.BaseInvoke;
 import com.jimmy.friday.center.service.GatewayServiceConsumerService;

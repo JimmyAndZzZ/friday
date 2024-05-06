@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.core.gateway.invoke;
 
 import com.jimmy.friday.boot.exception.GatewayException;
-import com.jimmy.friday.center.base.Invoke;
+import com.jimmy.friday.center.base.gateway.Invoke;
 
 import java.lang.reflect.Constructor;
 

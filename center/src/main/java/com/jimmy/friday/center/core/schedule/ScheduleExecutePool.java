@@ -24,9 +24,6 @@ public class ScheduleExecutePool implements Close {
     private final ThreadPoolExecutor lowPool = new ThreadPoolExecutor(5, 50, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(2000), r -> new Thread(r, "friday-schedule-low-" + r.hashCode()));
 
     @Autowired
-    private TransmitSupport transmitSupport;
-
-    @Autowired
     private AttachmentCache attachmentCache;
 
     public void execute(ScheduleJob scheduleJob) {

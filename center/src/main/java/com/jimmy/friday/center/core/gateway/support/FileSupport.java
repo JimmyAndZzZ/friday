@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
-import com.jimmy.friday.center.base.File;
+import com.jimmy.friday.center.base.gateway.File;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.utils.Assert;
 import org.springframework.beans.factory.annotation.Autowired;

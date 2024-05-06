@@ -15,7 +15,7 @@ import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceWarnTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
-import com.jimmy.friday.center.base.Invoke;
+import com.jimmy.friday.center.base.gateway.Invoke;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.GatewayService;

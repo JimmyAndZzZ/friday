@@ -7,7 +7,7 @@ import com.jimmy.friday.boot.enums.LoadTypeEnum;
 import com.jimmy.friday.boot.enums.ServiceTypeEnum;
 import com.jimmy.friday.center.base.Filter;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.base.Load;
+import com.jimmy.friday.center.base.gateway.Load;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

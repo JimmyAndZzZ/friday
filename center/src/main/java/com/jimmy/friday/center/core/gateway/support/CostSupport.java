@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.ChargeTypeEnum;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
-import com.jimmy.friday.center.base.Cost;
+import com.jimmy.friday.center.base.gateway.Cost;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.boot.other.ApiConstants;

@@ -11,7 +11,7 @@ import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.agent.AgentCommand;
 import com.jimmy.friday.boot.other.GlobalConstants;
-import com.jimmy.friday.center.base.Handler;
+import com.jimmy.friday.center.base.agent.Handler;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.agent.CommandSession;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;

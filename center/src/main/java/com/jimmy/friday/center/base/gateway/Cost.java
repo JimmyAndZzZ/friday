@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.base;
+package com.jimmy.friday.center.base.gateway;
 
 import com.jimmy.friday.boot.enums.ChargeTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;

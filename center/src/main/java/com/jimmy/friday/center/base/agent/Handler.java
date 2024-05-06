@@ -1,4 +1,4 @@
-package com.jimmy.friday.center.base;
+package com.jimmy.friday.center.base.agent;
 
 import com.jimmy.friday.boot.core.agent.Command;
 import com.jimmy.friday.boot.enums.CommandTypeEnum;
