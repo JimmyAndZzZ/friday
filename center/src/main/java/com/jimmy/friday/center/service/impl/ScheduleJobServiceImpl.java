@@ -20,7 +20,7 @@ import java.util.List;
 public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, ScheduleJob> implements ScheduleJobService {
 
     @Override
-    public void updateNextExecuteTime(Long nextTime, Integer id) {
+    public void updateNextExecuteTime(Long nextTime, Long id) {
         baseMapper.updateNextExecuteTime(nextTime, id);
     }
 
@@ -57,17 +57,17 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     }
 
     @Override
-    public void updateExecuteTime(Long lastTime, Long nextTime, Integer id) {
+    public void updateExecuteTime(Long lastTime, Long nextTime, Long id) {
         baseMapper.updateExecuteTime(lastTime, nextTime, id);
     }
 
     @Override
-    public void updateStatus(String status, Integer id) {
+    public void updateStatus(String status, Long id) {
         baseMapper.updateStatus(status, id);
     }
 
     @Override
-    public boolean needExecute(Integer id, Long nextTime) {
+    public boolean needExecute(Long id, Long nextTime) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         queryWrapper.eq("next_time", nextTime);

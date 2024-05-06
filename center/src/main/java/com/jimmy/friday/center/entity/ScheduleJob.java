@@ -18,7 +18,7 @@ import java.util.Date;
 public class ScheduleJob {
 
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     //任务执行CRON
     private String cron;
 

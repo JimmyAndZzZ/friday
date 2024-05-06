@@ -62,7 +62,7 @@ public class ScheduleCenter implements Initialize {
                     }
 
                     for (ScheduleJob scheduleJobInfo : scheduleJobs) {
-                        Integer id = scheduleJobInfo.getId();
+                        Long id = scheduleJobInfo.getId();
                         Long nextTime = scheduleJobInfo.getNextTime();
                         String redisKey = RedisConstants.Schedule.SCHEDULE_EXECUTE_JOB_LOCK + id + ":" + nextTime;
 
@@ -174,7 +174,7 @@ public class ScheduleCenter implements Initialize {
      * @param scheduleJob
      */
     private void updateScheduleJobInfo(ScheduleJob scheduleJob, Long lastTime) {
-        Integer id = scheduleJob.getId();
+        Long id = scheduleJob.getId();
         String cron = scheduleJob.getCron();
         if (StrUtil.isEmpty(cron)) {
             scheduleJob.setStatus(ScheduleStatusEnum.CLOSE.getCode());

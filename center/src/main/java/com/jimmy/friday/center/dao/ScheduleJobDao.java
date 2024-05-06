@@ -15,11 +15,11 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ScheduleJobDao extends BaseMapper<ScheduleJob> {
 
-    void updateExecuteTime(@Param("lastTime") Long lastTime, @Param("nextTime") Long nextTime, @Param("id") Integer id);
+    void updateExecuteTime(@Param("lastTime") Long lastTime, @Param("nextTime") Long nextTime, @Param("id") Long id);
 
-    void updateNextExecuteTime(@Param("nextTime") Long nextTime, @Param("id") Integer id);
+    void updateNextExecuteTime(@Param("nextTime") Long nextTime, @Param("id") Long id);
 
-    void updateStatus(@Param("status") String status, @Param("id") Integer id);
+    void updateStatus(@Param("status") String status, @Param("id") Long id);
 
 }
 
