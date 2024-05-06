@@ -19,9 +19,6 @@ public class FileSupport implements Initialize {
 
     private final Map<String, File> fileMap = Maps.newHashMap();
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     public int getPage(java.io.File file) {
         String s = FileUtil.extName(file);
         File f = fileMap.get(s.toUpperCase());
@@ -31,7 +28,7 @@ public class FileSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, File> beansOfType = applicationContext.getBeansOfType(File.class);
         beansOfType.values().forEach(bean -> {
             List<String> suffix = bean.suffix();

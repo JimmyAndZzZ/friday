@@ -1,21 +1,30 @@
 package com.jimmy.friday.center.core.schedule;
 
+import com.google.common.collect.Maps;
+import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
+import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.Close;
+import com.jimmy.friday.center.base.Initialize;
+import com.jimmy.friday.center.base.schedule.Block;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class ScheduleExecutePool implements Close {
+public class ScheduleExecutePool implements Close, Initialize {
+
+    private final Map<BlockHandlerStrategyTypeEnum, Block> blockMap = Maps.newHashMap();
 
     private final ThreadPoolExecutor highPool = new ThreadPoolExecutor(10, 200, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1000), r -> new Thread(r, "friday-schedule-high-" + r.hashCode()));
 
@@ -25,6 +34,17 @@ public class ScheduleExecutePool implements Close {
 
     @Autowired
     private AttachmentCache attachmentCache;
+
+    @Override
+    public void init(ApplicationContext applicationContext) throws Exception {
+        Map<String, Block> beansOfType = applicationContext.getBeansOfType(Block.class);
+        beansOfType.values().forEach(bean -> blockMap.put(bean.type(), bean));
+    }
+
+    @Override
+    public int sort() {
+        return 0;
+    }
 
     public void execute(ScheduleJob scheduleJob) {
         Long id = scheduleJob.getId();
@@ -44,11 +64,14 @@ public class ScheduleExecutePool implements Close {
             executor = this.lowPool;
         }
 
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-
+        executor.execute(() -> {
+            BlockHandlerStrategyTypeEnum blockHandlerStrategyTypeEnum = BlockHandlerStrategyTypeEnum.queryByCode(scheduleJob.getBlockStrategy());
+            if (blockHandlerStrategyTypeEnum == null) {
+                log.error("阻塞策略匹配失败");
+                return;
             }
+
+            blockMap.get(blockHandlerStrategyTypeEnum).block(scheduleJob);
         });
     }
 

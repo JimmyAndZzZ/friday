@@ -21,11 +21,8 @@ public class LoadSupport implements Initialize {
 
     private final Map<LoadTypeEnum, Load> loadMap = Maps.newHashMap();
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, Load> beansOfType = applicationContext.getBeansOfType(Load.class);
         beansOfType.values().forEach(bean -> loadMap.put(bean.type(), bean));
     }

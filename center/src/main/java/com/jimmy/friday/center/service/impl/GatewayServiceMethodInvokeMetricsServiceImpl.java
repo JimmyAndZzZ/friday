@@ -24,6 +24,7 @@ import com.jimmy.friday.center.service.GatewayServiceMethodService;
 import com.jimmy.friday.center.utils.RedisConstants;
 import com.jimmy.friday.center.vo.gateway.MetricsVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -78,7 +79,7 @@ public class GatewayServiceMethodInvokeMetricsServiceImpl extends ServiceImpl<Ga
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> {
             if (stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_INVOKE_METRICS_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
                 try {

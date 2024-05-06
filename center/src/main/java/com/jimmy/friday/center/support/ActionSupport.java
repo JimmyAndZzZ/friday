@@ -8,7 +8,6 @@ import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +21,6 @@ public class ActionSupport implements Initialize {
     private final Map<EventTypeEnum, Action<?>> actionMap = Maps.newHashMap();
 
     private final Map<EventTypeEnum, Class<?>> classMap = Maps.newHashMap();
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     public void action(Event event, ChannelHandlerContext ctx) {
         String type = event.getType();
@@ -46,7 +42,7 @@ public class ActionSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, Action> beansOfType = applicationContext.getBeansOfType(Action.class);
         for (Action value : beansOfType.values()) {
             EventTypeEnum type = value.type();

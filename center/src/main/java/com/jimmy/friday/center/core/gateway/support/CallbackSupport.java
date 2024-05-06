@@ -19,9 +19,6 @@ public class CallbackSupport implements Initialize, ApplicationListener<Callback
 
     private final Map<ServiceTypeEnum, Callback> callbackMap = Maps.newHashMap();
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     @Override
     public void onApplicationEvent(CallbackEvent event) {
         Service service = event.getService();
@@ -41,7 +38,7 @@ public class CallbackSupport implements Initialize, ApplicationListener<Callback
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, Callback> beansOfType = applicationContext.getBeansOfType(Callback.class);
         beansOfType.values().forEach(bean -> callbackMap.put(bean.type(), bean));
     }

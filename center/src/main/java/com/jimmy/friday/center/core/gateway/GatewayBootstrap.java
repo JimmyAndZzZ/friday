@@ -44,7 +44,7 @@ public class GatewayBootstrap implements InitializingBean, ApplicationRunner {
 
         List<Initialize> collect = values.stream().sorted(Comparator.comparingInt(Initialize::sort)).collect(Collectors.toList());
         for (Initialize initialize : collect) {
-            initialize.init();
+            initialize.init(applicationContext);
         }
 
         CronUtil.setMatchSecond(true);

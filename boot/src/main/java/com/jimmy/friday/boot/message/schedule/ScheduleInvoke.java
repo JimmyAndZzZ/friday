@@ -14,7 +14,7 @@ public class ScheduleInvoke implements Message {
 
     private String scheduleId;
 
-    private Map<String, String> param = new HashMap<>();
+    private String param;
 
     @Override
     public EventTypeEnum type() {

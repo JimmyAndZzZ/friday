@@ -18,6 +18,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class KafkaManager implements Initialize, Close {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         String kafkaServer = fridayConfigProperties.getKafkaServer();
         if (StrUtil.isEmpty(kafkaServer)) {
             throw new IllegalArgumentException("未配置kafka地址");

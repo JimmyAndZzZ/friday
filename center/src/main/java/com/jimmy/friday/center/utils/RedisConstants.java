@@ -31,9 +31,7 @@ public interface RedisConstants {
 
         String SCHEDULE_REGISTER_JOB_LOCK = "friday:schedule:register:job:lock:";
 
-        String SCHEDULE_JOB_RUNNING_INFO = "friday:schedule:job:running:info:";
-
-        String SCHEDULE_JOB_RUNNING_INFO_LOCK = "friday:schedule:job:running:info:lock:";
+        String SCHEDULE_JOB_RUNNING_FLAG = "friday:schedule:job:running:flag:";
 
     }
 

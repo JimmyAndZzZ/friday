@@ -54,9 +54,6 @@ import java.util.stream.Collectors;
 public class Gateway {
 
     @Autowired
-    private GatewayRouteElect gatewayRouteElect;
-
-    @Autowired
     private LoadSupport loadSupport;
 
     @Autowired
@@ -66,22 +63,16 @@ public class Gateway {
     private InvokeSupport invokeSupport;
 
     @Autowired
-    private RegisterSupport registerSupport;
-
-    @Autowired
-    private GatewayCallbackManager gatewayCallbackManager;
-
-    @Autowired
     private AttachmentCache attachmentCache;
 
     @Autowired
+    private RegisterSupport registerSupport;
+
+    @Autowired
+    private GatewayRouteElect gatewayRouteElect;
+
+    @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private GatewayRateLimiterManager gatewayRateLimiterManager;
-
-    @Autowired
-    private GatewayCircuitBreakerManager gatewayCircuitBreakerManager;
 
     @Autowired
     private GatewayAccountService gatewayAccountService;
@@ -90,10 +81,19 @@ public class Gateway {
     private GatewayServiceService gatewayServiceService;
 
     @Autowired
+    private GatewayCallbackManager gatewayCallbackManager;
+
+    @Autowired
+    private GatewayRateLimiterManager gatewayRateLimiterManager;
+
+    @Autowired
     private GatewayInvokeTraceService gatewayInvokeTraceService;
 
     @Autowired
     private GatewayServiceMethodService gatewayServiceMethodService;
+
+    @Autowired
+    private GatewayCircuitBreakerManager gatewayCircuitBreakerManager;
 
     @Autowired
     private GatewayServiceProviderService gatewayServiceProviderService;

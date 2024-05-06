@@ -21,9 +21,6 @@ public class CollectSupport implements Initialize {
 
     private final Map<MethodTypeEnum, Collect> collectMap = Maps.newHashMap();
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     public List<InvokeParam> collect(String methodType, HttpServletRequest request, ApiContext apiContext) throws Exception {
         MethodTypeEnum methodTypeEnum = MethodTypeEnum.queryByType(methodType);
 
@@ -32,7 +29,7 @@ public class CollectSupport implements Initialize {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(ApplicationContext applicationContext) throws Exception {
         Map<String, Collect> beansOfType = applicationContext.getBeansOfType(Collect.class);
         beansOfType.values().forEach(bean -> collectMap.put(bean.type(), bean));
     }
