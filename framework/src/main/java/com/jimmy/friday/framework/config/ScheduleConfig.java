@@ -1,5 +1,8 @@
 package com.jimmy.friday.framework.config;
 
+import com.jimmy.friday.framework.bootstrap.ScheduleBootstrap;
+import com.jimmy.friday.framework.callback.ScheduleCallback;
+import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.process.schedule.ScheduleInterruptProcess;
 import com.jimmy.friday.framework.process.schedule.ScheduleInvokeProcess;
 import com.jimmy.friday.framework.schedule.ScheduleCenter;
@@ -20,6 +23,16 @@ public class ScheduleConfig {
     @Bean
     public ScheduleExecutor scheduleExecutor(TransmitSupport transmitSupport, ApplicationContext applicationContext) {
         return new ScheduleExecutor(this.scheduleCenter(), transmitSupport, applicationContext);
+    }
+
+    @Bean
+    public ScheduleBootstrap scheduleBootstrap(TransmitSupport transmitSupport, ConfigLoad configLoad, ScheduleCenter scheduleCenter, ScheduleExecutor scheduleExecutor) {
+        return new ScheduleBootstrap(transmitSupport, configLoad, scheduleCenter, scheduleExecutor);
+    }
+
+    @Bean
+    public ScheduleCallback scheduleCallback(ConfigLoad configLoad, ScheduleCenter scheduleCenter) {
+        return new ScheduleCallback(configLoad, scheduleCenter);
     }
 
     @Configuration

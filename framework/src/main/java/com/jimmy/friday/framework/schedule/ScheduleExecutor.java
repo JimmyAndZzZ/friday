@@ -1,10 +1,13 @@
 package com.jimmy.friday.framework.schedule;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleResult;
 import com.jimmy.friday.framework.support.TransmitSupport;
@@ -16,7 +19,9 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +41,27 @@ public class ScheduleExecutor {
     private TransmitSupport transmitSupport;
 
     private ApplicationContext applicationContext;
+
+    public List<ScheduleRunInfo> getRunInfo() {
+        if (MapUtil.isNotEmpty(runningInfoMap)) {
+            return Lists.newArrayList();
+        }
+
+        List<ScheduleRunInfo> scheduleRunInfoList = Lists.newArrayList();
+
+        for (Map.Entry<Long, RunningInfo> entry : runningInfoMap.entrySet()) {
+            Long key = entry.getKey();
+            RunningInfo value = entry.getValue();
+
+            ScheduleRunInfo scheduleRunInfo = new ScheduleRunInfo();
+            scheduleRunInfo.setScheduleId(value.getScheduleId());
+            scheduleRunInfo.setRunTime(System.currentTimeMillis() - value.getStartDate());
+            scheduleRunInfo.setTraceId(key);
+            scheduleRunInfoList.add(scheduleRunInfo);
+        }
+
+        return scheduleRunInfoList;
+    }
 
     public ScheduleExecutor(ScheduleCenter scheduleCenter, TransmitSupport transmitSupport, ApplicationContext applicationContext) {
         this.scheduleCenter = scheduleCenter;

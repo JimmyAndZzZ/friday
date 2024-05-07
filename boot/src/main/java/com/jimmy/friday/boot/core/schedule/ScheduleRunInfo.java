@@ -13,6 +13,4 @@ public class ScheduleRunInfo implements Serializable {
 
     private Long traceId;
 
-    private String applicationId;
-
 }
