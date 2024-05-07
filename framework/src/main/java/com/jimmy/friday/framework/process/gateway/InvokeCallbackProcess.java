@@ -1,16 +1,12 @@
 package com.jimmy.friday.framework.process.gateway;
 
-import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.InvokeCallback;
 import com.jimmy.friday.framework.base.Process;
 import com.jimmy.friday.framework.support.CallbackSupport;
-import com.jimmy.friday.framework.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.util.Objects;
-
-public class InvokeCallbackProcess implements Process {
+public class InvokeCallbackProcess implements Process<InvokeCallback> {
 
     private CallbackSupport callbackSupport;
 
@@ -19,8 +15,8 @@ public class InvokeCallbackProcess implements Process {
     }
 
     @Override
-    public void process(Event event, ChannelHandlerContext ctx) {
-        callbackSupport.callback(Objects.requireNonNull(JsonUtil.parseObject(event.getMessage(), InvokeCallback.class)));
+    public void process(InvokeCallback invokeCallback, ChannelHandlerContext ctx) {
+        callbackSupport.callback(invokeCallback);
     }
 
     @Override

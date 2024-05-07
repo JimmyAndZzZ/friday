@@ -38,6 +38,8 @@ public interface RedisConstants {
         String SCHEDULE_TIMEOUT_JOB_LOCK = "friday:schedule:timeout:job:lock";
 
         String SCHEDULE_JOB_RELOAD_LOCK = "friday:schedule:job:reload:lock:";
+
+        String SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK = "friday:schedule:no:timeout:job:scan:lock";
     }
 
     interface Gateway {

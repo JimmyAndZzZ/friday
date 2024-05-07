@@ -1,6 +1,8 @@
 package com.jimmy.friday.framework.netty.client;
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.Ack;
@@ -15,6 +17,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
@@ -23,19 +27,42 @@ import java.util.concurrent.RejectedExecutionException;
 @ChannelHandler.Sharable
 public class ClientHandler extends SimpleChannelInboundHandler<Event> {
 
-    private final Map<EventTypeEnum, Process> processMap = new HashMap<>();
+    private final Map<EventTypeEnum, Class<?>> classMap = Maps.newHashMap();
 
-    private ConfigLoad configLoad;
+    private final Map<EventTypeEnum, Process<?>> processMap = new HashMap<>();
 
     private Client client;
 
+    private ConfigLoad configLoad;
+
     private ApplicationContext applicationContext;
 
-    public ClientHandler(ConfigLoad configLoad, ApplicationContext applicationContext, Client client) {
+    public ClientHandler(ConfigLoad configLoad, ApplicationContext applicationContext, Client client) throws Exception {
         super();
         this.configLoad = configLoad;
         this.client = client;
         this.applicationContext = applicationContext;
+
+        Map<String, Process> beansOfType = applicationContext.getBeansOfType(Process.class);
+        for (Process value : beansOfType.values()) {
+            EventTypeEnum type = value.type();
+            processMap.put(type, value);
+
+            Type[] genericInterfaces = value.getClass().getGenericInterfaces();
+            if (ArrayUtil.isNotEmpty(genericInterfaces)) {
+                Type genericInterface = genericInterfaces[0];
+                // 如果gType类型是ParameterizedType对象
+                if (genericInterface instanceof ParameterizedType) {
+                    // 强制类型转换
+                    ParameterizedType pType = (ParameterizedType) genericInterface;
+                    // 取得泛型类型的泛型参数
+                    Type[] tArgs = pType.getActualTypeArguments();
+                    if (ArrayUtil.isNotEmpty(tArgs)) {
+                        classMap.put(type, Class.forName(tArgs[0].getTypeName()));
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -61,6 +88,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
         String type = event.getType();
+        String message = event.getMessage();
 
         EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(type);
         if (eventTypeEnum == null) {
@@ -75,10 +103,14 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
                     ctx.writeAndFlush(new Event(EventTypeEnum.ACK, JsonUtil.toString(ack)));
                 }
 
+                Class<?> clazz = classMap.get(eventTypeEnum);
                 Process process = processMap.get(eventTypeEnum);
-                if (process != null) {
-                    process.process(event, ctx);
+
+                if (process == null || clazz == null) {
+                    return;
                 }
+
+                process.process(JsonUtil.parseObject(message, clazz), ctx);
             });
         } catch (RejectedExecutionException e) {
             log.error("Thread Pool Full");

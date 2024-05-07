@@ -2,13 +2,9 @@ package com.jimmy.friday.center;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.enums.JobRunStatusEnum;
-import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
-import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleInterrupt;
 import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.center.core.AttachmentCache;
@@ -23,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -53,18 +47,18 @@ public class Schedule {
         String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(scheduleJobLog.getExecutorId());
         if (applicationIdByExecutorId == null) {
             log.error("调度执行器未连接,{}", scheduleJobLog.getExecutorId());
-            this.callback(ScheduleResult.error("调度被中断", traceId));
+            this.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:执行器离线");
             return;
         }
 
         ScheduleJob byId = scheduleJobService.getById(jobId);
         if (byId == null) {
             log.error("定时器不存在,{}", jobId);
-            this.callback(ScheduleResult.error("定时器不存在", traceId));
+            this.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:定时器不存在");
             return;
         }
 
-        this.callback(ScheduleResult.error("调度被中断", traceId));
+        this.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:外部中断");
 
         ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
         scheduleInterrupt.setScheduleId(scheduleJobLog.getJobCode());
@@ -72,9 +66,7 @@ public class Schedule {
         transmitSupport.transmit(scheduleInterrupt, applicationIdByExecutorId);
     }
 
-    public void callback(ScheduleResult scheduleResult) {
-        Long traceId = scheduleResult.getTraceId();
-
+    public void callback(Long traceId, Long endDate, Boolean isSuccess, String errorMessage) {
         ScheduleJobLog scheduleJobLog = scheduleJobLogService.queryByTraceId(traceId);
         if (scheduleJobLog == null) {
             log.error("调度运行日志不存在,{}", traceId);
@@ -88,16 +80,16 @@ public class Schedule {
             return;
         }
 
-        Boolean isSuccess = scheduleResult.getIsSuccess();
         if (isSuccess) {
             scheduleJobLog.setRunStatus(JobRunStatusEnum.SUCCESS.getCode());
+            scheduleJobLog.setEndDate(endDate);
+            scheduleJobLogService.updateById(scheduleJobLog);
         } else {
             scheduleJobLog.setRunStatus(JobRunStatusEnum.ERROR.getCode());
-            scheduleJobLog.setErrorMessage(scheduleResult.getErrorMessage());
+            scheduleJobLog.setErrorMessage(errorMessage);
+            scheduleJobLog.setEndDate(endDate);
+            scheduleJobLogService.fail(scheduleJobLog);
         }
-
-        scheduleJobLog.setEndDate(scheduleResult.getEndDate());
-        scheduleJobLogService.updateById(scheduleJobLog);
     }
 
     public boolean isRunning(Long id) {

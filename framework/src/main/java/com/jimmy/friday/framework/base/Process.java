@@ -4,9 +4,9 @@ import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import io.netty.channel.ChannelHandlerContext;
 
-public interface Process {
+public interface Process<T> {
 
-    void process(Event event, ChannelHandlerContext ctx);
+    void process(T t, ChannelHandlerContext ctx);
 
     EventTypeEnum type();
 }

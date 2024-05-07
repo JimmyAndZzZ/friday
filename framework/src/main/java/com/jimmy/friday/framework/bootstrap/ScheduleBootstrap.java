@@ -4,12 +4,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleResult;
+import com.jimmy.friday.boot.enums.JobRunStatusEnum;
 import com.jimmy.friday.boot.exception.ScheduleException;
+import com.jimmy.friday.boot.message.schedule.ScheduleHeartbeat;
 import com.jimmy.friday.framework.annotation.Job;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.other.GatewayClassPathBeanDefinitionScanner;
 import com.jimmy.friday.framework.schedule.ScheduleCenter;
+import com.jimmy.friday.framework.schedule.ScheduleExecutor;
+import com.jimmy.friday.framework.support.TransmitSupport;
 import com.jimmy.friday.framework.utils.ClassUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,7 +21,10 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.ClassMetadata;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class ScheduleBootstrap implements Bootstrap {
 
@@ -25,9 +32,15 @@ public class ScheduleBootstrap implements Bootstrap {
 
     private ScheduleCenter scheduleCenter;
 
-    public ScheduleBootstrap(ConfigLoad configLoad, ScheduleCenter scheduleCenter) {
+    private TransmitSupport transmitSupport;
+
+    private ScheduleExecutor scheduleExecutor;
+
+    public ScheduleBootstrap(TransmitSupport transmitSupport, ConfigLoad configLoad, ScheduleCenter scheduleCenter, ScheduleExecutor scheduleExecutor) {
         this.configLoad = configLoad;
         this.scheduleCenter = scheduleCenter;
+        this.transmitSupport = transmitSupport;
+        this.scheduleExecutor = scheduleExecutor;
     }
 
     @Override
@@ -56,6 +69,13 @@ public class ScheduleBootstrap implements Bootstrap {
 
     @Override
     public void bootstrapAfter() throws Exception {
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+            ScheduleHeartbeat scheduleHeartbeat = new ScheduleHeartbeat();
+            scheduleHeartbeat.setApplicationId(configLoad.getId());
+            scheduleHeartbeat.setApplicationName(configLoad.getApplicationName());
+            scheduleHeartbeat.setScheduleRunInfoList(scheduleExecutor.getRunInfo());
+            transmitSupport.send(scheduleHeartbeat);
+        }, 0, 15, TimeUnit.SECONDS);
     }
 
     @Override

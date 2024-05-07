@@ -15,6 +15,8 @@ public class ScheduleResult implements Message {
 
     private Boolean isSuccess;
 
+    private Long endDate;
+
     @Override
     public EventTypeEnum type() {
         return EventTypeEnum.SCHEDULE_RESULT;

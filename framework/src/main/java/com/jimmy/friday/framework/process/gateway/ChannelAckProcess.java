@@ -1,14 +1,12 @@
 package com.jimmy.friday.framework.process.gateway;
 
-import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.ChannelAck;
 import com.jimmy.friday.framework.base.Process;
 import com.jimmy.friday.framework.support.ChannelSupport;
-import com.jimmy.friday.framework.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 
-public class ChannelAckProcess implements Process {
+public class ChannelAckProcess implements Process<ChannelAck> {
 
     private ChannelSupport channelSupport;
 
@@ -17,10 +15,7 @@ public class ChannelAckProcess implements Process {
     }
 
     @Override
-    public void process(Event event, ChannelHandlerContext ctx) {
-        String message = event.getMessage();
-        ChannelAck channelAck = JsonUtil.parseObject(message, ChannelAck.class);
-
+    public void process(ChannelAck channelAck, ChannelHandlerContext ctx) {
         channelSupport.notify(channelAck);
     }
 
