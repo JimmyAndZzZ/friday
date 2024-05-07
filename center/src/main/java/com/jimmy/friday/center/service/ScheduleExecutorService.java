@@ -13,7 +13,7 @@ public interface ScheduleExecutorService extends IService<ScheduleExecutor> {
 
     ScheduleExecutor query(String applicationName, String ip);
 
-    void register(String applicationName, String ip);
+    ScheduleExecutor register(String applicationName, String ip);
 
     void offline(String applicationName, String ip);
 

@@ -34,12 +34,12 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
     private AttachmentCache attachmentCache;
 
     @Override
-    public ScheduleExecutor getById(Serializable id){
+    public ScheduleExecutor getById(Serializable id) {
         return attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_EXECUTOR_CACHE, id.toString(), ScheduleExecutor.class, () -> super.getById(id));
     }
 
     @Override
-    public void register(String applicationName, String ip) {
+    public ScheduleExecutor register(String applicationName, String ip) {
         ScheduleExecutor one = this.query(applicationName, ip);
         if (one != null) {
             one.setStatus(ScheduleExecutorStatusEnum.ALIVE.getCode());
@@ -53,6 +53,8 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
                 this.save(one);
             }
         }
+
+        return one;
     }
 
     @Override

@@ -67,7 +67,7 @@ public class Schedule {
         this.callback(ScheduleResult.error("调度被中断", traceId));
 
         ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
-        scheduleInterrupt.setScheduleId(byId.getCode());
+        scheduleInterrupt.setScheduleId(scheduleJobLog.getJobCode());
         scheduleInterrupt.setTraceId(traceId);
         transmitSupport.transmit(scheduleInterrupt, applicationIdByExecutorId);
     }
@@ -82,7 +82,6 @@ public class Schedule {
         }
 
         attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + scheduleJobLog.getJobId());
-        attachmentCache.removeList(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_TRACE_ID_LIST, traceId.toString());
 
         if (!JobRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
             log.error("调度结束，更新无效,{}", traceId);
@@ -124,6 +123,7 @@ public class Schedule {
         scheduleJobLog.setExecutorId(select.getId());
         scheduleJobLog.setStartDate(System.currentTimeMillis());
         scheduleJobLog.setRunStatus(JobRunStatusEnum.RUNNING.getCode());
+        scheduleJobLog.setJobCode(scheduleJob.getCode());
         scheduleJobLog.setTraceId(traceId);
         //计算超时时间
         if (timeout != null && timeout > 0) {
@@ -153,12 +153,6 @@ public class Schedule {
     }
 
     public void invoke(ScheduleInvoke scheduleInvoke, String applicationId) {
-        Long traceId = scheduleInvoke.getTraceId();
-        if (!attachmentCache.attachStringList(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_TRACE_ID_LIST, traceId.toString())) {
-            log.error("当前调度未结束:{}", traceId);
-            return;
-        }
-
         transmitSupport.transmit(scheduleInvoke, applicationId);
     }
 }

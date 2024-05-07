@@ -37,5 +37,7 @@ public class ScheduleJobLog  {
     private String runParam;
 
     private Long endDate;
+
+    private String jobCode;
 }
 

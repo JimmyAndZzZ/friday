@@ -9,9 +9,12 @@ import cn.hutool.cron.CronUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.enums.*;
+import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
+import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.ScheduleJob;
@@ -42,6 +45,9 @@ public class ScheduleCenter implements Initialize {
     private static final long PRE_READ_MS = 5000;
 
     @Autowired
+    private Schedule schedule;
+
+    @Autowired
     private StripedLock stripedLock;
 
     @Autowired
@@ -70,7 +76,7 @@ public class ScheduleCenter implements Initialize {
                             scheduleJobLog.setErrorMessage("运行超时");
                             //乐观锁
                             if (scheduleJobLogService.fail(scheduleJobLog)) {
-//todo kill
+                                schedule.interrupt(scheduleJobLog);
                             }
                         }
                     }
@@ -142,8 +148,25 @@ public class ScheduleCenter implements Initialize {
         return 1;
     }
 
-    public void register(Collection<ScheduleInfo> scheduleInfos, String applicationName) {
-        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName, 60L, TimeUnit.SECONDS)) {
+    public void register(ScheduleExecutor connect, Collection<ScheduleInfo> scheduleInfos, String applicationName, String applicationId) {
+        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_JOB_RELOAD_LOCK + applicationId, 60L, TimeUnit.SECONDS)) {
+            try {
+                List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNotFinish(connect.getId());
+                if (CollUtil.isNotEmpty(scheduleJobLogs)) {
+                    for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
+                        ScheduleInvoke invoke = new ScheduleInvoke();
+                        invoke.setScheduleId(scheduleJobLog.getJobCode());
+                        invoke.setTraceId(scheduleJobLog.getTraceId());
+                        invoke.setParam(scheduleJobLog.getRunParam());
+                        schedule.invoke(invoke, applicationId);
+                    }
+                }
+            } finally {
+                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_JOB_RELOAD_LOCK + applicationId);
+            }
+        }
+
+        if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationId, 60L, TimeUnit.SECONDS)) {
             try {
                 if (CollUtil.isEmpty(scheduleInfos)) {
                     scheduleJobService.removeByApplicationName(applicationName);
@@ -194,7 +217,7 @@ public class ScheduleCenter implements Initialize {
             } catch (Exception e) {
                 log.error("保存调度任务失败", e);
             } finally {
-                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationName);
+                stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_REGISTER_JOB_LOCK + applicationId);
             }
         }
     }
