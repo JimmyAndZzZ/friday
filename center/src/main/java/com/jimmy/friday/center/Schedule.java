@@ -47,35 +47,45 @@ public class Schedule {
     private ScheduleJobLogService scheduleJobLogService;
 
     public void interrupt(ScheduleJobLog scheduleJobLog) {
+        Long jobId = scheduleJobLog.getJobId();
+        Long traceId = scheduleJobLog.getTraceId();
+
         String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(scheduleJobLog.getExecutorId());
         if (applicationIdByExecutorId == null) {
             log.error("调度执行器未连接,{}", scheduleJobLog.getExecutorId());
+            this.callback(ScheduleResult.error("调度被中断", traceId));
             return;
         }
-
-        Long jobId = scheduleJobLog.getJobId();
 
         ScheduleJob byId = scheduleJobService.getById(jobId);
         if (byId == null) {
             log.error("定时器不存在,{}", jobId);
+            this.callback(ScheduleResult.error("定时器不存在", traceId));
             return;
         }
 
+        this.callback(ScheduleResult.error("调度被中断", traceId));
+
         ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
         scheduleInterrupt.setScheduleId(byId.getCode());
-        scheduleInterrupt.setTraceId(scheduleJobLog.getTraceId());
+        scheduleInterrupt.setTraceId(traceId);
         transmitSupport.transmit(scheduleInterrupt, applicationIdByExecutorId);
     }
 
     public void callback(ScheduleResult scheduleResult) {
-        ScheduleJobLog scheduleJobLog = scheduleJobLogService.queryByTraceId(scheduleResult.getTraceId());
+        Long traceId = scheduleResult.getTraceId();
+
+        ScheduleJobLog scheduleJobLog = scheduleJobLogService.queryByTraceId(traceId);
         if (scheduleJobLog == null) {
-            log.error("调度运行日志不存在,{}", scheduleResult.getTraceId());
+            log.error("调度运行日志不存在,{}", traceId);
             return;
         }
 
+        attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + scheduleJobLog.getJobId());
+        attachmentCache.removeList(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_TRACE_ID_LIST, traceId.toString());
+
         if (!JobRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
-            log.error("调度结束，更新无效,{}", scheduleResult.getTraceId());
+            log.error("调度结束，更新无效,{}", traceId);
             return;
         }
 
@@ -142,12 +152,13 @@ public class Schedule {
         }
     }
 
-    /**
-     * 调用定时器
-     *
-     * @param scheduleInvoke
-     */
-    private void invoke(ScheduleInvoke scheduleInvoke, String applicationId) {
+    public void invoke(ScheduleInvoke scheduleInvoke, String applicationId) {
+        Long traceId = scheduleInvoke.getTraceId();
+        if (!attachmentCache.attachStringList(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_TRACE_ID_LIST, traceId.toString())) {
+            log.error("当前调度未结束:{}", traceId);
+            return;
+        }
+
         transmitSupport.transmit(scheduleInvoke, applicationId);
     }
 }

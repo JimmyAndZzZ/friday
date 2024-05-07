@@ -36,6 +36,8 @@ public interface RedisConstants {
         String SCHEDULE_JOB_RUNNING_FLAG = "friday:schedule:job:running:flag:";
 
         String SCHEDULE_TIMEOUT_JOB_LOCK = "friday:schedule:timeout:job:lock";
+
+        String SCHEDULE_JOB_RUNNING_TRACE_ID_LIST = "friday:schedule:job:trace:id:list";
     }
 
     interface Gateway {

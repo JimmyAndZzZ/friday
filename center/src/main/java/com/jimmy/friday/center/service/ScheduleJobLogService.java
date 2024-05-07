@@ -13,6 +13,10 @@ import java.util.List;
  */
 public interface ScheduleJobLogService extends IService<ScheduleJobLog> {
 
+    List<ScheduleJobLog> queryNotFinish(Long executorId);
+
+    List<ScheduleJobLog> queryNoTimeout();
+
     List<ScheduleJobLog> queryTimeout();
 
     ScheduleJobLog queryByTraceId(Long traceId);

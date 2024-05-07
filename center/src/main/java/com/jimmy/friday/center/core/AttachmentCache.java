@@ -70,11 +70,11 @@ public class AttachmentCache {
         stringRedisTemplate.opsForSet().add(key, JsonUtil.toString(attachment));
     }
 
-    public void attachStringList(String key, String attachment) {
+    public boolean attachStringList(String key, String attachment) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(attachment);
 
-        stringRedisTemplate.opsForSet().add(key, attachment);
+        return Objects.equals(stringRedisTemplate.opsForSet().add(key, attachment), 1L);
     }
 
     public <T> List<T> attachmentList(String key, Class<T> clazz) {
@@ -217,5 +217,9 @@ public class AttachmentCache {
 
     public void remove(String mainKey) {
         stringRedisTemplate.delete(mainKey);
+    }
+
+    public void removeList(String mainKey, String value) {
+        stringRedisTemplate.opsForSet().remove(mainKey, value);
     }
 }
