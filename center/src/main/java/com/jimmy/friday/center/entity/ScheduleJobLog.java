@@ -32,10 +32,12 @@ public class ScheduleJobLog  {
 
     private String errorMessage;
 //超时时间
-    private Long timeout;
+    private Long timeoutDate;
 //运行参数
     private String runParam;
 
     private Long endDate;
+
+    private String jobCode;
 }
 

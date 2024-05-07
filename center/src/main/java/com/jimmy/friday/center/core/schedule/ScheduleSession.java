@@ -42,7 +42,9 @@ public class ScheduleSession implements Initialize {
 
     private final ConcurrentMap<String, AtomicInteger> heartbeatFailCheck = Maps.newConcurrentMap();
 
-    private final Cache<String, Long> heartbeatSign = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
+    private final Cache<String, Long> heartbeatSign = CacheBuilder
+            .newBuilder()
+            .expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
             .build();
 
     @Autowired
@@ -53,6 +55,26 @@ public class ScheduleSession implements Initialize {
 
     @Autowired
     private ScheduleExecutorService scheduleExecutorService;
+
+    public String getApplicationIdByExecutorId(Long id) {
+        com.jimmy.friday.center.entity.ScheduleExecutor byId = scheduleExecutorService.getById(id);
+        if (byId == null) {
+            return null;
+        }
+
+        Collection<ScheduleExecutor> values = executor.values();
+        if (CollUtil.isEmpty(values)) {
+            return null;
+        }
+
+        for (ScheduleExecutor value : values) {
+            if (value.getApplicationName().equals(byId.getApplicationName()) && value.getIp().equals(byId.getIpAddress())) {
+                return value.getApplicationId();
+            }
+        }
+
+        return null;
+    }
 
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
@@ -102,7 +124,7 @@ public class ScheduleSession implements Initialize {
         this.runInfo.put(applicationId, scheduleRunInfoList);
     }
 
-    public void connect(String applicationId, String applicationName, String ip) {
+    public ScheduleExecutor connect(String applicationId, String applicationName, String ip) {
         Lock lock = this.stripedLock.getLocalLock(LockKeyConstants.Schedule.SCHEDULE_EXECUTOR_SESSION, 8, applicationId);
         lock.lock();
 
@@ -126,7 +148,12 @@ public class ScheduleSession implements Initialize {
                 this.executor.put(applicationId, executor);
             }
 
-            this.scheduleExecutorService.register(applicationName, ip);
+            ScheduleExecutor scheduleExecutor = new ScheduleExecutor();
+            scheduleExecutor.setApplicationId(applicationId);
+            scheduleExecutor.setApplicationName(applicationName);
+            scheduleExecutor.setIp(ip);
+            scheduleExecutor.setId(this.scheduleExecutorService.register(applicationName, ip).getId());
+            return scheduleExecutor;
         } finally {
             lock.unlock();
         }

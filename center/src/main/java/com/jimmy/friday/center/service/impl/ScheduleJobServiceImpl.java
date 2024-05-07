@@ -3,11 +3,16 @@ package com.jimmy.friday.center.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.ScheduleJobDao;
+import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.service.ScheduleJobService;
+import com.jimmy.friday.center.utils.RedisConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,6 +24,14 @@ import java.util.List;
 @Service("scheduleJobInfoService")
 public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, ScheduleJob> implements ScheduleJobService {
 
+    @Autowired
+    private AttachmentCache attachmentCache;
+
+    @Override
+    public ScheduleJob getById(Serializable id) {
+        return attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_JOB_CACHE, id.toString(), ScheduleJob.class, () -> super.getById(id));
+    }
+    
     @Override
     public void updateNextExecuteTime(Long nextTime, Long id) {
         baseMapper.updateNextExecuteTime(nextTime, id);

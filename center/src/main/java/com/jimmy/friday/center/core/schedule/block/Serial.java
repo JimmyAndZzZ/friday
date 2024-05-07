@@ -40,6 +40,11 @@ public class Serial implements Block {
                         break;
                     }
 
+                    if (schedule.isRunning(scheduleJob.getId())) {
+                        ThreadUtil.sleep(1000);
+                        continue;
+                    }
+
                     ScheduleJob poll = queue.poll();
                     if (poll == null) {
                         ThreadUtil.sleep(100);

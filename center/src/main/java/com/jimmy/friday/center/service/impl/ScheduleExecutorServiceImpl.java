@@ -13,9 +13,11 @@ import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.service.ScheduleExecutorService;
 import com.jimmy.friday.center.utils.RedisConstants;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +34,12 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
     private AttachmentCache attachmentCache;
 
     @Override
-    public void register(String applicationName, String ip) {
+    public ScheduleExecutor getById(Serializable id) {
+        return attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_EXECUTOR_CACHE, id.toString(), ScheduleExecutor.class, () -> super.getById(id));
+    }
+
+    @Override
+    public ScheduleExecutor register(String applicationName, String ip) {
         ScheduleExecutor one = this.query(applicationName, ip);
         if (one != null) {
             one.setStatus(ScheduleExecutorStatusEnum.ALIVE.getCode());
@@ -46,6 +53,8 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
                 this.save(one);
             }
         }
+
+        return one;
     }
 
     @Override

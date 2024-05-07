@@ -15,6 +15,8 @@ public interface RedisConstants {
 
     interface Schedule {
 
+        String SCHEDULE_JOB_CACHE = "friday:schedule:jon:cache";
+
         String SCHEDULE_EXECUTE_COUNT = "friday:schedule:execute:count:";
 
         String SCHEDULE_EXECUTE_FAIL_COUNT = "friday:schedule:execute:fail:count:";
@@ -33,6 +35,9 @@ public interface RedisConstants {
 
         String SCHEDULE_JOB_RUNNING_FLAG = "friday:schedule:job:running:flag:";
 
+        String SCHEDULE_TIMEOUT_JOB_LOCK = "friday:schedule:timeout:job:lock";
+
+        String SCHEDULE_JOB_RELOAD_LOCK = "friday:schedule:job:reload:lock:";
     }
 
     interface Gateway {

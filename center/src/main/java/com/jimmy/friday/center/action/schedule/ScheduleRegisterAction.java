@@ -1,5 +1,6 @@
 package com.jimmy.friday.center.action.schedule;
 
+import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.schedule.ScheduleRegister;
 import com.jimmy.friday.center.base.Action;
@@ -22,8 +23,10 @@ public class ScheduleRegisterAction implements Action<ScheduleRegister> {
 
     @Override
     public void action(ScheduleRegister scheduleRegister, ChannelHandlerContext channelHandlerContext) {
-        scheduleSession.connect(scheduleRegister.getApplicationId(), scheduleRegister.getApplicationName(), scheduleRegister.getIp());
-        scheduleCenter.register(scheduleRegister.getScheduleInfos(), scheduleRegister.getApplicationName());
+        String applicationId = scheduleRegister.getApplicationId();
+        String applicationName = scheduleRegister.getApplicationName();
+
+        scheduleCenter.register(scheduleSession.connect(applicationId, applicationName, scheduleRegister.getIp()), scheduleRegister.getScheduleInfos(), applicationName, applicationId);
     }
 
     @Override
