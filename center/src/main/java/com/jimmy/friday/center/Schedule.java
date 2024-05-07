@@ -53,18 +53,18 @@ public class Schedule {
         String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(scheduleJobLog.getExecutorId());
         if (applicationIdByExecutorId == null) {
             log.error("调度执行器未连接,{}", scheduleJobLog.getExecutorId());
-            this.callback(ScheduleResult.error("调度被中断", traceId));
+            this.callback(ScheduleResult.error("调度被中断,原因:执行器离线", traceId));
             return;
         }
 
         ScheduleJob byId = scheduleJobService.getById(jobId);
         if (byId == null) {
             log.error("定时器不存在,{}", jobId);
-            this.callback(ScheduleResult.error("定时器不存在", traceId));
+            this.callback(ScheduleResult.error("调度被中断,原因:定时器不存在", traceId));
             return;
         }
 
-        this.callback(ScheduleResult.error("调度被中断", traceId));
+        this.callback(ScheduleResult.error("调度被中断,原因:外部中断", traceId));
 
         ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
         scheduleInterrupt.setScheduleId(scheduleJobLog.getJobCode());
@@ -91,13 +91,14 @@ public class Schedule {
         Boolean isSuccess = scheduleResult.getIsSuccess();
         if (isSuccess) {
             scheduleJobLog.setRunStatus(JobRunStatusEnum.SUCCESS.getCode());
+            scheduleJobLog.setEndDate(scheduleResult.getEndDate());
+            scheduleJobLogService.updateById(scheduleJobLog);
         } else {
             scheduleJobLog.setRunStatus(JobRunStatusEnum.ERROR.getCode());
             scheduleJobLog.setErrorMessage(scheduleResult.getErrorMessage());
+            scheduleJobLog.setEndDate(scheduleResult.getEndDate());
+            scheduleJobLogService.fail(scheduleJobLog);
         }
-
-        scheduleJobLog.setEndDate(scheduleResult.getEndDate());
-        scheduleJobLogService.updateById(scheduleJobLog);
     }
 
     public boolean isRunning(Long id) {

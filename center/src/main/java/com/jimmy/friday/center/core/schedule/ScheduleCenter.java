@@ -11,6 +11,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.core.schedule.ScheduleResult;
+import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.boot.enums.*;
 import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
@@ -51,6 +53,9 @@ public class ScheduleCenter implements Initialize {
     private StripedLock stripedLock;
 
     @Autowired
+    private ScheduleSession scheduleSession;
+
+    @Autowired
     private ScheduleTimeRing scheduleTimeRing;
 
     @Autowired
@@ -64,6 +69,41 @@ public class ScheduleCenter implements Initialize {
 
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
+        //超时扫描
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+            if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK, 300L, TimeUnit.SECONDS)) {
+                try {
+                    List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNoTimeout();
+                    if (CollUtil.isNotEmpty(scheduleJobLogs)) {
+                        Map<Long, List<ScheduleJobLog>> groupBy = scheduleJobLogs.stream().collect(Collectors.groupingBy(ScheduleJobLog::getExecutorId));
+
+                        for (Map.Entry<Long, List<ScheduleJobLog>> entry : groupBy.entrySet()) {
+                            Long key = entry.getKey();
+                            List<ScheduleJobLog> value = entry.getValue();
+
+                            String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(key);
+                            for (ScheduleJobLog scheduleJobLog : value) {
+                                Long traceId = scheduleJobLog.getTraceId();
+
+                                if (StrUtil.isEmpty(applicationIdByExecutorId)) {
+                                    schedule.callback(ScheduleResult.error("调度被中断,原因:执行器离线", traceId));
+                                    continue;
+                                }
+
+                                List<ScheduleRunInfo> realTimeRunInfo = scheduleSession.getRealTimeRunInfo(applicationIdByExecutorId);
+                                Set<Long> traceIds = CollUtil.isEmpty(realTimeRunInfo) ? Sets.newHashSet() : realTimeRunInfo.stream().map(ScheduleRunInfo::getTraceId).collect(Collectors.toSet());
+
+                                if (!traceIds.contains(traceId)) {
+                                    schedule.callback(ScheduleResult.error("调度被中断,原因:进程消失", traceId));
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    stripedLock.releaseLock(RedisConstants.Schedule.SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK);
+                }
+            }
+        }, 0, 60, TimeUnit.SECONDS);
         //超时扫描
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
             if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
@@ -154,11 +194,7 @@ public class ScheduleCenter implements Initialize {
                 List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNotFinish(connect.getId());
                 if (CollUtil.isNotEmpty(scheduleJobLogs)) {
                     for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
-                        ScheduleInvoke invoke = new ScheduleInvoke();
-                        invoke.setScheduleId(scheduleJobLog.getJobCode());
-                        invoke.setTraceId(scheduleJobLog.getTraceId());
-                        invoke.setParam(scheduleJobLog.getRunParam());
-                        schedule.invoke(invoke, applicationId);
+                        schedule.callback(ScheduleResult.error("调度被中断,原因:执行器重启", scheduleJobLog.getTraceId()));
                     }
                 }
             } finally {
