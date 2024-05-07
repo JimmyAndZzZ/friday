@@ -3,25 +3,22 @@ package com.jimmy.friday.center.core.schedule;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.cron.CronUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
-import com.jimmy.friday.boot.enums.*;
-import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
-import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
+import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
+import com.jimmy.friday.boot.enums.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
-import com.jimmy.friday.center.entity.TransactionPoint;
 import com.jimmy.friday.center.other.CronExpression;
 import com.jimmy.friday.center.service.ScheduleJobLogService;
 import com.jimmy.friday.center.service.ScheduleJobService;
@@ -35,7 +32,6 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -86,7 +82,7 @@ public class ScheduleCenter implements Initialize {
                                 Long traceId = scheduleJobLog.getTraceId();
 
                                 if (StrUtil.isEmpty(applicationIdByExecutorId)) {
-                                    schedule.callback(ScheduleResult.error("调度被中断,原因:执行器离线", traceId));
+                                    schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:执行器离线");
                                     continue;
                                 }
 
@@ -94,7 +90,7 @@ public class ScheduleCenter implements Initialize {
                                 Set<Long> traceIds = CollUtil.isEmpty(realTimeRunInfo) ? Sets.newHashSet() : realTimeRunInfo.stream().map(ScheduleRunInfo::getTraceId).collect(Collectors.toSet());
 
                                 if (!traceIds.contains(traceId)) {
-                                    schedule.callback(ScheduleResult.error("调度被中断,原因:进程消失", traceId));
+                                    schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:进程消失");
                                 }
                             }
                         }
@@ -194,7 +190,7 @@ public class ScheduleCenter implements Initialize {
                 List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNotFinish(connect.getId());
                 if (CollUtil.isNotEmpty(scheduleJobLogs)) {
                     for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
-                        schedule.callback(ScheduleResult.error("调度被中断,原因:执行器重启", scheduleJobLog.getTraceId()));
+                        schedule.callback(scheduleJobLog.getTraceId(), System.currentTimeMillis(), false, "调度被中断,原因:执行器重启");
                     }
                 }
             } finally {

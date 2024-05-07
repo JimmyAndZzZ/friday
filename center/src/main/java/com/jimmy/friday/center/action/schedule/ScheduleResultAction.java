@@ -1,12 +1,9 @@
 package com.jimmy.friday.center.action.schedule;
 
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.message.schedule.ScheduleRegister;
+import com.jimmy.friday.boot.message.schedule.ScheduleResult;
 import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.Action;
-import com.jimmy.friday.center.core.schedule.ScheduleCenter;
-import com.jimmy.friday.center.core.schedule.ScheduleSession;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +18,7 @@ public class ScheduleResultAction implements Action<ScheduleResult> {
 
     @Override
     public void action(ScheduleResult scheduleResult, ChannelHandlerContext channelHandlerContext) {
-        schedule.callback(scheduleResult);
+        schedule.callback(scheduleResult.getTraceId(), scheduleResult.getEndDate(), scheduleResult.getIsSuccess(), scheduleResult.getErrorMessage());
     }
 
     @Override

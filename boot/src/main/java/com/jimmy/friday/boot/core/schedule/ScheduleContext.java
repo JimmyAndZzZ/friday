@@ -1,17 +1,15 @@
 package com.jimmy.friday.boot.core.schedule;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.HashMap;
+import java.io.Serializable;
 
-public class ScheduleContext extends HashMap<String,String> {
+@Data
+public class ScheduleContext implements Serializable {
 
-    @Getter
-    @Setter
     private String scheduleId;
 
-    @Getter
-    @Setter
     private Long traceId;
+
+    private String param;
 }

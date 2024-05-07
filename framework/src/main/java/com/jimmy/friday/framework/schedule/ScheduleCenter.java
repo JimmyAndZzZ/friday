@@ -11,6 +11,10 @@ public class ScheduleCenter {
 
     private final Map<String, ScheduleInfo> scheduleInfoMap = Maps.newHashMap();
 
+    public ScheduleInfo getScheduleInfo(String scheduleId) {
+        return scheduleInfoMap.get(scheduleId);
+    }
+
     public void register(String className, String methodName, String scheduleId) {
         ScheduleInfo scheduleInfo = new ScheduleInfo();
         scheduleInfo.setScheduleId(scheduleId);
@@ -23,7 +27,7 @@ public class ScheduleCenter {
     }
 
     public void setSpringBeanId(String scheduleId, String springBeanId) {
-        ScheduleInfo scheduleInfo = scheduleInfoMap.get(scheduleId);
+        ScheduleInfo scheduleInfo = this.getScheduleInfo(scheduleId);
         if (scheduleInfo == null) {
             throw new ScheduleException(scheduleId + "定时器不存在");
         }

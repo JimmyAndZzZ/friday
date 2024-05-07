@@ -9,7 +9,7 @@ public class ScheduleRunInfo implements Serializable {
 
     private String scheduleId;
 
-    private Integer runTime;
+    private Long runTime;
 
     private Long traceId;
 

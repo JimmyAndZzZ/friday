@@ -9,19 +9,15 @@ import com.jimmy.friday.framework.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class GatewayInvokeProcess implements Process {
+public class GatewayInvokeProcess implements Process<GatewayInvoke> {
 
     @Autowired
     private InvokeSupport invokeSupport;
 
     @Override
-    public void process(Event event, ChannelHandlerContext ctx) {
-        String message = event.getMessage();
-        GatewayInvoke gatewayInvoke = JsonUtil.parseObject(message, GatewayInvoke.class);
+    public void process(GatewayInvoke gatewayInvoke, ChannelHandlerContext ctx) {
         invokeSupport.invoke(gatewayInvoke);
-
-        event.setMessage(JsonUtil.toString(gatewayInvoke));
-        ctx.writeAndFlush(event);
+        ctx.writeAndFlush(new Event(EventTypeEnum.GATEWAY_INVOKE, JsonUtil.toString(gatewayInvoke)));
     }
 
     @Override

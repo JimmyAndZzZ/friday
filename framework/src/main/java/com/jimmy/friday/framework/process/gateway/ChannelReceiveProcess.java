@@ -9,7 +9,7 @@ import com.jimmy.friday.framework.support.ChannelSupport;
 import com.jimmy.friday.framework.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 
-public class ChannelReceiveProcess implements Process {
+public class ChannelReceiveProcess implements Process<ChannelReceive> {
 
     private ChannelSupport channelSupport;
 
@@ -18,10 +18,7 @@ public class ChannelReceiveProcess implements Process {
     }
 
     @Override
-    public void process(Event event, ChannelHandlerContext ctx) {
-        String message = event.getMessage();
-        ChannelReceive channelReceive = JsonUtil.parseObject(message, ChannelReceive.class);
-
+    public void process(ChannelReceive channelReceive, ChannelHandlerContext ctx) {
         ctx.writeAndFlush(new Event(EventTypeEnum.CHANNEL_ACK, JsonUtil.toString(ChannelAck.success(channelReceive.getId()))));
         channelSupport.receive(channelReceive);
     }

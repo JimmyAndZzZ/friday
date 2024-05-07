@@ -2,18 +2,25 @@ package com.jimmy.friday.framework.schedule;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.exception.ScheduleException;
+import com.jimmy.friday.boot.message.schedule.ScheduleResult;
+import com.jimmy.friday.framework.support.TransmitSupport;
 import com.jimmy.friday.framework.utils.ClassUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class ScheduleExecutor {
@@ -22,9 +29,83 @@ public class ScheduleExecutor {
 
     private final Map<String, Object> instance = new HashMap<>();
 
+    private final ConcurrentMap<Long, RunningInfo> runningInfoMap = Maps.newConcurrentMap();
+
+    private ScheduleCenter scheduleCenter;
+
+    private TransmitSupport transmitSupport;
+
     private ApplicationContext applicationContext;
 
-    private void execute(ScheduleInfo scheduleInfo, ScheduleContext scheduleContext, Long traceId) {
+    public ScheduleExecutor(ScheduleCenter scheduleCenter, TransmitSupport transmitSupport, ApplicationContext applicationContext) {
+        this.scheduleCenter = scheduleCenter;
+        this.transmitSupport = transmitSupport;
+        this.applicationContext = applicationContext;
+    }
+
+    public void interrupt(Long traceId) {
+        RunningInfo runningInfo = runningInfoMap.remove(traceId);
+        if (runningInfo == null) {
+            log.error("traceId:{}中断失败，调度不存在", traceId);
+            return;
+        }
+
+        runningInfo.getExecutorService().shutdownNow();
+    }
+
+    public void invoke(Long traceId, String scheduleId, String param) {
+        ScheduleInfo scheduleInfo = scheduleCenter.getScheduleInfo(scheduleId);
+        if (scheduleInfo == null) {
+            ScheduleResult scheduleResult = new ScheduleResult();
+            scheduleResult.setId(scheduleId);
+            scheduleResult.setTraceId(traceId);
+            scheduleResult.setIsSuccess(false);
+            scheduleResult.setErrorMessage("本地定时器不存在");
+            scheduleResult.setEndDate(System.currentTimeMillis());
+            transmitSupport.send(scheduleResult);
+            return;
+        }
+
+        RunningInfo runningInfo = new RunningInfo(scheduleId);
+        //判断是否正在运行
+        RunningInfo put = runningInfoMap.putIfAbsent(traceId, runningInfo);
+        if (put != null) {
+            log.error("traceId:{}调度正在运行，此次调度作废", traceId);
+
+            runningInfo.close();
+            return;
+        }
+        //执行定时器
+        runningInfo.getExecutorService().submit(() -> {
+            try {
+                ScheduleContext scheduleContext = new ScheduleContext();
+                scheduleContext.setScheduleId(scheduleId);
+                scheduleContext.setParam(param);
+                scheduleContext.setTraceId(traceId);
+
+                com.jimmy.friday.boot.core.schedule.ScheduleResult execute = execute(scheduleInfo, scheduleContext);
+
+                ScheduleResult scheduleResult = new ScheduleResult();
+                scheduleResult.setId(scheduleId);
+                scheduleResult.setTraceId(traceId);
+                scheduleResult.setIsSuccess(execute.getIsSuccess());
+                scheduleResult.setErrorMessage(execute.getErrorMessage());
+                scheduleResult.setEndDate(execute.getEndDate());
+                transmitSupport.send(scheduleResult);
+            } finally {
+                runningInfoMap.remove(traceId);
+            }
+        });
+    }
+
+    /**
+     * 执行定时器
+     *
+     * @param scheduleInfo
+     * @param scheduleContext
+     */
+    private com.jimmy.friday.boot.core.schedule.ScheduleResult execute(ScheduleInfo scheduleInfo, ScheduleContext scheduleContext) {
+        Long traceId = scheduleContext.getTraceId();
         String className = scheduleInfo.getClassName();
         String scheduleId = scheduleInfo.getScheduleId();
         String methodName = scheduleInfo.getMethodName();
@@ -33,19 +114,20 @@ public class ScheduleExecutor {
         Object instanceObject = this.getInstanceObject(className, springBeanId);
         if (instanceObject == null) {
             log.error("获取执行器实例失败,class:{}", className);
-            return;
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器实例失败", traceId);
         }
 
         Method method = this.findMethod(className, methodName, scheduleId);
         if (method == null) {
             log.error("获取执行器方法失败,class:{},method:{}", className, methodName);
-            return;
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器方法失败", traceId);
         }
 
         try {
-            method.invoke(instanceObject, scheduleContext);
-        } catch (Exception e) {
+            return (com.jimmy.friday.boot.core.schedule.ScheduleResult) method.invoke(instanceObject, scheduleContext);
+        } catch (Throwable e) {
             log.error("执行失败", e);
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error(e.getMessage(), traceId);
         }
     }
 
@@ -121,6 +203,26 @@ public class ScheduleExecutor {
             throw new ScheduleException(className + "类不存在");
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ScheduleException(className + "类初始化失败");
+        }
+    }
+
+    @Data
+    private static class RunningInfo implements Serializable {
+
+        private Long startDate;
+
+        private String scheduleId;
+
+        private ExecutorService executorService;
+
+        public RunningInfo(String scheduleId) {
+            this.scheduleId = scheduleId;
+            this.startDate = System.currentTimeMillis();
+            this.executorService = Executors.newSingleThreadExecutor();
+        }
+
+        public void close() {
+            executorService.shutdownNow();
         }
     }
 }
