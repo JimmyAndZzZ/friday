@@ -87,6 +87,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Event> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        cause.printStackTrace();
         ctx.close();
     }
 }

@@ -41,6 +41,8 @@ public enum EventTypeEnum {
     CHANNEL_ACK("channelAck", "频道消息确认", false),
     SCHEDULE_REGISTER("scheduleRegister", "调度注册", false),
     SCHEDULE_INVOKE("scheduleInvoke", "调度运行", false),
+    SCHEDULE_APPEND("scheduleAppend", "调度增加", false),
+    SCHEDULE_DELETE("scheduleDelete", "调度删除", false),
     SCHEDULE_RESULT("scheduleResult", "调度结果", false),
     SCHEDULE_HEARTBEAT("scheduleHeartbeat", "调度心跳", false),
     SCHEDULE_INTERRUPT("scheduleInterrupt", "调度中断", false);

@@ -15,11 +15,12 @@ public class ScheduleCenter {
         return scheduleInfoMap.get(scheduleId);
     }
 
-    public void register(String className, String methodName, String scheduleId) {
+    public void register(String className, String methodName, String scheduleId, String cron) {
         ScheduleInfo scheduleInfo = new ScheduleInfo();
         scheduleInfo.setScheduleId(scheduleId);
         scheduleInfo.setMethodName(methodName);
         scheduleInfo.setClassName(className);
+        scheduleInfo.setCron(cron);
 
         if (scheduleInfoMap.put(scheduleId, scheduleInfo) != null) {
             throw new ScheduleException(scheduleId + "定时器重复定义");
