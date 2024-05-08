@@ -10,6 +10,7 @@ import com.jimmy.friday.boot.message.schedule.ScheduleHeartbeat;
 import com.jimmy.friday.framework.annotation.Job;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.core.ConfigLoad;
+import com.jimmy.friday.framework.other.CronExpression;
 import com.jimmy.friday.framework.other.GatewayClassPathBeanDefinitionScanner;
 import com.jimmy.friday.framework.schedule.ScheduleCenter;
 import com.jimmy.friday.framework.schedule.ScheduleExecutor;
@@ -112,6 +113,7 @@ public class ScheduleBootstrap implements Bootstrap {
         for (Method method : methods) {
             Job annotation = AnnotationUtils.getAnnotation(method, Job.class);
             if (annotation != null) {
+                String cron = annotation.cron();
                 Class<?> returnType = method.getReturnType();
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 if (parameterTypes.length != 1) {
@@ -127,7 +129,11 @@ public class ScheduleBootstrap implements Bootstrap {
                     throw new ScheduleException("方法:" + method.getName() + "返回类型不符合，需要返回ScheduleResult");
                 }
 
-                scheduleCenter.register(beanClassName, method.getName(), annotation.id());
+                if (!CronExpression.isValidExpression(cron)) {
+                    throw new ScheduleException("cron表达式:" + cron + "错误");
+                }
+
+                scheduleCenter.register(beanClassName, method.getName(), annotation.id(), cron);
             }
         }
     }

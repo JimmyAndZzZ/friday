@@ -40,4 +40,10 @@ public class CenterEventHandler extends SimpleChannelInboundHandler<Event> {
         //关闭与客户端的连接
         ctx.close();
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error("事件处理异常", cause);
+        ctx.close();
+    }
 }

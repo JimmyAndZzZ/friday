@@ -8,4 +8,6 @@ import java.lang.annotation.*;
 public @interface Job {
 
     String id();
+
+    String cron();
 }

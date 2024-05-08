@@ -184,6 +184,16 @@ public class ScheduleCenter implements Initialize {
         return 1;
     }
 
+    public void append(ScheduleInfo scheduleInfo, String applicationName) {
+
+
+    }
+
+    public void delete(String scheduleId, String applicationName) {
+
+
+    }
+
     public void register(ScheduleExecutor connect, Collection<ScheduleInfo> scheduleInfos, String applicationName, String applicationId) {
         if (stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_JOB_RELOAD_LOCK + applicationId, 60L, TimeUnit.SECONDS)) {
             try {
