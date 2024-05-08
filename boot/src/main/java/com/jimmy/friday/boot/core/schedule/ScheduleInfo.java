@@ -1,5 +1,6 @@
 package com.jimmy.friday.boot.core.schedule;
 
+import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,5 +17,7 @@ public class ScheduleInfo implements Serializable {
     private String scheduleId;
 
     private String cron;
+
+    private ScheduleSourceEnum scheduleSourceEnum;
 
 }

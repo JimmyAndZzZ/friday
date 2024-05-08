@@ -80,74 +80,68 @@ public class GatewayServiceMethodInvokeMetricsServiceImpl extends ServiceImpl<Ga
 
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
-        CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> {
-            if (stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_INVOKE_METRICS_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
-                try {
-                    Date now = new Date();
-                    String today = DateUtil.today();
-                    List<GatewayServiceMethodInvokeMetrics> list = Lists.newArrayList();
-                    //获取method和service映射
-                    Map<Long, Long> methodIdMapperServiceId = gatewayServiceMethodService.getMethodIdMapperServiceId();
-                    //删除7天前的数据
-                    QueryWrapper<GatewayServiceMethodInvokeMetrics> queryWrapper = new QueryWrapper<>();
-                    queryWrapper.le("create_date", DateUtil.offsetDay(now, -7));
-                    this.remove(queryWrapper);
+        CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_INVOKE_METRICS_JOB_LOCK, 300L, TimeUnit.SECONDS, () -> {
+            Date now = new Date();
+            String today = DateUtil.today();
+            List<GatewayServiceMethodInvokeMetrics> list = Lists.newArrayList();
+            //获取method和service映射
+            Map<Long, Long> methodIdMapperServiceId = gatewayServiceMethodService.getMethodIdMapperServiceId();
+            //删除7天前的数据
+            QueryWrapper<GatewayServiceMethodInvokeMetrics> queryWrapper = new QueryWrapper<>();
+            queryWrapper.le("create_date", DateUtil.offsetDay(now, -7));
+            this.remove(queryWrapper);
 
-                    Iterable<String> todayInvokeKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + "*");
-                    if (CollUtil.isNotEmpty(todayInvokeKeys)) {
-                        for (String key : todayInvokeKeys) {
-                            String attachment = attachmentCache.attachment(key);
-                            if (StrUtil.isNotEmpty(attachment)) {
-                                attachmentCache.remove(key);
+            Iterable<String> todayInvokeKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT + "*");
+            if (CollUtil.isNotEmpty(todayInvokeKeys)) {
+                for (String key : todayInvokeKeys) {
+                    String attachment = attachmentCache.attachment(key);
+                    if (StrUtil.isNotEmpty(attachment)) {
+                        attachmentCache.remove(key);
 
-                                Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT));
-                                if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
-                                    continue;
-                                }
-
-                                GatewayServiceMethodInvokeMetrics gatewayServiceMethodInvokeMetrics = new GatewayServiceMethodInvokeMetrics();
-                                gatewayServiceMethodInvokeMetrics.setServiceId(methodIdMapperServiceId.get(methodId));
-                                gatewayServiceMethodInvokeMetrics.setMethodId(methodId);
-                                gatewayServiceMethodInvokeMetrics.setInvokeCount(Convert.toInt(attachment, 0));
-                                gatewayServiceMethodInvokeMetrics.setMeterUnit(InvokeMetricsTypeEnum.EVERYDAY.getCode());
-                                gatewayServiceMethodInvokeMetrics.setMeterDate(today);
-                                gatewayServiceMethodInvokeMetrics.setCreateDate(now);
-                                list.add(gatewayServiceMethodInvokeMetrics);
-                            }
+                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_TODAY_INVOKE_COUNT));
+                        if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
+                            continue;
                         }
-                    }
 
-                    Iterable<String> historyKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + "*");
-                    if (CollUtil.isNotEmpty(historyKeys)) {
-                        for (String key : historyKeys) {
-                            String attachment = attachmentCache.attachment(key);
-                            if (StrUtil.isNotEmpty(attachment)) {
-                                Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT));
-                                if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
-                                    attachmentCache.remove(key);
-                                    continue;
-                                }
-
-                                GatewayServiceMethodInvokeMetrics gatewayServiceMethodInvokeMetrics = new GatewayServiceMethodInvokeMetrics();
-                                gatewayServiceMethodInvokeMetrics.setServiceId(methodIdMapperServiceId.get(methodId));
-                                gatewayServiceMethodInvokeMetrics.setMethodId(methodId);
-                                gatewayServiceMethodInvokeMetrics.setInvokeCount(Convert.toInt(attachment, 0));
-                                gatewayServiceMethodInvokeMetrics.setMeterUnit(InvokeMetricsTypeEnum.HISTORY.getCode());
-                                gatewayServiceMethodInvokeMetrics.setMeterDate(today);
-                                gatewayServiceMethodInvokeMetrics.setCreateDate(now);
-                                list.add(gatewayServiceMethodInvokeMetrics);
-                            }
-                        }
+                        GatewayServiceMethodInvokeMetrics gatewayServiceMethodInvokeMetrics = new GatewayServiceMethodInvokeMetrics();
+                        gatewayServiceMethodInvokeMetrics.setServiceId(methodIdMapperServiceId.get(methodId));
+                        gatewayServiceMethodInvokeMetrics.setMethodId(methodId);
+                        gatewayServiceMethodInvokeMetrics.setInvokeCount(Convert.toInt(attachment, 0));
+                        gatewayServiceMethodInvokeMetrics.setMeterUnit(InvokeMetricsTypeEnum.EVERYDAY.getCode());
+                        gatewayServiceMethodInvokeMetrics.setMeterDate(today);
+                        gatewayServiceMethodInvokeMetrics.setCreateDate(now);
+                        list.add(gatewayServiceMethodInvokeMetrics);
                     }
-
-                    if (CollUtil.isNotEmpty(list)) {
-                        this.saveBatch(list);
-                    }
-                } finally {
-                    stripedLock.releaseLock(RedisConstants.Gateway.GATEWAY_INVOKE_METRICS_JOB_LOCK);
                 }
             }
-        });
+
+            Iterable<String> historyKeys = attachmentCache.keys(RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT + "*");
+            if (CollUtil.isNotEmpty(historyKeys)) {
+                for (String key : historyKeys) {
+                    String attachment = attachmentCache.attachment(key);
+                    if (StrUtil.isNotEmpty(attachment)) {
+                        Long methodId = Convert.toLong(StrUtil.removeAll(key, RedisConstants.Gateway.GATEWAY_METHOD_HISTORY_INVOKE_COUNT));
+                        if (methodId == null || !methodIdMapperServiceId.containsKey(methodId)) {
+                            attachmentCache.remove(key);
+                            continue;
+                        }
+
+                        GatewayServiceMethodInvokeMetrics gatewayServiceMethodInvokeMetrics = new GatewayServiceMethodInvokeMetrics();
+                        gatewayServiceMethodInvokeMetrics.setServiceId(methodIdMapperServiceId.get(methodId));
+                        gatewayServiceMethodInvokeMetrics.setMethodId(methodId);
+                        gatewayServiceMethodInvokeMetrics.setInvokeCount(Convert.toInt(attachment, 0));
+                        gatewayServiceMethodInvokeMetrics.setMeterUnit(InvokeMetricsTypeEnum.HISTORY.getCode());
+                        gatewayServiceMethodInvokeMetrics.setMeterDate(today);
+                        gatewayServiceMethodInvokeMetrics.setCreateDate(now);
+                        list.add(gatewayServiceMethodInvokeMetrics);
+                    }
+                }
+            }
+
+            if (CollUtil.isNotEmpty(list)) {
+                this.saveBatch(list);
+            }
+        }));
     }
 
     @Override

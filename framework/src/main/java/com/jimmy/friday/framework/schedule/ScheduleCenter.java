@@ -2,6 +2,7 @@ package com.jimmy.friday.framework.schedule;
 
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.boot.exception.ScheduleException;
 
 import java.util.Collection;
@@ -21,6 +22,7 @@ public class ScheduleCenter {
         scheduleInfo.setMethodName(methodName);
         scheduleInfo.setClassName(className);
         scheduleInfo.setCron(cron);
+        scheduleInfo.setScheduleSourceEnum(ScheduleSourceEnum.ANNOTATION);
 
         if (scheduleInfoMap.put(scheduleId, scheduleInfo) != null) {
             throw new ScheduleException(scheduleId + "定时器重复定义");

@@ -1,6 +1,7 @@
 package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.center.entity.ScheduleJob;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     void updateNextExecuteTime(Long nextTime, Long id);
 
-    void removeByApplicationName(String applicationName);
+    void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
     List<ScheduleJob> queryByApplicationName(String applicationName);
 
