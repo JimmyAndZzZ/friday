@@ -4,7 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.ServiceWarnTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceWarnTypeEnum;
 import com.jimmy.friday.center.dao.GatewayServiceWarnDao;
 import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.GatewayServiceProvider;

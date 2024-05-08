@@ -1,13 +1,13 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.gateway;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CostStrategyTypeEnum {
+public enum OrderPurposeTypeEnum {
 
-    COMMON("0", "普通"), FILE("1", "文件");
+    BALANCE_RECHARGE("0", "余额充值");
 
     private String code;
 

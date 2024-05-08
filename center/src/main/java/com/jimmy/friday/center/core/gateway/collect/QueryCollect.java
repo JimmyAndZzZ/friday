@@ -4,7 +4,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.google.common.collect.Lists;
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
-import com.jimmy.friday.boot.enums.MethodTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.MethodTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
 import com.jimmy.friday.center.base.gateway.Collect;
 import com.jimmy.friday.center.utils.JsonUtil;

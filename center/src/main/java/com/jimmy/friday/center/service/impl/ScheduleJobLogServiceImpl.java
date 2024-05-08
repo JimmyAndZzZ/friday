@@ -2,7 +2,7 @@ package com.jimmy.friday.center.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
 import com.jimmy.friday.center.dao.ScheduleJobLogDao;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
 import com.jimmy.friday.center.service.ScheduleJobLogService;

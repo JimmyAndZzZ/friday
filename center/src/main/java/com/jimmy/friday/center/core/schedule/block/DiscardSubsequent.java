@@ -1,6 +1,6 @@
 package com.jimmy.friday.center.core.schedule.block;
 
-import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
+import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.schedule.Block;
 import com.jimmy.friday.center.entity.ScheduleJob;

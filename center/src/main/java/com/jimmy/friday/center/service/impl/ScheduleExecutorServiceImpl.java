@@ -1,24 +1,19 @@
 package com.jimmy.friday.center.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.ScheduleExecutorStatusEnum;
-import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.ScheduleExecutorStatusEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Obtain;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.ScheduleExecutorDao;
-import com.jimmy.friday.center.entity.GatewayService;
 import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.service.ScheduleExecutorService;
 import com.jimmy.friday.center.utils.RedisConstants;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**

@@ -1,8 +1,8 @@
 package com.jimmy.friday.center.event;
 
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.CallbackTypeEnum;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.CallbackTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import org.springframework.context.ApplicationEvent;
 
 public class CallbackEvent extends ApplicationEvent {

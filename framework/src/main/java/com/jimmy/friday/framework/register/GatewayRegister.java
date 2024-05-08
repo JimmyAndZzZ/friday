@@ -2,7 +2,7 @@ package com.jimmy.friday.framework.register;
 
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.gateway.Method;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.framework.annotation.Api;
 import com.jimmy.friday.framework.annotation.Condition;
 import com.jimmy.friday.framework.annotation.GatewayService;

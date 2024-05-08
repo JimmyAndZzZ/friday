@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.core.agent.Command;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.agent.AgentCommand;

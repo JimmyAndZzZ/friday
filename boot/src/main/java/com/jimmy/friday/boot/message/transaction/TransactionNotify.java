@@ -3,7 +3,7 @@ package com.jimmy.friday.boot.message.transaction;
 import com.jimmy.friday.boot.base.Message;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import lombok.Data;
 
 import java.util.List;

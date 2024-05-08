@@ -1,7 +1,7 @@
 package com.jimmy.friday.boot.core.gateway;
 
-import com.jimmy.friday.boot.enums.ServiceStatusEnum;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;

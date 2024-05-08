@@ -3,7 +3,7 @@ package com.jimmy.friday.center.core.gateway.invoke;
 import cn.hutool.core.util.IdUtil;
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.message.gateway.Heartbeat;
 import com.jimmy.friday.center.action.gateway.GatewayHeartbeatAction;
 import com.jimmy.friday.center.core.gateway.RegisterCenter;

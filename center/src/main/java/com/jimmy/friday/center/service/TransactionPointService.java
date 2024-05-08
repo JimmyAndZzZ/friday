@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.center.entity.TransactionPoint;
 
 import java.util.Collection;

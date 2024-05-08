@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.agent.Topology;
-import com.jimmy.friday.boot.enums.ApplicationStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.ApplicationStatusEnum;
 import com.jimmy.friday.boot.other.ShortUUID;
 import com.jimmy.friday.center.dao.HawkEyeTopologyModuleDao;
 import com.jimmy.friday.center.entity.HawkEyeTopologyModule;

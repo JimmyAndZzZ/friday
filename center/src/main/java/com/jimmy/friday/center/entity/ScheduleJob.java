@@ -48,6 +48,8 @@ public class ScheduleJob {
 
     private String isManual;
 
+    private String source;
+
     public ScheduleJob clear() {
         this.description = null;
         return this;

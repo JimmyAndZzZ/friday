@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.base.gateway;
 
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
-import com.jimmy.friday.boot.enums.MethodTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.MethodTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
 
 import javax.servlet.http.HttpServletRequest;

@@ -1,14 +1,13 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ServiceStatusEnum {
+public enum ScheduleExecutorStatusEnum {
     ALIVE("0"),
-    ABNORMAL("1"),
-    DISCONNECT("2");
+    DISCONNECT("1");
 
     private String code;
 }

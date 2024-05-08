@@ -6,7 +6,7 @@ import com.jimmy.friday.agent.base.CommandWorker;
 import com.jimmy.friday.agent.command.BaseWorker;
 import com.jimmy.friday.agent.core.AgentClassLoader;
 import com.jimmy.friday.agent.exception.AgentException;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;

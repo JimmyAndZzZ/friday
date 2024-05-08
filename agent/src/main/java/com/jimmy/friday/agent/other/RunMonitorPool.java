@@ -4,7 +4,7 @@ import com.jimmy.friday.agent.support.CommandSupport;
 import com.jimmy.friday.boot.core.agent.Command;
 import com.jimmy.friday.boot.core.agent.ContextHold;
 import com.jimmy.friday.boot.core.agent.RunLine;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 import com.jimmy.friday.boot.result.TraceResult;
 import com.jimmy.friday.boot.result.WatchResult;
 

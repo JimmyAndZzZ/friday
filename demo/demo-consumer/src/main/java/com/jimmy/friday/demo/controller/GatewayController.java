@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.base.Callback;
 import com.jimmy.friday.boot.core.gateway.GatewayResponse;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.demo.service.GatewayApi;
 import com.jimmy.friday.framework.Gateway;
 import com.jimmy.friday.framework.annotation.GatewayReference;

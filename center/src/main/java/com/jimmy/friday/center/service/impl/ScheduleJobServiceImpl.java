@@ -2,10 +2,9 @@ package com.jimmy.friday.center.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.ScheduleStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.ScheduleStatusEnum;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.ScheduleJobDao;
-import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.service.ScheduleJobService;
 import com.jimmy.friday.center.utils.RedisConstants;

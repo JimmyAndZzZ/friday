@@ -7,7 +7,7 @@ import com.google.common.collect.Sets;
 import com.jimmy.friday.agent.other.AntPathMatcher;
 import com.jimmy.friday.agent.utils.DockerUtil;
 import com.jimmy.friday.boot.core.agent.Topology;
-import com.jimmy.friday.boot.enums.TopologyTypeEnum;
+import com.jimmy.friday.boot.enums.agent.TopologyTypeEnum;
 import com.jimmy.friday.boot.other.ConfigConstants;
 
 import java.io.BufferedReader;

@@ -1,7 +1,7 @@
 package com.jimmy.friday.agent.base;
 
 import com.jimmy.friday.boot.core.agent.Command;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 
 public interface CommandWorker<T> {
 

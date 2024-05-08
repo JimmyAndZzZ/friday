@@ -5,7 +5,7 @@ import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
 import com.jimmy.friday.boot.enums.AckTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionAck;
 import com.jimmy.friday.boot.message.transaction.TransactionRefund;
 import com.jimmy.friday.center.core.AttachmentCache;

@@ -2,7 +2,7 @@ package com.jimmy.friday.boot.message.gateway;
 
 import com.jimmy.friday.boot.base.Message;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.enums.NotifyTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.NotifyTypeEnum;
 import lombok.Data;
 
 @Data

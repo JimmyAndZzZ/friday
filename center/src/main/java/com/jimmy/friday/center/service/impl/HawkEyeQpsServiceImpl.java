@@ -3,7 +3,7 @@ package com.jimmy.friday.center.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.boot.core.agent.Qps;
-import com.jimmy.friday.boot.enums.ApplicationStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.ApplicationStatusEnum;
 import com.jimmy.friday.boot.message.agent.AgentQps;
 import com.jimmy.friday.boot.other.ShortUUID;
 import com.jimmy.friday.center.annotation.Async;

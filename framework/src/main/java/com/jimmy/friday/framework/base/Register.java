@@ -2,7 +2,7 @@ package com.jimmy.friday.framework.base;
 
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import org.springframework.core.type.filter.TypeFilter;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
-import com.jimmy.friday.boot.enums.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
 import com.jimmy.friday.boot.message.schedule.ScheduleInterrupt;
 import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.center.core.AttachmentCache;

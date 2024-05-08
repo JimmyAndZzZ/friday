@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jimmy.friday.boot.enums.InvokeMetricsTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.InvokeMetricsTypeEnum;
 import com.jimmy.friday.center.entity.GatewayServiceMethodInvokeMetrics;
 import com.jimmy.friday.center.vo.gateway.MetricsVO;
 

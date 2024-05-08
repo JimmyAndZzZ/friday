@@ -2,7 +2,7 @@ package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.center.entity.GatewayService;
 
 import java.io.Serializable;

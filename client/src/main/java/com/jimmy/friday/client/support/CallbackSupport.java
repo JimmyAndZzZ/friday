@@ -2,7 +2,7 @@ package com.jimmy.friday.client.support;
 
 import cn.hutool.core.map.MapUtil;
 import com.jimmy.friday.boot.base.Callback;
-import com.jimmy.friday.boot.enums.NotifyTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.NotifyTypeEnum;
 import com.jimmy.friday.boot.message.gateway.InvokeCallback;
 
 import java.time.Instant;

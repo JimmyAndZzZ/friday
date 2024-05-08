@@ -1,4 +1,4 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.transaction;
 
 public enum TransactionPropagationEnum {
     REQUIRED,
