@@ -1,9 +1,11 @@
 package com.jimmy.friday.center.core;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
+import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Obtain;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
@@ -11,13 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 @Component
-public class StripedLock {
+public class StripedLock implements Close {
 
     private final Set<String> lockKeys = Sets.newHashSet();
 
@@ -28,6 +29,29 @@ public class StripedLock {
 
     @Autowired
     private AttachmentCache attachmentCache;
+
+    @Override
+    public void close() {
+        if (CollUtil.isNotEmpty(lockKeys)) {
+            for (String lockKey : lockKeys) {
+                attachmentCache.remove(lockKey);
+            }
+        }
+    }
+
+    public <T> T tryLock(String key, Long time, TimeUnit timeUnit, Obtain<T> obtain, T tryFailResult) {
+        if (this.tryLock(key, time, timeUnit)) {
+            try {
+                lockKeys.add(key);
+                return obtain.obtain();
+            } finally {
+                this.releaseLock(key);
+                lockKeys.remove(key);
+            }
+        } else {
+            return tryFailResult;
+        }
+    }
 
     public void tryLock(String key, Long time, TimeUnit timeUnit, Runnable runnable) {
         if (this.tryLock(key, time, timeUnit)) {
@@ -54,10 +78,6 @@ public class StripedLock {
 
     public RReadWriteLock getDistributedReadWriteLock(String key) {
         return redissonClient.getReadWriteLock(key);
-    }
-
-    public Lock getDistributedLock(String key) {
-        return redissonClient.getLock(key);
     }
 
     /**
