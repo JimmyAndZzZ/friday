@@ -2,6 +2,7 @@ package com.jimmy.friday.center.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleStatusEnum;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.ScheduleJobDao;
@@ -30,7 +31,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     public ScheduleJob getById(Serializable id) {
         return attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_JOB_CACHE, id.toString(), ScheduleJob.class, () -> super.getById(id));
     }
-    
+
     @Override
     public void updateNextExecuteTime(Long nextTime, Long id) {
         baseMapper.updateNextExecuteTime(nextTime, id);
@@ -52,9 +53,14 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     }
 
     @Override
-    public void removeByApplicationName(String applicationName) {
+    public void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("application_name", applicationName);
+
+        if (scheduleSourceEnum != null) {
+            queryWrapper.eq("source", scheduleSourceEnum.getCode());
+        }
+
         this.remove(queryWrapper);
     }
 

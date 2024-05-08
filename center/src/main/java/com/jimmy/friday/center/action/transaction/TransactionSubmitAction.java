@@ -57,52 +57,50 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
         transactionAck.setTransactionId(id);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        RReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK);
-        RLock lock = readWriteLock.writeLock();
+        stripedLock.readWriteLockWrite(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + id, 120L, TimeUnit.SECONDS, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!transactionPointService.updateStatus(transactionStatus, id, TransactionStatusEnum.WAIT)) {
+                        log.error("事务状态已更新，当前提交作废:{}", id);
+                        return;
+                    }
+                    //更新缓存
+                    attachmentCache.attachString(RedisConstants.Transaction.TRANSACTION_POINT + id, transactionStatus.getState());
+                    attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + id, 3L, TimeUnit.DAYS);
 
-        try {
-            lock.lock(120, TimeUnit.SECONDS);
+                    Collection<TransactionFacts> transactionFacts = transactionManager.getTransactionFacts(id);
+                    if (CollUtil.isEmpty(transactionFacts)) {
+                        log.error("当前事务上下文不存在:{}", id);
+                        return;
+                    }
+                    //groupby
+                    Map<String, List<TransactionFacts>> groupBy = transactionFacts.stream().collect(Collectors.groupingBy(TransactionFacts::getApplicationId));
 
-            if (!transactionPointService.updateStatus(transactionStatus, id, TransactionStatusEnum.WAIT)) {
-                log.error("事务状态已更新，当前提交作废:{}", id);
-                return;
-            }
-            //更新缓存
-            attachmentCache.attachString(RedisConstants.Transaction.TRANSACTION_POINT + id, transactionStatus.getState());
-            attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + id, 3L, TimeUnit.DAYS);
+                    for (Map.Entry<String, List<TransactionFacts>> entry : groupBy.entrySet()) {
+                        String key = entry.getKey();
+                        List<TransactionFacts> value = entry.getValue();
 
-            Collection<TransactionFacts> transactionFacts = transactionManager.getTransactionFacts(id);
-            if (CollUtil.isEmpty(transactionFacts)) {
-                log.error("当前事务上下文不存在:{}", id);
-                return;
-            }
-            //groupby
-            Map<String, List<TransactionFacts>> groupBy = transactionFacts.stream().collect(Collectors.groupingBy(TransactionFacts::getApplicationId));
+                        Channel c = ChannelHandlerPool.getChannel(key);
+                        if (c == null) {
+                            log.error("当前应用id不存在:{},事务id:{}", key, id);
+                            continue;
+                        }
 
-            for (Map.Entry<String, List<TransactionFacts>> entry : groupBy.entrySet()) {
-                String key = entry.getKey();
-                List<TransactionFacts> value = entry.getValue();
-
-                Channel c = ChannelHandlerPool.getChannel(key);
-                if (c == null) {
-                    log.error("当前应用id不存在:{},事务id:{}", key, id);
-                    continue;
+                        TransactionNotify transactionNotify = new TransactionNotify();
+                        transactionNotify.setId(id);
+                        transactionNotify.setTransactionFacts(value);
+                        transactionNotify.setTransactionStatus(transactionStatus);
+                        c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_NOTIFY, JsonUtil.toString(transactionNotify)));
+                    }
+                } catch (Exception e) {
+                    transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
+                    throw e;
+                } finally {
+                    channelHandlerContext.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
                 }
-
-                TransactionNotify transactionNotify = new TransactionNotify();
-                transactionNotify.setId(id);
-                transactionNotify.setTransactionFacts(value);
-                transactionNotify.setTransactionStatus(transactionStatus);
-                c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_NOTIFY, JsonUtil.toString(transactionNotify)));
             }
-        } catch (Exception e) {
-            transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
-            throw e;
-        } finally {
-            channelHandlerContext.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
-
-            lock.unlock();
-        }
+        });
     }
 
     @Override

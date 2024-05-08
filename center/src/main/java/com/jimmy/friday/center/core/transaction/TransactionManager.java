@@ -57,50 +57,49 @@ public class TransactionManager {
         transactionAck.setTransactionId(transactionId);
         transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
 
-        RReadWriteLock readWriteLock = stripedLock.getDistributedReadWriteLock(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId);
-        RLock lock = readWriteLock.readLock();
-        try {
-            lock.lock(120, TimeUnit.SECONDS);
+        stripedLock.readWriteLockRead(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId, 120L, TimeUnit.SECONDS, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (attachmentCache.setIfAbsent(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, TransactionStatusEnum.WAIT.getState())) {
+                        TransactionPoint transactionPoint = new TransactionPoint();
+                        transactionPoint.setId(transactionId);
+                        transactionPoint.setCreateDate(new Date());
+                        transactionPoint.setTimeout(DEFAULT_TIME_OUT);
+                        transactionPoint.setStatus(TransactionStatusEnum.WAIT.getState());
+                        transactionPoint.setTimeoutTimestamp(transactionFacts.getCurrentTimestamp() + DEFAULT_TIME_OUT * 1000);
+                        transactionPointService.save(transactionPoint);
+                        //过期时间三天
+                        attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, 3L, TimeUnit.DAYS);
+                    } else {
+                        String attachment = attachmentCache.attachment(RedisConstants.Transaction.TRANSACTION_POINT + transactionId);
 
-            if (attachmentCache.setIfAbsent(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, TransactionStatusEnum.WAIT.getState())) {
-                TransactionPoint transactionPoint = new TransactionPoint();
-                transactionPoint.setId(transactionId);
-                transactionPoint.setCreateDate(new Date());
-                transactionPoint.setTimeout(DEFAULT_TIME_OUT);
-                transactionPoint.setStatus(TransactionStatusEnum.WAIT.getState());
-                transactionPoint.setTimeoutTimestamp(transactionFacts.getCurrentTimestamp() + DEFAULT_TIME_OUT * 1000);
-                transactionPointService.save(transactionPoint);
-                //过期时间三天
-                attachmentCache.expire(RedisConstants.Transaction.TRANSACTION_POINT + transactionId, 3L, TimeUnit.DAYS);
-            } else {
-                String attachment = attachmentCache.attachment(RedisConstants.Transaction.TRANSACTION_POINT + transactionId);
+                        TransactionStatusEnum transactionStatusEnum = TransactionStatusEnum.queryByState(attachment);
+                        if (transactionStatusEnum == null) {
+                            log.error("事务id:{}，状态异常,缓存事务状态:{}", transactionId, attachment);
+                            transactionStatusEnum = TransactionStatusEnum.FAIL;
+                        }
 
-                TransactionStatusEnum transactionStatusEnum = TransactionStatusEnum.queryByState(attachment);
-                if (transactionStatusEnum == null) {
-                    log.error("事务id:{}，状态异常,缓存事务状态:{}", transactionId, attachment);
-                    transactionStatusEnum = TransactionStatusEnum.FAIL;
-                }
+                        if (!TransactionStatusEnum.WAIT.equals(transactionStatusEnum)) {
+                            transactionFacts.setTransactionStatus(transactionStatusEnum);
+                            //事务提交退回
+                            TransactionRefund transactionRefund = new TransactionRefund();
+                            transactionRefund.setId(transactionId);
+                            transactionRefund.setTransactionFacts(transactionFacts);
+                            c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_REFUND, JsonUtil.toString(transactionRefund)));
+                            return;
+                        }
+                    }
 
-                if (!TransactionStatusEnum.WAIT.equals(transactionStatusEnum)) {
-                    transactionFacts.setTransactionStatus(transactionStatusEnum);
-                    //事务提交退回
-                    TransactionRefund transactionRefund = new TransactionRefund();
-                    transactionRefund.setId(transactionId);
-                    transactionRefund.setTransactionFacts(transactionFacts);
-                    c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_REFUND, JsonUtil.toString(transactionRefund)));
-                    return;
+                    attachmentCache.attach(RedisConstants.Transaction.TRANSACTION_FACTS + transactionId, transactionFacts.getId().toString(), transactionFacts);
+                } catch (Exception e) {
+                    transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
+                    throw e;
+                } finally {
+                    c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
                 }
             }
-
-            attachmentCache.attach(RedisConstants.Transaction.TRANSACTION_FACTS + transactionId, transactionFacts.getId().toString(), transactionFacts);
-        } catch (Exception e) {
-            transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
-            throw e;
-        } finally {
-            c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
-
-            lock.unlock();
-        }
+        });
     }
 
     public Collection<TransactionFacts> getTransactionFacts(String id) {

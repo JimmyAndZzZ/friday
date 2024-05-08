@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -110,19 +111,16 @@ public class GatewayPushChannelSubServiceImpl extends ServiceImpl<GatewayPushCha
             return false;
         }
 
-        Lock distributedLock = stripedLock.getDistributedLock(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB_SAVE_LOCK + accountId + ":" + channelName);
-        if (distributedLock.tryLock()) {
-            try {
+        return stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB_SAVE_LOCK + accountId + ":" + channelName, 120L, TimeUnit.SECONDS, new Obtain<Boolean>() {
+
+            @Override
+            public Boolean obtain() {
                 attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + channelName);
-                boolean save = super.save(gatewayPushChannelSub);
+                boolean save = GatewayPushChannelSubServiceImpl.super.save(gatewayPushChannelSub);
                 attachmentCache.remove(RedisConstants.Gateway.GATEWAY_CHANNEL_SUB + channelName);
                 return save;
-            } finally {
-                distributedLock.unlock(); // 释放锁
             }
-        } else {
-            return false;
-        }
+        }, false);
     }
 }
 

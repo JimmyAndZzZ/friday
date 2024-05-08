@@ -90,39 +90,33 @@ public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAcc
 
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
-        CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> {
-            if (stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK, 300L, TimeUnit.SECONDS)) {
-                try {
+        CronUtil.schedule(IdUtil.simpleUUID(), "0 0 23 * * ?", () -> stripedLock.tryLock(RedisConstants.Gateway.GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK, 300L, TimeUnit.SECONDS, () -> {
 
-                    int intDate = Integer.parseInt(DateUtil.format(new Date(), "yyyyMMdd"));
+            int intDate = Integer.parseInt(DateUtil.format(new Date(), "yyyyMMdd"));
 
-                    List<GatewayAccountInvokeCount> save = Lists.newArrayList();
+            List<GatewayAccountInvokeCount> save = Lists.newArrayList();
 
-                    List<GatewayAccount> list = gatewayAccountService.list();
-                    for (GatewayAccount gatewayAccount : list) {
-                        String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
-                        if (StrUtil.isNotEmpty(s)) {
-                            attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+            List<GatewayAccount> list = gatewayAccountService.list();
+            for (GatewayAccount gatewayAccount : list) {
+                String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                if (StrUtil.isNotEmpty(s)) {
+                    attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
 
-                            Integer anInt = Convert.toInt(s);
-                            if (anInt != null) {
-                                GatewayAccountInvokeCount gatewayAccountInvokeCount = new GatewayAccountInvokeCount();
-                                gatewayAccountInvokeCount.setAccountId(gatewayAccount.getId());
-                                gatewayAccountInvokeCount.setInvokeDate(intDate);
-                                gatewayAccountInvokeCount.setInvokeCount(anInt);
-                                save.add(gatewayAccountInvokeCount);
-                            }
-                        }
+                    Integer anInt = Convert.toInt(s);
+                    if (anInt != null) {
+                        GatewayAccountInvokeCount gatewayAccountInvokeCount = new GatewayAccountInvokeCount();
+                        gatewayAccountInvokeCount.setAccountId(gatewayAccount.getId());
+                        gatewayAccountInvokeCount.setInvokeDate(intDate);
+                        gatewayAccountInvokeCount.setInvokeCount(anInt);
+                        save.add(gatewayAccountInvokeCount);
                     }
-
-                    if (CollUtil.isNotEmpty(save)) {
-                        this.saveBatch(save);
-                    }
-                } finally {
-                    stripedLock.releaseLock(RedisConstants.Gateway.GATEWAY_ACCOUNT_INVOKE_COUNT_JOB_LOCK);
                 }
             }
-        });
+
+            if (CollUtil.isNotEmpty(save)) {
+                this.saveBatch(save);
+            }
+        }));
     }
 
     @Override
