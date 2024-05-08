@@ -1,17 +1,20 @@
 package com.jimmy.friday.center.core;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Obtain;
+import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +24,10 @@ import java.util.concurrent.locks.Lock;
 public class StripedLock implements Close {
 
     private final Set<String> lockKeys = Sets.newHashSet();
+
+    private final Map<String, RLock> readLocks = Maps.newConcurrentMap();
+
+    private final Map<String, RLock> writeLocks = Maps.newConcurrentMap();
 
     private final ConcurrentMap<String, Striped<Lock>> stripedLock = Maps.newConcurrentMap();
 
@@ -35,6 +42,18 @@ public class StripedLock implements Close {
         if (CollUtil.isNotEmpty(lockKeys)) {
             for (String lockKey : lockKeys) {
                 attachmentCache.remove(lockKey);
+            }
+        }
+
+        if (MapUtil.isNotEmpty(readLocks)) {
+            for (RLock value : readLocks.values()) {
+                value.unlock();
+            }
+        }
+
+        if (MapUtil.isNotEmpty(writeLocks)) {
+            for (RLock value : writeLocks.values()) {
+                value.unlock();
             }
         }
     }
@@ -76,8 +95,32 @@ public class StripedLock implements Close {
         return ifPresent != null ? ifPresent.get(key) : lock.get(key);
     }
 
-    public RReadWriteLock getDistributedReadWriteLock(String key) {
-        return redissonClient.getReadWriteLock(key);
+    public void readWriteLockRead(String key, Long time, TimeUnit timeUnit, Runnable runnable) {
+        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(key);
+        RLock rLock = readWriteLock.readLock();
+
+        rLock.lock(time, timeUnit);
+        try {
+            readLocks.put(key, rLock);
+            runnable.run();
+        } finally {
+            rLock.unlock();
+            readLocks.remove(key);
+        }
+    }
+
+    public void readWriteLockWrite(String key, Long time, TimeUnit timeUnit, Runnable runnable) {
+        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(key);
+        RLock rLock = readWriteLock.writeLock();
+
+        rLock.lock(time, timeUnit);
+        try {
+            writeLocks.put(key, rLock);
+            runnable.run();
+        } finally {
+            rLock.unlock();
+            writeLocks.remove(key);
+        }
     }
 
     /**
