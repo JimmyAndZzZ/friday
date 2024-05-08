@@ -3,7 +3,7 @@ package com.jimmy.friday.center.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.ServiceStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceStatusEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.core.AttachmentCache;

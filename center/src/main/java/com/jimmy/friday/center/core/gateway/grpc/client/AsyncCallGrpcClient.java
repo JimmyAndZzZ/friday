@@ -2,8 +2,8 @@ package com.jimmy.friday.center.core.gateway.grpc.client;
 
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.NotifyTypeEnum;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.NotifyTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.core.gateway.grpc.GrpcErrorMapper;
 import com.jimmy.friday.center.event.NotifyEvent;

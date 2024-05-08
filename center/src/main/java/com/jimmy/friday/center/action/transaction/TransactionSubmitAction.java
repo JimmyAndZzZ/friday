@@ -5,7 +5,7 @@ import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
 import com.jimmy.friday.boot.enums.AckTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionAck;
 import com.jimmy.friday.boot.message.transaction.TransactionNotify;
 import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
@@ -29,8 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.stream.Collectors;
 
 @Slf4j

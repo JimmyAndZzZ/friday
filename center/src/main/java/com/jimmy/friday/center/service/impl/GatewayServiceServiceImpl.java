@@ -1,12 +1,11 @@
 package com.jimmy.friday.center.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Sets;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.dao.GatewayServiceDao;

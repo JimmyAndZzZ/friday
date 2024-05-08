@@ -1,7 +1,7 @@
 package com.jimmy.friday.framework.transaction.def;
 
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;

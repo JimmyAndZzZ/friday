@@ -3,7 +3,7 @@ package com.jimmy.friday.demo.controller;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.GatewayResponse;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.demo.dto.TestDTO;
 import com.jimmy.friday.demo.service.Dubbo2Api;
 import com.jimmy.friday.framework.Gateway;

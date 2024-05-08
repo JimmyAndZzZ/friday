@@ -2,7 +2,7 @@ package com.jimmy.friday.agent.command;
 
 import com.jimmy.friday.agent.support.TransmitSupport;
 import com.jimmy.friday.boot.core.agent.Command;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 import com.jimmy.friday.boot.message.agent.AgentCommand;
 
 import java.lang.management.ManagementFactory;

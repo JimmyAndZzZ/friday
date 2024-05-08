@@ -1,7 +1,7 @@
 package com.jimmy.friday.framework.base;
 
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.framework.annotation.Transactional;
 import com.jimmy.friday.framework.transaction.def.TransactionInfo;
 

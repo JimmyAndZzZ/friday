@@ -1,13 +1,13 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.gateway;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OrderPurposeTypeEnum {
+public enum OrderSourceTypeEnum {
 
-    BALANCE_RECHARGE("0", "余额充值");
+    INSIDE("0", "内部");
 
     private String code;
 

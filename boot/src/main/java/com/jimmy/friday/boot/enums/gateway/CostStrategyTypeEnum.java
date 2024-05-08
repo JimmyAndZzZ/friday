@@ -1,13 +1,13 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.gateway;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OrderSourceTypeEnum {
+public enum CostStrategyTypeEnum {
 
-    INSIDE("0", "内部");
+    COMMON("0", "普通"), FILE("1", "文件");
 
     private String code;
 

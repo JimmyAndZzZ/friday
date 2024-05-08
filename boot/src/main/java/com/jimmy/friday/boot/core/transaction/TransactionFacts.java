@@ -1,8 +1,8 @@
 package com.jimmy.friday.boot.core.transaction;
 
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -1,7 +1,7 @@
 package com.jimmy.friday.framework.annotation;
 
-import com.jimmy.friday.boot.enums.TransactionPropagationEnum;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionPropagationEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 
 import java.lang.annotation.*;
 

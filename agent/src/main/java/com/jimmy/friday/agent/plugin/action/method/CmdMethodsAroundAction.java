@@ -5,7 +5,7 @@ import com.jimmy.friday.agent.core.EnhancedField;
 import com.jimmy.friday.agent.other.RunMonitorPool;
 import com.jimmy.friday.agent.utils.JsonUtil;
 import com.jimmy.friday.boot.core.agent.RunLine;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 
 import java.lang.reflect.Method;
 import java.util.BitSet;

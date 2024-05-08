@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.event;
 
-import com.jimmy.friday.boot.enums.NotifyTypeEnum;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.NotifyTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import org.springframework.context.ApplicationEvent;
 
 public class NotifyEvent extends ApplicationEvent {

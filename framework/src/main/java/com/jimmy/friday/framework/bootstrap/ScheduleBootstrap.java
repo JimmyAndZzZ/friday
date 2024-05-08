@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleResult;
-import com.jimmy.friday.boot.enums.JobRunStatusEnum;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleHeartbeat;
 import com.jimmy.friday.framework.annotation.Job;
@@ -22,7 +21,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.ClassMetadata;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

@@ -1,8 +1,8 @@
 package com.jimmy.friday.center.core.gateway.load;
 
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.LoadTypeEnum;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.LoadTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.center.base.gateway.Load;
 import org.springframework.stereotype.Component;
 

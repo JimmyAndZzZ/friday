@@ -1,6 +1,6 @@
 package com.jimmy.friday.framework.annotation;
 
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.other.GlobalConstants;
 
 import java.lang.annotation.*;

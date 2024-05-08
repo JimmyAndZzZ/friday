@@ -1,14 +1,14 @@
-package com.jimmy.friday.boot.enums;
+package com.jimmy.friday.boot.enums.schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TopologyTypeEnum {
+public enum ScheduleStatusEnum {
 
-    APPLICATION("application");
+    CLOSE("0"),
+    OPEN("1");
 
     private String code;
-
 }

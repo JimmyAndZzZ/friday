@@ -2,7 +2,7 @@ package com.jimmy.friday.center.core.gateway.support;
 
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
-import com.jimmy.friday.boot.enums.ChargeTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ChargeTypeEnum;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
 import com.jimmy.friday.center.base.gateway.Cost;

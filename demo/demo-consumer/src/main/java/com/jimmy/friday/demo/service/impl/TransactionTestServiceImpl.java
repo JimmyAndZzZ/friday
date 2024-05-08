@@ -2,7 +2,7 @@ package com.jimmy.friday.demo.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.demo.service.TransactionTestService;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.demo.component.TransactionComponent;
 import com.jimmy.friday.demo.dao.TransactionTestDao;
 import com.jimmy.friday.demo.entity.TransactionTest;

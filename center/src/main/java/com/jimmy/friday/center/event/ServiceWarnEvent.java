@@ -1,6 +1,6 @@
 package com.jimmy.friday.center.event;
 
-import com.jimmy.friday.boot.enums.ServiceWarnTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceWarnTypeEnum;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Date;

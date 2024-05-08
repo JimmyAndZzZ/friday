@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Param;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.dao.GatewayServiceMethodParamDao;
 import com.jimmy.friday.center.entity.GatewayService;

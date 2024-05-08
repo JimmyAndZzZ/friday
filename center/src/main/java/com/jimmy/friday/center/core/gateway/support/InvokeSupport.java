@@ -3,7 +3,7 @@ package com.jimmy.friday.center.core.gateway.support;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.base.gateway.Invoke;

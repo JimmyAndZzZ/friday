@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.core.gateway.cost;
 
 import cn.hutool.core.collection.CollUtil;
-import com.jimmy.friday.boot.enums.ChargeTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ChargeTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
 import com.jimmy.friday.center.entity.GatewayCostStrategyDetails;
 import com.jimmy.friday.boot.other.ApiConstants;

@@ -10,7 +10,7 @@ import com.jimmy.friday.boot.core.gateway.GatewayRequest;
 import com.jimmy.friday.boot.core.gateway.GatewayResponse;
 import com.jimmy.friday.boot.core.gateway.Method;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.ServiceReload;
 import com.jimmy.friday.boot.other.ConfigConstants;

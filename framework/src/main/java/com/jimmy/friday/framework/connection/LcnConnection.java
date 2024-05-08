@@ -1,6 +1,6 @@
 package com.jimmy.friday.framework.connection;
 
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import lombok.extern.slf4j.Slf4j;
 

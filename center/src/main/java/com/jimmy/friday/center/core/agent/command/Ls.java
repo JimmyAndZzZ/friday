@@ -3,7 +3,7 @@ package com.jimmy.friday.center.core.agent.command;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.core.agent.Command;
-import com.jimmy.friday.boot.enums.CommandTypeEnum;
+import com.jimmy.friday.boot.enums.agent.CommandTypeEnum;
 import com.jimmy.friday.center.base.agent.Handler;
 import com.jimmy.friday.center.core.agent.support.AgentSupport;
 import org.springframework.beans.factory.annotation.Autowired;

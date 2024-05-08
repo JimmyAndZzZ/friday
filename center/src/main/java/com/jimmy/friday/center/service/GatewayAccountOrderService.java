@@ -2,9 +2,9 @@ package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jimmy.friday.boot.enums.OrderPurposeTypeEnum;
-import com.jimmy.friday.boot.enums.OrderSourceTypeEnum;
-import com.jimmy.friday.boot.enums.OrderStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.OrderPurposeTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.OrderSourceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.OrderStatusEnum;
 import com.jimmy.friday.center.entity.GatewayAccountOrder;
 
 import java.math.BigDecimal;

@@ -8,7 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.jimmy.friday.boot.core.agent.RunTopology;
 import com.jimmy.friday.boot.core.agent.Topology;
-import com.jimmy.friday.boot.enums.ApplicationStatusEnum;
+import com.jimmy.friday.boot.enums.gateway.ApplicationStatusEnum;
 import com.jimmy.friday.boot.message.agent.AgentRunTopology;
 import com.jimmy.friday.boot.other.ShortUUID;
 import com.jimmy.friday.center.annotation.Async;

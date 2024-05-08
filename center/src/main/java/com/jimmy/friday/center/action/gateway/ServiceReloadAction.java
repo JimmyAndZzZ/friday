@@ -2,7 +2,7 @@ package com.jimmy.friday.center.action.gateway;
 
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.gateway.Service;
-import com.jimmy.friday.boot.enums.CallbackTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.CallbackTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.ServiceReload;
 import com.jimmy.friday.center.base.Action;

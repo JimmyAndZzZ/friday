@@ -8,7 +8,7 @@ import cn.hutool.crypto.SecureUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.*;
-import com.jimmy.friday.boot.enums.ServiceTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.exception.BusinessException;
 import com.jimmy.friday.boot.exception.GatewayException;

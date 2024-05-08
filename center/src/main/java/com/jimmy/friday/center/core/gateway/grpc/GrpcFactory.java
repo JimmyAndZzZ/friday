@@ -1,7 +1,7 @@
 package com.jimmy.friday.center.core.gateway.grpc;
 
 import com.google.common.collect.Maps;
-import com.jimmy.friday.boot.enums.GrpcMethodEnum;
+import com.jimmy.friday.boot.enums.gateway.GrpcMethodEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.center.core.gateway.grpc.client.AsyncCallGrpcClient;
 import com.jimmy.friday.center.core.gateway.grpc.client.CallGrpcClient;

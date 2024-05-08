@@ -1,7 +1,7 @@
 package com.jimmy.friday.framework.proxy;
 
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.boot.message.transaction.TransactionTimeout;
 import com.jimmy.friday.framework.annotation.Transactional;
 import com.jimmy.friday.framework.base.TransactionConnectionProxy;

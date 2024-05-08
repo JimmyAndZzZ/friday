@@ -1,8 +1,8 @@
 package com.jimmy.friday.framework.proxy;
 
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
-import com.jimmy.friday.boot.enums.TransactionStatusEnum;
-import com.jimmy.friday.boot.enums.TransactionTypeEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
+import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.boot.exception.TransactionException;
 import com.jimmy.friday.framework.connection.LcnConnection;
 import com.jimmy.friday.framework.core.GlobalCache;

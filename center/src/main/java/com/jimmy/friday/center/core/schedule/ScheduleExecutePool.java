@@ -1,14 +1,12 @@
 package com.jimmy.friday.center.core.schedule;
 
 import com.google.common.collect.Maps;
-import com.jimmy.friday.boot.enums.BlockHandlerStrategyTypeEnum;
-import com.jimmy.friday.center.Schedule;
+import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.base.schedule.Block;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.entity.ScheduleJob;
-import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.RedisConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

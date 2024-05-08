@@ -3,12 +3,11 @@ package com.jimmy.friday.center.core.gateway.support;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
 import com.jimmy.friday.boot.enums.ExceptionEnum;
-import com.jimmy.friday.boot.enums.MethodTypeEnum;
+import com.jimmy.friday.boot.enums.gateway.MethodTypeEnum;
 import com.jimmy.friday.center.core.gateway.api.ApiContext;
 import com.jimmy.friday.center.base.gateway.Collect;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.utils.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
