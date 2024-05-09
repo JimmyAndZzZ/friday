@@ -17,11 +17,12 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ScheduleCenter {
 
-    private final Map<String, ScheduleInfo> scheduleInfoMap = Maps.newHashMap();
+    private final Map<String, ScheduleInfo> scheduleInfoMap = new HashMap<>();
 
     private ConfigLoad configLoad;
 
