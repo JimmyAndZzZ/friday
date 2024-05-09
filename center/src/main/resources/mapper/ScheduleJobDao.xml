@@ -19,26 +19,34 @@
         <result property="nextTime" column="next_time" jdbcType="INTEGER"/>
     </resultMap>
 
-    <update id="updateExecuteTime" >
+    <update id="updateBlockHandlerStrategyType">
+        update schedule_job_info
+        set block_strategy=#{update},
+            update_date=now()
+        where id = #{id}
+          and block_strategy = #{expect}
+    </update>
+
+    <update id="updateExecuteTime">
         update schedule_job_info
         set last_time=#{lastTime},
             next_time=#{nextTime},
             update_date=now()
-        where id=#{id}
+        where id = #{id}
     </update>
 
-    <update id="updateNextExecuteTime" >
+    <update id="updateNextExecuteTime">
         update schedule_job_info
         set next_time=#{nextTime},
             update_date=now()
-        where id=#{id}
+        where id = #{id}
     </update>
 
-    <update id="updateStatus" >
+    <update id="updateStatus">
         update schedule_job_info
         set status=#{status},
             update_date=now()
-        where id=#{id}
+        where id = #{id}
     </update>
 
 

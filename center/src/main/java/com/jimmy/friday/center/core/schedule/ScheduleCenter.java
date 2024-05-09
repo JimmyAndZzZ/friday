@@ -170,13 +170,19 @@ public class ScheduleCenter implements Initialize {
     }
 
     public void append(ScheduleInfo scheduleInfo, String applicationName) {
+        String cron = scheduleInfo.getCron();
 
+        ScheduleJob save = scheduleJobService.save(scheduleInfo, applicationName);
+        if (save == null) {
+            return;
+        }
 
+        Long lastTime = save.getLastTime();
+        scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), save.getId());
     }
 
     public void delete(String scheduleId, String applicationName) {
-
-
+        scheduleJobService.removeByCodeAndApplicationName(scheduleId, applicationName);
     }
 
     public void register(ScheduleExecutor connect, Collection<ScheduleInfo> scheduleInfos, String applicationName, String applicationId) {
@@ -194,9 +200,6 @@ public class ScheduleCenter implements Initialize {
                 scheduleJobService.removeByApplicationName(applicationName, ScheduleSourceEnum.ANNOTATION);
                 return;
             }
-
-            Date now = new Date();
-            List<ScheduleJob> insert = Lists.newArrayList();
             //之前已存在的
             List<ScheduleJob> scheduleJobs = scheduleJobService.queryByApplicationName(applicationName);
             Map<String, ScheduleJob> map = CollUtil.isEmpty(scheduleJobs) ? Maps.newHashMap() : scheduleJobs.stream().collect(Collectors.toMap(ScheduleJob::getCode, g -> g));
@@ -204,33 +207,26 @@ public class ScheduleCenter implements Initialize {
             for (ScheduleInfo scheduleInfo : scheduleInfos) {
                 String cron = scheduleInfo.getCron();
                 String scheduleId = scheduleInfo.getScheduleId();
+                BlockHandlerStrategyTypeEnum blockHandlerStrategyType = scheduleInfo.getBlockHandlerStrategyType();
 
                 ScheduleJob scheduleJob = map.remove(scheduleId);
                 if (scheduleJob != null) {
+                    Long id = scheduleJob.getId();
+                    String blockStrategy = scheduleJob.getBlockStrategy();
                     //更新下次执行时间
                     if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
                         Long lastTime = scheduleJob.getLastTime();
-                        scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), scheduleJob.getId());
+                        scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), id);
+                        //判断是否更新阻塞策略
+                        if (!blockHandlerStrategyType.getCode().equals(blockStrategy)) {
+                            if (scheduleJobService.updateBlockHandlerStrategyType(id, blockStrategy, blockHandlerStrategyType.getCode())) {
+                                scheduleExecutePool.release(id, blockStrategy);
+                            }
+                        }
                     }
                 } else {
-                    scheduleJob = new ScheduleJob();
-                    scheduleJob.setTimeout(0L);
-                    scheduleJob.setCron(cron);
-                    scheduleJob.setRetryCount(0);
-                    scheduleJob.setCreateDate(now);
-                    scheduleJob.setUpdateDate(now);
-                    scheduleJob.setCode(scheduleId);
-                    scheduleJob.setApplicationName(applicationName);
-                    scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
-                    scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
-                    scheduleJob.setBlockStrategy(BlockHandlerStrategyTypeEnum.SERIAL.getCode());
-                    scheduleJob.setNextTime(this.generateNextTime(cron, System.currentTimeMillis()));
-                    insert.add(scheduleJob);
+                    this.append(scheduleInfo, applicationName);
                 }
-            }
-
-            if (CollUtil.isNotEmpty(insert)) {
-                scheduleJobService.saveBatch(insert);
             }
 
             if (MapUtil.isNotEmpty(map)) {

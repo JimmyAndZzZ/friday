@@ -8,4 +8,6 @@ public interface Block {
     void block(ScheduleJob scheduleJob);
 
     BlockHandlerStrategyTypeEnum type();
+
+    void release(Long id);
 }

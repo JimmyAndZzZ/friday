@@ -26,6 +26,11 @@ public class Serial implements Block {
     private Schedule schedule;
 
     @Override
+    public void release(Long id) {
+        queueMap.remove(id);
+    }
+
+    @Override
     public void block(ScheduleJob scheduleJob) {
         Long id = scheduleJob.getId();
         //放入队列

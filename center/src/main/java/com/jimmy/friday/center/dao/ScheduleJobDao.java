@@ -15,6 +15,8 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ScheduleJobDao extends BaseMapper<ScheduleJob> {
 
+    boolean updateBlockHandlerStrategyType(@Param("id") Long id, @Param("expect") String expect, @Param("update") String update);
+
     void updateExecuteTime(@Param("lastTime") Long lastTime, @Param("nextTime") Long nextTime, @Param("id") Long id);
 
     void updateNextExecuteTime(@Param("nextTime") Long nextTime, @Param("id") Long id);

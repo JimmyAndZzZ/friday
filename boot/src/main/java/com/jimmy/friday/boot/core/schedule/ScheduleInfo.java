@@ -1,5 +1,6 @@
 package com.jimmy.friday.boot.core.schedule;
 
+import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import lombok.Data;
 
@@ -18,6 +19,8 @@ public class ScheduleInfo implements Serializable {
 
     private String cron;
 
-    private ScheduleSourceEnum scheduleSourceEnum;
+    private BlockHandlerStrategyTypeEnum blockHandlerStrategyType = BlockHandlerStrategyTypeEnum.SERIAL;
+
+    private ScheduleSourceEnum scheduleSource;
 
 }

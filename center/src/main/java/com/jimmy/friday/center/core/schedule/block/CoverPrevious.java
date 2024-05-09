@@ -24,4 +24,9 @@ public class CoverPrevious implements Block {
     public BlockHandlerStrategyTypeEnum type() {
         return BlockHandlerStrategyTypeEnum.COVER_PREVIOUS;
     }
+
+    @Override
+    public void release(Long id) {
+
+    }
 }
