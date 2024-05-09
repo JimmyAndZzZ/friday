@@ -30,5 +30,9 @@ public class DiscardSubsequent implements Block {
         return BlockHandlerStrategyTypeEnum.DISCARD_SUBSEQUENT;
     }
 
+    @Override
+    public void release(Long id) {
+
+    }
 
 }

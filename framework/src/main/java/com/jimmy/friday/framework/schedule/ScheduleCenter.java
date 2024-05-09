@@ -22,7 +22,7 @@ public class ScheduleCenter {
         scheduleInfo.setMethodName(methodName);
         scheduleInfo.setClassName(className);
         scheduleInfo.setCron(cron);
-        scheduleInfo.setScheduleSourceEnum(ScheduleSourceEnum.ANNOTATION);
+        scheduleInfo.setScheduleSource(ScheduleSourceEnum.ANNOTATION);
 
         if (scheduleInfoMap.put(scheduleId, scheduleInfo) != null) {
             throw new ScheduleException(scheduleId + "定时器重复定义");

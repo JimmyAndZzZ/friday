@@ -1,6 +1,8 @@
 package com.jimmy.friday.center.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.center.entity.ScheduleJob;
 
@@ -13,6 +15,10 @@ import java.util.List;
  * @since 2024-04-24 17:29:27
  */
 public interface ScheduleJobService extends IService<ScheduleJob> {
+
+    boolean updateBlockHandlerStrategyType(Long id, String expect, String update);
+
+    ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName);
 
     void updateNextExecuteTime(Long nextTime, Long id);
 
@@ -27,6 +33,8 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
     void updateStatus(String status, Long id);
 
     boolean needExecute(Long id, Long nextTime);
+
+    void removeByCodeAndApplicationName(String code, String applicationName);
 
     List<ScheduleJob> queryExecuteJobs(Long time, Integer size);
 }

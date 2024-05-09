@@ -39,6 +39,13 @@ public class ScheduleExecutePool implements Close, Initialize {
         beansOfType.values().forEach(bean -> blockMap.put(bean.type(), bean));
     }
 
+    public void release(Long id, String blockHandlerStrategyTypeCode) {
+        BlockHandlerStrategyTypeEnum blockHandlerStrategyTypeEnum = BlockHandlerStrategyTypeEnum.queryByCode(blockHandlerStrategyTypeCode);
+        if (blockHandlerStrategyTypeEnum != null) {
+            blockMap.get(blockHandlerStrategyTypeEnum).release(id);
+        }
+    }
+
     @Override
     public int sort() {
         return 0;
