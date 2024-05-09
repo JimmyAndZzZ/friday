@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.enums.transaction.TransactionPropagationEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
-import com.jimmy.friday.framework.annotation.Transactional;
+import com.jimmy.friday.framework.annotation.transaction.Transactional;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.base.TransactionConnectionProxy;
 import com.jimmy.friday.framework.core.ConfigLoad;

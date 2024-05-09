@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.transaction;
 
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;

@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.schedule;
 
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleResult;

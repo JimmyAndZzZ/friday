@@ -1,13 +1,12 @@
 package com.jimmy.friday.framework.bootstrap;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jimmy.friday.boot.exception.GatewayException;
-import com.jimmy.friday.framework.annotation.GatewayReference;
+import com.jimmy.friday.framework.annotation.gateway.GatewayReference;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.core.ConfigLoad;
-import com.jimmy.friday.framework.other.GatewayClassPathBeanDefinitionScanner;
+import com.jimmy.friday.framework.other.gateway.GatewayClassPathBeanDefinitionScanner;
 import com.jimmy.friday.framework.support.InvokeSupport;
 import com.jimmy.friday.framework.support.RegisterSupport;
 import com.jimmy.friday.framework.utils.ClassUtil;

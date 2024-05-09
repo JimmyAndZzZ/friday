@@ -41,27 +41,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         this.configLoad = configLoad;
         this.client = client;
         this.applicationContext = applicationContext;
-
-        Map<String, Process> beansOfType = applicationContext.getBeansOfType(Process.class);
-        for (Process value : beansOfType.values()) {
-            EventTypeEnum type = value.type();
-            processMap.put(type, value);
-
-            Type[] genericInterfaces = value.getClass().getGenericInterfaces();
-            if (ArrayUtil.isNotEmpty(genericInterfaces)) {
-                Type genericInterface = genericInterfaces[0];
-                // 如果gType类型是ParameterizedType对象
-                if (genericInterface instanceof ParameterizedType) {
-                    // 强制类型转换
-                    ParameterizedType pType = (ParameterizedType) genericInterface;
-                    // 取得泛型类型的泛型参数
-                    Type[] tArgs = pType.getActualTypeArguments();
-                    if (ArrayUtil.isNotEmpty(tArgs)) {
-                        classMap.put(type, Class.forName(tArgs[0].getTypeName()));
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -69,7 +48,25 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         //初始化本地处理类
         if (MapUtil.isEmpty(processMap)) {
             Map<String, Process> beansOfType = applicationContext.getBeansOfType(Process.class);
-            beansOfType.values().forEach(bean -> processMap.put(bean.type(), bean));
+            for (Process value : beansOfType.values()) {
+                EventTypeEnum type = value.type();
+                processMap.put(type, value);
+
+                Type[] genericInterfaces = value.getClass().getGenericInterfaces();
+                if (ArrayUtil.isNotEmpty(genericInterfaces)) {
+                    Type genericInterface = genericInterfaces[0];
+                    // 如果gType类型是ParameterizedType对象
+                    if (genericInterface instanceof ParameterizedType) {
+                        // 强制类型转换
+                        ParameterizedType pType = (ParameterizedType) genericInterface;
+                        // 取得泛型类型的泛型参数
+                        Type[] tArgs = pType.getActualTypeArguments();
+                        if (ArrayUtil.isNotEmpty(tArgs)) {
+                            classMap.put(type, Class.forName(tArgs[0].getTypeName()));
+                        }
+                    }
+                }
+            }
         }
         //本地回调初始化
         Map<String, Callback> callbackMap = applicationContext.getBeansOfType(Callback.class);

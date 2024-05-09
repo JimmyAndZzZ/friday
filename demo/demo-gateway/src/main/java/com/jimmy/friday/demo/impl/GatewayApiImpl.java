@@ -5,8 +5,8 @@ import com.jimmy.friday.demo.dto.ResultDTO;
 import com.jimmy.friday.demo.dto.TestDTO;
 import com.jimmy.friday.demo.service.GatewayApi;
 import com.jimmy.friday.framework.Channel;
-import com.jimmy.friday.framework.annotation.Api;
-import com.jimmy.friday.framework.annotation.GatewayService;
+import com.jimmy.friday.framework.annotation.gateway.Api;
+import com.jimmy.friday.framework.annotation.gateway.GatewayService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

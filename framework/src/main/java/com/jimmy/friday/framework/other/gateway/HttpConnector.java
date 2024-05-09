@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.gateway;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

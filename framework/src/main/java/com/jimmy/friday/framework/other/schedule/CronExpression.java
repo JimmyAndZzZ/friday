@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.schedule;
 
 import lombok.Getter;
 

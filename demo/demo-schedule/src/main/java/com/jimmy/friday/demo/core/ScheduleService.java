@@ -2,7 +2,7 @@ package com.jimmy.friday.demo.core;
 
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleResult;
-import com.jimmy.friday.framework.annotation.Schedule;
+import com.jimmy.friday.framework.annotation.schedule.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

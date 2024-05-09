@@ -1,8 +1,8 @@
-package com.jimmy.friday.framework.annotation;
+package com.jimmy.friday.framework.annotation.gateway;
 
 import com.jimmy.friday.framework.config.BootstrapConfig;
-import com.jimmy.friday.framework.other.GatewayImportSelector;
-import com.jimmy.friday.framework.other.GatewayScanRegistrar;
+import com.jimmy.friday.framework.other.gateway.GatewayImportSelector;
+import com.jimmy.friday.framework.other.gateway.GatewayScanRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

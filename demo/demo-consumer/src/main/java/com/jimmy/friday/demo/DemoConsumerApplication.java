@@ -1,7 +1,7 @@
 package com.jimmy.friday.demo;
 
-import com.jimmy.friday.framework.annotation.EnableGateway;
-import com.jimmy.friday.framework.annotation.EnableTransactional;
+import com.jimmy.friday.framework.annotation.gateway.EnableGateway;
+import com.jimmy.friday.framework.annotation.transaction.EnableTransactional;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

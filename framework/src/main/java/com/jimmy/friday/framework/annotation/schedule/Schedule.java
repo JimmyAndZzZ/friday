@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.annotation;
+package com.jimmy.friday.framework.annotation.schedule;
 
 import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 

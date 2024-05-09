@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.transaction;
 
 
 import com.google.common.collect.Maps;

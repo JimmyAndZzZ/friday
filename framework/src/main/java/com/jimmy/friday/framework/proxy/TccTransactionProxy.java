@@ -8,7 +8,7 @@ import com.jimmy.friday.boot.core.gateway.InvokeParam;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
 import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
-import com.jimmy.friday.framework.annotation.Transactional;
+import com.jimmy.friday.framework.annotation.transaction.Transactional;
 import com.jimmy.friday.framework.core.GlobalCache;
 import com.jimmy.friday.framework.support.TransmitSupport;
 import com.jimmy.friday.framework.transaction.def.TransactionInfo;

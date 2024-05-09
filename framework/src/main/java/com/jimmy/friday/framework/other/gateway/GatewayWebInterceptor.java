@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.gateway;
 
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.other.AttributeConstants;

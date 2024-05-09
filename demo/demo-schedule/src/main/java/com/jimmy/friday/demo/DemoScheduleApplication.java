@@ -1,6 +1,6 @@
 package com.jimmy.friday.demo;
 
-import com.jimmy.friday.framework.annotation.EnableSchedule;
+import com.jimmy.friday.framework.annotation.schedule.EnableSchedule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

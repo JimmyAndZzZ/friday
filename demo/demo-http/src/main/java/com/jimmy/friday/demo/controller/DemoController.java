@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.demo.dto.TestDTO;
 import com.jimmy.friday.demo.fallback.DemoFallback;
 import com.jimmy.friday.demo.vo.NewsContentVO;
-import com.jimmy.friday.framework.annotation.Api;
+import com.jimmy.friday.framework.annotation.gateway.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

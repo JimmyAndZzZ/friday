@@ -1,7 +1,7 @@
-package com.jimmy.friday.framework.other;
+package com.jimmy.friday.framework.other.gateway;
 
 import cn.hutool.core.collection.CollUtil;
-import com.jimmy.friday.framework.annotation.EnableGateway;
+import com.jimmy.friday.framework.annotation.gateway.EnableGateway;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;

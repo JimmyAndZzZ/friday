@@ -1,15 +1,13 @@
 package com.jimmy.friday.framework.utils;
 
-import com.google.common.collect.Maps;
 import org.springframework.cglib.proxy.Enhancer;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 
 public class ClassUtil {
 
-    private static final Map<String, Class<?>> CLASS_CACHE = Maps.newHashMap();
+    private static final Map<String, Class<?>> CLASS_CACHE = new HashMap<>();
 
     private ClassUtil() {
 

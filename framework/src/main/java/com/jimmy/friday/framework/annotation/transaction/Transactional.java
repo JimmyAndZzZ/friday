@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.annotation;
+package com.jimmy.friday.framework.annotation.transaction;
 
 import com.jimmy.friday.boot.enums.transaction.TransactionPropagationEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;

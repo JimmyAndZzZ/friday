@@ -1,4 +1,4 @@
-package com.jimmy.friday.framework.annotation;
+package com.jimmy.friday.framework.annotation.gateway;
 
 import java.lang.annotation.*;
 
