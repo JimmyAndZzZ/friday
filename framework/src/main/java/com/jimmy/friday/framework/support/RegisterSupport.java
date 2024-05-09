@@ -14,9 +14,9 @@ import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.ServiceReload;
 import com.jimmy.friday.boot.other.ConfigConstants;
-import com.jimmy.friday.framework.annotation.GatewayReference;
+import com.jimmy.friday.framework.annotation.gateway.GatewayReference;
 import com.jimmy.friday.framework.base.Register;
-import com.jimmy.friday.framework.other.ConditionContextImpl;
+import com.jimmy.friday.framework.other.gateway.ConditionContextImpl;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.process.gateway.RpcProtocolInvokeProcess;
 import com.jimmy.friday.framework.register.BaseRegister;
@@ -262,7 +262,7 @@ public class RegisterSupport {
 
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         // 扫描带有自定义注解的类
-        provider.addIncludeFilter(new AnnotationTypeFilter(com.jimmy.friday.framework.annotation.Condition.class));
+        provider.addIncludeFilter(new AnnotationTypeFilter(com.jimmy.friday.framework.annotation.gateway.Condition.class));
         //初始化condition上下文
         ConditionContextImpl conditionContext = new ConditionContextImpl(beanFactory);
         Set<BeanDefinition> scanList = provider.findCandidateComponents(scanPath);
@@ -273,7 +273,7 @@ public class RegisterSupport {
             }
 
             Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(bean.getBeanClassName());
-            com.jimmy.friday.framework.annotation.Condition annotation = AnnotationUtils.getAnnotation(clazz, com.jimmy.friday.framework.annotation.Condition.class);
+            com.jimmy.friday.framework.annotation.gateway.Condition annotation = AnnotationUtils.getAnnotation(clazz, com.jimmy.friday.framework.annotation.gateway.Condition.class);
             if (annotation != null) {
                 if (baseClass.isInterface()) {
                     Class<?>[] interfaces = clazz.getInterfaces();
@@ -306,13 +306,13 @@ public class RegisterSupport {
         MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(bean.getBeanClassName());
 
         AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
-        if (metadata == null || !metadata.isAnnotated(com.jimmy.friday.framework.annotation.Condition.class.getName())) {
+        if (metadata == null || !metadata.isAnnotated(com.jimmy.friday.framework.annotation.gateway.Condition.class.getName())) {
             return true;
         }
 
         List<Condition> conditions = new ArrayList<>();
 
-        MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(com.jimmy.friday.framework.annotation.Condition.class.getName(), true);
+        MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(com.jimmy.friday.framework.annotation.gateway.Condition.class.getName(), true);
         Object values = (attributes != null ? attributes.get("condition") : null);
         List<String> conditionArray = (List<String>) (values != null ? values : Collections.emptyList());
 

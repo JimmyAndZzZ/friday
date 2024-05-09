@@ -2,7 +2,7 @@ package com.jimmy.friday.demo.component;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
-import com.jimmy.friday.framework.annotation.Transactional;
+import com.jimmy.friday.framework.annotation.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -44,8 +44,8 @@ public class ConfigLoad {
     private Set<String> schedulePackagesToScan;
 
     public ConfigLoad() {
-        String property = System.getProperty("gateway.config.path");
-        this.path = StringUtil.isNullOrEmpty(property) ? "gateway.properties" : property;
+        String property = System.getProperty("friday.config.path");
+        this.path = StringUtil.isNullOrEmpty(property) ? "friday.properties" : property;
         this.loadProperties(path);
 
         String name = this.getApplicationName();

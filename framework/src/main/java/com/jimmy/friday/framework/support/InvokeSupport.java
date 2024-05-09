@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.core.gateway.InvokeParam;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.GatewayInvoke;
-import com.jimmy.friday.framework.annotation.GatewayService;
+import com.jimmy.friday.framework.annotation.gateway.GatewayService;
 import com.jimmy.friday.framework.utils.ClassUtil;
 import com.jimmy.friday.framework.utils.JsonUtil;
 import lombok.Data;

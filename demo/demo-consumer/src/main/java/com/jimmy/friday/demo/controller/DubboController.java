@@ -7,7 +7,7 @@ import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.demo.dto.TestDTO;
 import com.jimmy.friday.demo.service.Dubbo2Api;
 import com.jimmy.friday.framework.Gateway;
-import com.jimmy.friday.framework.annotation.GatewayReference;
+import com.jimmy.friday.framework.annotation.gateway.GatewayReference;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

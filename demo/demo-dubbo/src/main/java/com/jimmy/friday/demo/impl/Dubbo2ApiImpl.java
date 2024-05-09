@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.jimmy.friday.demo.DubboFallback;
 import com.jimmy.friday.demo.dto.TestDTO;
 import com.jimmy.friday.demo.service.Dubbo2Api;
-import com.jimmy.friday.framework.annotation.Api;
+import com.jimmy.friday.framework.annotation.gateway.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 

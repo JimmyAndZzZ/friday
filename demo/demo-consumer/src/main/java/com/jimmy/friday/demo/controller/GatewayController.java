@@ -7,7 +7,7 @@ import com.jimmy.friday.boot.core.gateway.GatewayResponse;
 import com.jimmy.friday.boot.enums.gateway.ServiceTypeEnum;
 import com.jimmy.friday.demo.service.GatewayApi;
 import com.jimmy.friday.framework.Gateway;
-import com.jimmy.friday.framework.annotation.GatewayReference;
+import com.jimmy.friday.framework.annotation.gateway.GatewayReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

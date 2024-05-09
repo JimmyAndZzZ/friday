@@ -1,7 +1,7 @@
 package com.jimmy.friday.framework.config;
 
 import com.jimmy.friday.framework.condition.HttpCondition;
-import com.jimmy.friday.framework.other.GatewayWebInterceptor;
+import com.jimmy.friday.framework.other.gateway.GatewayWebInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;

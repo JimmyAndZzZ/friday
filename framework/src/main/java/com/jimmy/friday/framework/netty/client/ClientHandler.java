@@ -2,7 +2,6 @@ package com.jimmy.friday.framework.netty.client;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.Ack;
@@ -27,7 +26,7 @@ import java.util.concurrent.RejectedExecutionException;
 @ChannelHandler.Sharable
 public class ClientHandler extends SimpleChannelInboundHandler<Event> {
 
-    private final Map<EventTypeEnum, Class<?>> classMap = Maps.newHashMap();
+    private final Map<EventTypeEnum, Class<?>> classMap = new HashMap<>();
 
     private final Map<EventTypeEnum, Process<?>> processMap = new HashMap<>();
 
@@ -42,27 +41,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         this.configLoad = configLoad;
         this.client = client;
         this.applicationContext = applicationContext;
-
-        Map<String, Process> beansOfType = applicationContext.getBeansOfType(Process.class);
-        for (Process value : beansOfType.values()) {
-            EventTypeEnum type = value.type();
-            processMap.put(type, value);
-
-            Type[] genericInterfaces = value.getClass().getGenericInterfaces();
-            if (ArrayUtil.isNotEmpty(genericInterfaces)) {
-                Type genericInterface = genericInterfaces[0];
-                // 如果gType类型是ParameterizedType对象
-                if (genericInterface instanceof ParameterizedType) {
-                    // 强制类型转换
-                    ParameterizedType pType = (ParameterizedType) genericInterface;
-                    // 取得泛型类型的泛型参数
-                    Type[] tArgs = pType.getActualTypeArguments();
-                    if (ArrayUtil.isNotEmpty(tArgs)) {
-                        classMap.put(type, Class.forName(tArgs[0].getTypeName()));
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -70,7 +48,25 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         //初始化本地处理类
         if (MapUtil.isEmpty(processMap)) {
             Map<String, Process> beansOfType = applicationContext.getBeansOfType(Process.class);
-            beansOfType.values().forEach(bean -> processMap.put(bean.type(), bean));
+            for (Process value : beansOfType.values()) {
+                EventTypeEnum type = value.type();
+                processMap.put(type, value);
+
+                Type[] genericInterfaces = value.getClass().getGenericInterfaces();
+                if (ArrayUtil.isNotEmpty(genericInterfaces)) {
+                    Type genericInterface = genericInterfaces[0];
+                    // 如果gType类型是ParameterizedType对象
+                    if (genericInterface instanceof ParameterizedType) {
+                        // 强制类型转换
+                        ParameterizedType pType = (ParameterizedType) genericInterface;
+                        // 取得泛型类型的泛型参数
+                        Type[] tArgs = pType.getActualTypeArguments();
+                        if (ArrayUtil.isNotEmpty(tArgs)) {
+                            classMap.put(type, Class.forName(tArgs[0].getTypeName()));
+                        }
+                    }
+                }
+            }
         }
         //本地回调初始化
         Map<String, Callback> callbackMap = applicationContext.getBeansOfType(Callback.class);
