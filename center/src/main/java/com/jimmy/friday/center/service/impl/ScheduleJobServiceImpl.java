@@ -54,24 +54,30 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
         }
 
         if (attachmentCache.putIfAbsent(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleId, DEFAULT_ID)) {
-            scheduleJob = this.queryByCodeAndApplicationName(scheduleId, applicationName);
-            if (scheduleJob != null) {
-                attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleId, scheduleJob.getId().toString());
-                return scheduleJob;
-            } else {
-                scheduleJob = new ScheduleJob();
-                scheduleJob.setTimeout(0L);
-                scheduleJob.setCron(scheduleInfo.getCron());
-                scheduleJob.setRetryCount(0);
-                scheduleJob.setCreateDate(new Date());
-                scheduleJob.setUpdateDate(new Date());
-                scheduleJob.setCode(scheduleId);
-                scheduleJob.setApplicationName(applicationName);
-                scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
-                scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
-                scheduleJob.setBlockStrategy(blockHandlerStrategyType.getCode());
-                scheduleJob.setSource(scheduleInfo.getScheduleSource().getCode());
-                return scheduleJob;
+            try {
+                scheduleJob = this.queryByCodeAndApplicationName(scheduleId, applicationName);
+                if (scheduleJob != null) {
+                    attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleId, scheduleJob.getId().toString());
+                    return scheduleJob;
+                } else {
+                    scheduleJob = new ScheduleJob();
+                    scheduleJob.setTimeout(0L);
+                    scheduleJob.setCron(scheduleInfo.getCron());
+                    scheduleJob.setRetryCount(0);
+                    scheduleJob.setCreateDate(new Date());
+                    scheduleJob.setUpdateDate(new Date());
+                    scheduleJob.setCode(scheduleId);
+                    scheduleJob.setApplicationName(applicationName);
+                    scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());
+                    scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
+                    scheduleJob.setBlockStrategy(blockHandlerStrategyType.getCode());
+                    scheduleJob.setSource(scheduleInfo.getScheduleSource().getCode());
+                    this.save(scheduleJob);
+                    return scheduleJob;
+                }
+            } catch (Exception e) {
+                attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleId);
+                throw e;
             }
         } else {
             Object attachment = attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleId);

@@ -25,7 +25,6 @@ public class ScheduleRegisterAction implements Action<ScheduleRegister> {
     public void action(ScheduleRegister scheduleRegister, ChannelHandlerContext channelHandlerContext) {
         String applicationId = scheduleRegister.getApplicationId();
         String applicationName = scheduleRegister.getApplicationName();
-
         scheduleCenter.register(scheduleSession.connect(applicationId, applicationName, scheduleRegister.getIp()), scheduleRegister.getScheduleInfos(), applicationName, applicationId);
     }
 

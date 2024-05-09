@@ -204,6 +204,7 @@ public class ScheduleSession implements Initialize {
 
             executor.setWeight(this.getWeight(applicationId));
             executor.setLastInvokeTime(this.getLastInvokeTime(applicationId));
+            executors.add(executor);
         }
 
         if (CollUtil.isEmpty(executors)) {

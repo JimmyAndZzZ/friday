@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
+import com.jimmy.friday.boot.core.schedule.ScheduleInvokeResult;
 import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleResult;
@@ -19,7 +20,6 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class ScheduleExecutor {
                 scheduleContext.setParam(param);
                 scheduleContext.setTraceId(traceId);
 
-                com.jimmy.friday.boot.core.schedule.ScheduleResult execute = execute(scheduleInfo, scheduleContext);
+                ScheduleInvokeResult execute = execute(scheduleInfo, scheduleContext);
 
                 ScheduleResult scheduleResult = new ScheduleResult();
                 scheduleResult.setId(scheduleId);
@@ -130,8 +130,7 @@ public class ScheduleExecutor {
      * @param scheduleInfo
      * @param scheduleContext
      */
-    private com.jimmy.friday.boot.core.schedule.ScheduleResult execute(ScheduleInfo scheduleInfo, ScheduleContext scheduleContext) {
-        Long traceId = scheduleContext.getTraceId();
+    private ScheduleInvokeResult execute(ScheduleInfo scheduleInfo, ScheduleContext scheduleContext) {
         String className = scheduleInfo.getClassName();
         String scheduleId = scheduleInfo.getScheduleId();
         String methodName = scheduleInfo.getMethodName();
@@ -140,20 +139,20 @@ public class ScheduleExecutor {
         Object instanceObject = this.getInstanceObject(className, springBeanId);
         if (instanceObject == null) {
             log.error("获取执行器实例失败,class:{}", className);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器实例失败");
+            return ScheduleInvokeResult.error("获取执行器实例失败");
         }
 
         Method method = this.findMethod(className, methodName, scheduleId);
         if (method == null) {
             log.error("获取执行器方法失败,class:{},method:{}", className, methodName);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器方法失败");
+            return ScheduleInvokeResult.error("获取执行器方法失败");
         }
 
         try {
-            return (com.jimmy.friday.boot.core.schedule.ScheduleResult) method.invoke(instanceObject, scheduleContext);
+            return (ScheduleInvokeResult) method.invoke(instanceObject, scheduleContext);
         } catch (Throwable e) {
             log.error("执行失败", e);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error(e.getMessage());
+            return ScheduleInvokeResult.error(e.getMessage());
         }
     }
 
@@ -187,7 +186,7 @@ public class ScheduleExecutor {
             if (methodName.equals(m.getName())) {
                 Class<?> returnType = m.getReturnType();
                 Class<?>[] parameterTypes = m.getParameterTypes();
-                if (parameterTypes.length == 1 && parameterTypes[0].equals(ScheduleContext.class) && returnType.equals(ScheduleResult.class)) {
+                if (parameterTypes.length == 1 && parameterTypes[0].equals(ScheduleContext.class) && returnType.equals(ScheduleInvokeResult.class)) {
                     this.method.put(scheduleId, m);
                     return m;
                 }

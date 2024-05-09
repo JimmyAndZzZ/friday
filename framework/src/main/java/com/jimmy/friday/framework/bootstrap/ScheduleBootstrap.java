@@ -3,7 +3,7 @@ package com.jimmy.friday.framework.bootstrap;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
+import com.jimmy.friday.boot.core.schedule.ScheduleInvokeResult;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleHeartbeat;
 import com.jimmy.friday.framework.annotation.schedule.Schedule;
@@ -52,7 +52,7 @@ public class ScheduleBootstrap implements Bootstrap {
             return !classMetadata.isInterface() && !classMetadata.isAbstract() && !classMetadata.isAnnotation();
         });
 
-        for (String packagePath : configLoad.getGatewayPackagesToScan()) {
+        for (String packagePath : configLoad.getSchedulePackagesToScan()) {
             //自定义函数参数处理
             Set<BeanDefinition> scanList = provider.findCandidateComponents(packagePath);
             if (CollUtil.isEmpty(scanList)) {
@@ -122,7 +122,7 @@ public class ScheduleBootstrap implements Bootstrap {
                     throw new ScheduleException("方法:" + method.getName() + "参数类型不符合，入参需要ScheduleContext");
                 }
 
-                if (!returnType.equals(ScheduleResult.class)) {
+                if (!returnType.equals(ScheduleInvokeResult.class)) {
                     throw new ScheduleException("方法:" + method.getName() + "返回类型不符合，需要返回ScheduleResult");
                 }
 
