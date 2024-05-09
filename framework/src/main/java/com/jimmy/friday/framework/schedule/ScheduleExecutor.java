@@ -140,20 +140,20 @@ public class ScheduleExecutor {
         Object instanceObject = this.getInstanceObject(className, springBeanId);
         if (instanceObject == null) {
             log.error("获取执行器实例失败,class:{}", className);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器实例失败", traceId);
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器实例失败");
         }
 
         Method method = this.findMethod(className, methodName, scheduleId);
         if (method == null) {
             log.error("获取执行器方法失败,class:{},method:{}", className, methodName);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器方法失败", traceId);
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error("获取执行器方法失败");
         }
 
         try {
             return (com.jimmy.friday.boot.core.schedule.ScheduleResult) method.invoke(instanceObject, scheduleContext);
         } catch (Throwable e) {
             log.error("执行失败", e);
-            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error(e.getMessage(), traceId);
+            return com.jimmy.friday.boot.core.schedule.ScheduleResult.error(e.getMessage());
         }
     }
 

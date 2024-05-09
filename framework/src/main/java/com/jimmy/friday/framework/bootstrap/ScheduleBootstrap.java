@@ -6,7 +6,7 @@ import com.jimmy.friday.boot.core.schedule.ScheduleContext;
 import com.jimmy.friday.boot.core.schedule.ScheduleResult;
 import com.jimmy.friday.boot.exception.ScheduleException;
 import com.jimmy.friday.boot.message.schedule.ScheduleHeartbeat;
-import com.jimmy.friday.framework.annotation.Job;
+import com.jimmy.friday.framework.annotation.Schedule;
 import com.jimmy.friday.framework.base.Bootstrap;
 import com.jimmy.friday.framework.core.ConfigLoad;
 import com.jimmy.friday.framework.other.CronExpression;
@@ -84,7 +84,7 @@ public class ScheduleBootstrap implements Bootstrap {
 
         Method[] methods = clazz.getMethods();
         for (Method method : methods) {
-            Job annotation = AnnotationUtils.getAnnotation(method, Job.class);
+            Schedule annotation = AnnotationUtils.getAnnotation(method, Schedule.class);
             if (annotation != null) {
                 scheduleCenter.setSpringBeanId(annotation.id(), beanName);
             }
@@ -109,7 +109,7 @@ public class ScheduleBootstrap implements Bootstrap {
         }
 
         for (Method method : methods) {
-            Job annotation = AnnotationUtils.getAnnotation(method, Job.class);
+            Schedule annotation = AnnotationUtils.getAnnotation(method, Schedule.class);
             if (annotation != null) {
                 String cron = annotation.cron();
                 Class<?> returnType = method.getReturnType();
@@ -127,11 +127,7 @@ public class ScheduleBootstrap implements Bootstrap {
                     throw new ScheduleException("方法:" + method.getName() + "返回类型不符合，需要返回ScheduleResult");
                 }
 
-                if (!CronExpression.isValidExpression(cron)) {
-                    throw new ScheduleException("cron表达式:" + cron + "错误");
-                }
-
-                scheduleCenter.register(beanClassName, method.getName(), annotation.id(), cron);
+                scheduleCenter.register(beanClassName, method.getName(), annotation.id(), cron, annotation.BlockHandlerStrategyType());
             }
         }
     }
