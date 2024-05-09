@@ -1,9 +1,9 @@
 package com.jimmy.friday.framework.base;
 
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
+import com.jimmy.friday.boot.core.schedule.ScheduleInvokeResult;
 
 public interface Job {
 
-    ScheduleResult run(ScheduleContext scheduleContext);
+    ScheduleInvokeResult run(ScheduleContext scheduleContext);
 }

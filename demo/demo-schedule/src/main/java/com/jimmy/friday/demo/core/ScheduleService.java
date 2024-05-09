@@ -1,7 +1,7 @@
 package com.jimmy.friday.demo.core;
 
 import com.jimmy.friday.boot.core.schedule.ScheduleContext;
-import com.jimmy.friday.boot.core.schedule.ScheduleResult;
+import com.jimmy.friday.boot.core.schedule.ScheduleInvokeResult;
 import com.jimmy.friday.framework.annotation.schedule.Schedule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class ScheduleService {
 
     @Schedule(id = "test", cron = "0/30 * * * * ?")
-    public ScheduleResult run(ScheduleContext scheduleContext) {
+    public ScheduleInvokeResult run(ScheduleContext scheduleContext) {
         log.info("收到定时器:{}", scheduleContext.getTraceId());
-        return ScheduleResult.ok();
+        return ScheduleInvokeResult.ok();
     }
 }

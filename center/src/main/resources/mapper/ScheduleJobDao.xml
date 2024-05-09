@@ -20,7 +20,7 @@
     </resultMap>
 
     <update id="updateBlockHandlerStrategyType">
-        update schedule_job_info
+        update schedule_job
         set block_strategy=#{update},
             update_date=now()
         where id = #{id}
@@ -28,7 +28,7 @@
     </update>
 
     <update id="updateExecuteTime">
-        update schedule_job_info
+        update schedule_job
         set last_time=#{lastTime},
             next_time=#{nextTime},
             update_date=now()
@@ -36,14 +36,14 @@
     </update>
 
     <update id="updateNextExecuteTime">
-        update schedule_job_info
+        update schedule_job
         set next_time=#{nextTime},
             update_date=now()
         where id = #{id}
     </update>
 
     <update id="updateStatus">
-        update schedule_job_info
+        update schedule_job
         set status=#{status},
             update_date=now()
         where id = #{id}
