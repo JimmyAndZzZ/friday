@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "friday.center")
 public class FridayConfigProperties {
 
-    private Integer serverPort = 11211;
+    private Integer serverPort = 33233;
 
     private String tempPath;
 

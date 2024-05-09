@@ -20,6 +20,7 @@
         <module>demo-consumer</module>
         <module>demo-http</module>
         <module>demo-agent</module>
+        <module>demo-schedule</module>
         <module>demo-consumer-simple</module>
     </modules>
 

@@ -2,7 +2,6 @@ package com.jimmy.friday.framework.netty.client;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.Ack;
@@ -27,7 +26,7 @@ import java.util.concurrent.RejectedExecutionException;
 @ChannelHandler.Sharable
 public class ClientHandler extends SimpleChannelInboundHandler<Event> {
 
-    private final Map<EventTypeEnum, Class<?>> classMap = Maps.newHashMap();
+    private final Map<EventTypeEnum, Class<?>> classMap = new HashMap<>();
 
     private final Map<EventTypeEnum, Process<?>> processMap = new HashMap<>();
 
