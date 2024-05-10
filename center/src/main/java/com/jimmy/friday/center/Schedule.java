@@ -96,6 +96,10 @@ public class Schedule {
         return StrUtil.isNotEmpty(attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id));
     }
 
+    public void release(Long id) {
+        attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
+    }
+
     public void submit(ScheduleJob scheduleJob) {
         Long id = scheduleJob.getId();
         Long timeout = scheduleJob.getTimeout();

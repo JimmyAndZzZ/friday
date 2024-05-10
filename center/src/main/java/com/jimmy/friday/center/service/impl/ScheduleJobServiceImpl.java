@@ -133,13 +133,16 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     }
 
     @Override
-    public void removeByCodeAndApplicationName(String code, String applicationName) {
+    public ScheduleJob removeByCodeAndApplicationName(String code, String applicationName) {
         ScheduleJob scheduleJob = this.queryByCodeAndApplicationName(code, applicationName);
         if (scheduleJob != null) {
             attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleJob.getCode());
             attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_CACHE, scheduleJob.getId().toString());
             super.removeById(scheduleJob.getId());
+            return scheduleJob;
         }
+
+        return null;
     }
 
     @Override

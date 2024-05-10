@@ -34,7 +34,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     boolean needExecute(Long id, Long nextTime);
 
-    void removeByCodeAndApplicationName(String code, String applicationName);
+    ScheduleJob removeByCodeAndApplicationName(String code, String applicationName);
 
     List<ScheduleJob> queryExecuteJobs(Long time, Integer size);
 }

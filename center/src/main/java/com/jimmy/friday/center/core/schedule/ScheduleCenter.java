@@ -181,7 +181,11 @@ public class ScheduleCenter implements Initialize {
     }
 
     public void delete(String scheduleId, String applicationName) {
-        scheduleJobService.removeByCodeAndApplicationName(scheduleId, applicationName);
+        ScheduleJob scheduleJob = scheduleJobService.removeByCodeAndApplicationName(scheduleId, applicationName);
+        if (scheduleJob != null) {
+            scheduleExecutePool.release(scheduleJob.getId(), scheduleJob.getBlockStrategy());
+            schedule.release(scheduleJob.getId());
+        }
     }
 
     public void register(ScheduleExecutor connect, Collection<ScheduleInfo> scheduleInfos, String applicationName, String applicationId) {

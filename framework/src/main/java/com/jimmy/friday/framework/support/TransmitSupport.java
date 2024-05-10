@@ -142,8 +142,6 @@ public class TransmitSupport implements ApplicationContextAware {
     private void sendWithAck(Event event, Client client) {
         String id = event.getId();
 
-        log.info("发了一个:{}", id);
-
         try {
             CountDownLatch countDownLatch = new CountDownLatch(1);
             confirm.put(id, countDownLatch);
