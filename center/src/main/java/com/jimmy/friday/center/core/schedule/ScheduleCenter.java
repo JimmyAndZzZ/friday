@@ -67,48 +67,56 @@ public class ScheduleCenter implements Initialize {
     public void init(ApplicationContext applicationContext) throws Exception {
         //超时扫描
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK, 300L, TimeUnit.SECONDS, () -> {
-            List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNoTimeout();
-            if (CollUtil.isNotEmpty(scheduleJobLogs)) {
-                Map<Long, List<ScheduleJobLog>> groupBy = scheduleJobLogs.stream().collect(Collectors.groupingBy(ScheduleJobLog::getExecutorId));
+            try {
+                List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryNoTimeout();
+                if (CollUtil.isNotEmpty(scheduleJobLogs)) {
+                    Map<Long, List<ScheduleJobLog>> groupBy = scheduleJobLogs.stream().collect(Collectors.groupingBy(ScheduleJobLog::getExecutorId));
 
-                for (Map.Entry<Long, List<ScheduleJobLog>> entry : groupBy.entrySet()) {
-                    Long key = entry.getKey();
-                    List<ScheduleJobLog> value = entry.getValue();
+                    for (Map.Entry<Long, List<ScheduleJobLog>> entry : groupBy.entrySet()) {
+                        Long key = entry.getKey();
+                        List<ScheduleJobLog> value = entry.getValue();
 
-                    String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(key);
-                    for (ScheduleJobLog scheduleJobLog : value) {
-                        Long traceId = scheduleJobLog.getTraceId();
+                        String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(key);
+                        for (ScheduleJobLog scheduleJobLog : value) {
+                            Long traceId = scheduleJobLog.getTraceId();
 
-                        if (StrUtil.isEmpty(applicationIdByExecutorId)) {
-                            schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:执行器离线");
-                            continue;
-                        }
+                            if (StrUtil.isEmpty(applicationIdByExecutorId)) {
+                                schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:执行器离线");
+                                continue;
+                            }
 
-                        List<ScheduleRunInfo> realTimeRunInfo = scheduleSession.getRealTimeRunInfo(applicationIdByExecutorId);
-                        Set<Long> traceIds = CollUtil.isEmpty(realTimeRunInfo) ? Sets.newHashSet() : realTimeRunInfo.stream().map(ScheduleRunInfo::getTraceId).collect(Collectors.toSet());
+                            List<ScheduleRunInfo> realTimeRunInfo = scheduleSession.getRealTimeRunInfo(applicationIdByExecutorId);
+                            Set<Long> traceIds = CollUtil.isEmpty(realTimeRunInfo) ? Sets.newHashSet() : realTimeRunInfo.stream().map(ScheduleRunInfo::getTraceId).collect(Collectors.toSet());
 
-                        if (!traceIds.contains(traceId)) {
-                            schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:进程消失");
+                            if (!traceIds.contains(traceId)) {
+                                schedule.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:进程消失");
+                            }
                         }
                     }
                 }
+                //校验运行状态
+                schedule.checkRunning();
+            } catch (Exception e) {
+                log.error("校验运行状态定时器运行失败", e);
             }
-            //校验运行状态
-            schedule.checkRunning();
         }), 0, 60, TimeUnit.SECONDS);
         //超时扫描
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS, () -> {
-            List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryTimeout();
-            if (CollUtil.isNotEmpty(scheduleJobLogs)) {
-                for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
-                    scheduleJobLog.setEndDate(System.currentTimeMillis());
-                    scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.TIMEOUT.getCode());
-                    scheduleJobLog.setErrorMessage("运行超时");
-                    //乐观锁
-                    if (scheduleJobLogService.fail(scheduleJobLog)) {
-                        schedule.interrupt(scheduleJobLog);
+            try {
+                List<ScheduleJobLog> scheduleJobLogs = scheduleJobLogService.queryTimeout();
+                if (CollUtil.isNotEmpty(scheduleJobLogs)) {
+                    for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
+                        scheduleJobLog.setEndDate(System.currentTimeMillis());
+                        scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.TIMEOUT.getCode());
+                        scheduleJobLog.setErrorMessage("运行超时");
+                        //乐观锁
+                        if (scheduleJobLogService.fail(scheduleJobLog)) {
+                            schedule.interrupt(scheduleJobLog);
+                        }
                     }
                 }
+            } catch (Exception e) {
+                log.error("调度超时定时器运行失败", e);
             }
         }), 0, 30, TimeUnit.SECONDS);
         //扫描定时器

@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Obtain;
+import com.jimmy.friday.center.utils.RedisConstants;
 import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
@@ -73,6 +74,10 @@ public class StripedLock implements Close {
     }
 
     public void tryLock(String key, Long time, TimeUnit timeUnit, Runnable runnable) {
+        if(RedisConstants.Schedule.SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK.equals(key)){
+            System.out.println(123);
+        }
+
         if (this.tryLock(key, time, timeUnit)) {
             try {
                 lockKeys.add(key);

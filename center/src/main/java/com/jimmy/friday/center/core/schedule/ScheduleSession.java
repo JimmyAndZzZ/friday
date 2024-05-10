@@ -42,9 +42,7 @@ public class ScheduleSession implements Initialize {
 
     private final ConcurrentMap<String, AtomicInteger> heartbeatFailCheck = Maps.newConcurrentMap();
 
-    private final Cache<String, Long> heartbeatSign = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
+    private final Cache<String, Long> heartbeatSign = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS) // 设置过期时间为1分钟
             .build();
 
     @Autowired
@@ -80,32 +78,36 @@ public class ScheduleSession implements Initialize {
     public void init(ApplicationContext applicationContext) throws Exception {
         // 定时任务，每隔三分钟执行一次
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-            if (MapUtil.isNotEmpty(session)) {
-                for (Map.Entry<String, Set<String>> entry : session.entrySet()) {
-                    String key = entry.getKey();
-                    Set<String> value = entry.getValue();
+            try {
+                if (MapUtil.isNotEmpty(session)) {
+                    for (Map.Entry<String, Set<String>> entry : session.entrySet()) {
+                        String key = entry.getKey();
+                        Set<String> value = entry.getValue();
 
-                    if (CollUtil.isNotEmpty(value)) {
-                        Iterator<String> iterator = value.iterator();
+                        if (CollUtil.isNotEmpty(value)) {
+                            Iterator<String> iterator = value.iterator();
 
-                        while (iterator.hasNext()) {
-                            String applicationId = iterator.next();
+                            while (iterator.hasNext()) {
+                                String applicationId = iterator.next();
 
-                            Long ifPresent = this.heartbeatSign.getIfPresent(applicationId);
-                            if (ifPresent == null) {
-                                log.error("应用{},id:{}，三分钟内没有心跳", key, applicationId);
+                                Long ifPresent = this.heartbeatSign.getIfPresent(applicationId);
+                                if (ifPresent == null) {
+                                    log.error("应用{},id:{}，三分钟内没有心跳", key, applicationId);
 
-                                AtomicInteger atomicInteger = heartbeatFailCheck.computeIfAbsent(applicationId, s -> new AtomicInteger(0));
-                                int i = atomicInteger.incrementAndGet();
-                                //心跳失联次数过大
-                                if (i >= MAX_HEARTBEAT_FAIL_COUNT) {
-                                    log.error("应用{},id:{}，被剔除", key, applicationId);
-                                    iterator.remove();
+                                    AtomicInteger atomicInteger = heartbeatFailCheck.computeIfAbsent(applicationId, s -> new AtomicInteger(0));
+                                    int i = atomicInteger.incrementAndGet();
+                                    //心跳失联次数过大
+                                    if (i >= MAX_HEARTBEAT_FAIL_COUNT) {
+                                        log.error("应用{},id:{}，被剔除", key, applicationId);
+                                        iterator.remove();
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            } catch (Exception e) {
+                log.error("无效会话剔除定时器运行失败", e);
             }
         }, 0, 3, TimeUnit.MINUTES);
     }
