@@ -108,14 +108,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     }
 
     @Override
-    public List<ScheduleJob> queryByApplicationName(String applicationName) {
-        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("application_name", applicationName);
-        return this.list(queryWrapper);
-    }
-
-    @Override
-    public void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum) {
+    public List<ScheduleJob> queryByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("application_name", applicationName);
 
@@ -123,7 +116,12 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
             queryWrapper.eq("source", scheduleSourceEnum.getCode());
         }
 
-        List<ScheduleJob> list = this.list(queryWrapper);
+        return this.list(queryWrapper);
+    }
+
+    @Override
+    public void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum) {
+        List<ScheduleJob> list = this.queryByApplicationName(applicationName, scheduleSourceEnum);
         if (CollUtil.isNotEmpty(list)) {
             for (ScheduleJob scheduleJob : list) {
                 attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_CODE_ID_MAPPER + applicationName, scheduleJob.getCode());

@@ -24,7 +24,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
-    List<ScheduleJob> queryByApplicationName(String applicationName);
+    List<ScheduleJob> queryByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
     ScheduleJob queryByCodeAndApplicationName(String code, String applicationName);
 

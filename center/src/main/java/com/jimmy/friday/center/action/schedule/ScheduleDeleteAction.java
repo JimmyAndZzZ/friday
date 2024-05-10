@@ -24,6 +24,6 @@ public class ScheduleDeleteAction implements Action<ScheduleDelete> {
 
     @Override
     public EventTypeEnum type() {
-        return EventTypeEnum.SCHEDULE_APPEND;
+        return EventTypeEnum.SCHEDULE_DELETE;
     }
 }

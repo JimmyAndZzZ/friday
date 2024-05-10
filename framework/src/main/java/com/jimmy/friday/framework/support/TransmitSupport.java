@@ -10,22 +10,21 @@ import com.jimmy.friday.boot.exception.ConnectionException;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.exception.TransmitException;
 import com.jimmy.friday.boot.other.ConfigConstants;
-import com.jimmy.friday.framework.netty.client.Client;
 import com.jimmy.friday.framework.core.ConfigLoad;
-import com.jimmy.friday.framework.other.AckEvent;
+import com.jimmy.friday.framework.netty.client.Client;
 import com.jimmy.friday.framework.utils.JsonUtil;
-import io.netty.channel.ChannelOutboundInvoker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TransmitSupport implements ApplicationContextAware, ApplicationListener<AckEvent> {
+@Slf4j
+public class TransmitSupport implements ApplicationContextAware {
 
     private final Map<String, CountDownLatch> confirm = Maps.newConcurrentMap();
 
@@ -102,7 +101,7 @@ public class TransmitSupport implements ApplicationContextAware, ApplicationList
                     } else {
                         client.send(event);
                     }
-                    
+
                     return;
                 }
             }
@@ -127,9 +126,7 @@ public class TransmitSupport implements ApplicationContextAware, ApplicationList
         }
     }
 
-    @Override
-    public void onApplicationEvent(AckEvent event) {
-        String id = event.getId();
+    public void notify(String id) {
         CountDownLatch remove = confirm.remove(id);
         if (remove != null) {
             remove.countDown();
@@ -144,6 +141,8 @@ public class TransmitSupport implements ApplicationContextAware, ApplicationList
      */
     private void sendWithAck(Event event, Client client) {
         String id = event.getId();
+
+        log.info("发了一个:{}", id);
 
         try {
             CountDownLatch countDownLatch = new CountDownLatch(1);

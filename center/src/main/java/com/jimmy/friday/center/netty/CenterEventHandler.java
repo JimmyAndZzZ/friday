@@ -1,7 +1,10 @@
 package com.jimmy.friday.center.netty;
 
 import com.jimmy.friday.boot.core.Event;
+import com.jimmy.friday.boot.enums.EventTypeEnum;
+import com.jimmy.friday.boot.message.Ack;
 import com.jimmy.friday.center.support.ActionSupport;
+import com.jimmy.friday.center.utils.JsonUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +32,20 @@ public class CenterEventHandler extends SimpleChannelInboundHandler<Event> {
     protected void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
         log.debug("收到客户端推送:{}", event);
         try {
-            executorService.submit(() -> actionSupport.action(event, ctx));
+            executorService.submit(() -> {
+                EventTypeEnum eventTypeEnum = EventTypeEnum.queryByCode(event.getType());
+                if (eventTypeEnum == null) {
+                    return;
+                }
+
+                if (eventTypeEnum.getIsNeedAck()) {
+                    Ack ack = new Ack();
+                    ack.setId(event.getId());
+                    ctx.writeAndFlush(new Event(EventTypeEnum.ACK, JsonUtil.toString(ack)));
+                }
+
+                actionSupport.action(event, ctx);
+            });
         } catch (RejectedExecutionException e) {
             log.error("Thread Pool Full");
         }

@@ -200,7 +200,7 @@ public class ScheduleCenter implements Initialize {
                 return;
             }
             //之前已存在的
-            List<ScheduleJob> scheduleJobs = scheduleJobService.queryByApplicationName(applicationName);
+            List<ScheduleJob> scheduleJobs = scheduleJobService.queryByApplicationName(applicationName, ScheduleSourceEnum.ANNOTATION);
             Map<String, ScheduleJob> map = CollUtil.isEmpty(scheduleJobs) ? Maps.newHashMap() : scheduleJobs.stream().collect(Collectors.toMap(ScheduleJob::getCode, g -> g));
 
             for (ScheduleInfo scheduleInfo : scheduleInfos) {

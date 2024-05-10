@@ -3,23 +3,22 @@ package com.jimmy.friday.framework.process;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.Ack;
 import com.jimmy.friday.framework.base.Process;
-import com.jimmy.friday.framework.other.AckEvent;
+import com.jimmy.friday.framework.support.TransmitSupport;
 import io.netty.channel.ChannelHandlerContext;
-import org.springframework.context.ApplicationContext;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AckProcess implements Process<Ack> {
 
-    private ApplicationContext applicationContext;
+    private TransmitSupport transmitSupport;
 
-    public AckProcess(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public AckProcess(TransmitSupport transmitSupport) {
+        this.transmitSupport = transmitSupport;
     }
 
     @Override
     public void process(Ack ack, ChannelHandlerContext ctx) {
-        AckEvent ackEvent = new AckEvent(applicationContext);
-        ackEvent.setId(ack.getId());
-        applicationContext.publishEvent(ackEvent);
+        transmitSupport.notify(ack.getId());
     }
 
     @Override
