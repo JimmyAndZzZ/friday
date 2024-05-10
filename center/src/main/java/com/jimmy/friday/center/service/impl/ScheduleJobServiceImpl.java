@@ -95,8 +95,8 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     }
 
     @Override
-    public void updateNextExecuteTime(Long nextTime, Long id) {
-        baseMapper.updateNextExecuteTime(nextTime, id);
+    public void updateNextExecuteTimeAndCron(Long nextTime, String cron, Long id) {
+        baseMapper.updateNextExecuteTimeAndCron(nextTime, cron, id);
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface ScheduleJobDao extends BaseMapper<ScheduleJob> {
 
     void updateExecuteTime(@Param("lastTime") Long lastTime, @Param("nextTime") Long nextTime, @Param("id") Long id);
 
-    void updateNextExecuteTime(@Param("nextTime") Long nextTime, @Param("id") Long id);
+    void updateNextExecuteTimeAndCron(@Param("nextTime") Long nextTime, @Param("cron") String cron, @Param("id") Long id);
 
     void updateStatus(@Param("status") String status, @Param("id") Long id);
 

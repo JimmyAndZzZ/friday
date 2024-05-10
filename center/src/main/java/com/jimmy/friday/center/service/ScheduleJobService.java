@@ -20,7 +20,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName);
 
-    void updateNextExecuteTime(Long nextTime, Long id);
+    void updateNextExecuteTimeAndCron(Long nextTime, String cron, Long id);
 
     void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
