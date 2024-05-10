@@ -15,4 +15,10 @@ public class ScheduleService {
         log.info("收到定时器:{}", scheduleContext.getTraceId());
         return ScheduleInvokeResult.ok();
     }
+
+    @Schedule(id = "run1", cron = "0/3 * * * * ?")
+    public ScheduleInvokeResult run1(ScheduleContext scheduleContext) {
+        log.info("run1:{}", scheduleContext.getTraceId());
+        return ScheduleInvokeResult.ok();
+    }
 }

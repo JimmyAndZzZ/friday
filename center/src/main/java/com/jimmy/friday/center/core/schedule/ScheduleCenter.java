@@ -136,21 +136,21 @@ public class ScheduleCenter implements Initialize {
                                 if (nowTime > nextTime + PRE_READ_MS) {
                                     scheduleExecutePool.execute(scheduleJobInfo);
 
-                                    this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
+                                    this.refreshScheduleNextTime(scheduleJobInfo, System.currentTimeMillis());
                                 } else if (nowTime > nextTime) {
                                     scheduleExecutePool.execute(scheduleJobInfo);
 
-                                    this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
+                                    this.refreshScheduleNextTime(scheduleJobInfo, System.currentTimeMillis());
                                     //时间范围内触发直接丢时间轮
                                     while (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJobInfo.getStatus()) && nowTime + PRE_READ_MS > scheduleJobInfo.getNextTime()) {
                                         scheduleTimeRing.push(scheduleJobInfo);
 
-                                        this.updateScheduleJobInfo(scheduleJobInfo, scheduleJobInfo.getNextTime());
+                                        this.refreshScheduleNextTime(scheduleJobInfo, scheduleJobInfo.getNextTime());
                                     }
                                 } else {
                                     scheduleTimeRing.push(scheduleJobInfo);
 
-                                    this.updateScheduleJobInfo(scheduleJobInfo, nextTime);
+                                    this.refreshScheduleNextTime(scheduleJobInfo, nextTime);
                                 }
                             }
                         });
@@ -172,15 +172,12 @@ public class ScheduleCenter implements Initialize {
     }
 
     public void append(ScheduleInfo scheduleInfo, String applicationName) {
-        String cron = scheduleInfo.getCron();
-
         ScheduleJob save = scheduleJobService.save(scheduleInfo, applicationName);
         if (save == null) {
             return;
         }
 
-        Long lastTime = save.getLastTime();
-        scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), save.getId());
+        this.updateSchedule(save, scheduleInfo);
     }
 
     public void delete(String scheduleId, String applicationName) {
@@ -207,25 +204,9 @@ public class ScheduleCenter implements Initialize {
             Map<String, ScheduleJob> map = CollUtil.isEmpty(scheduleJobs) ? Maps.newHashMap() : scheduleJobs.stream().collect(Collectors.toMap(ScheduleJob::getCode, g -> g));
 
             for (ScheduleInfo scheduleInfo : scheduleInfos) {
-                String cron = scheduleInfo.getCron();
-                String scheduleId = scheduleInfo.getScheduleId();
-                BlockHandlerStrategyTypeEnum blockHandlerStrategyType = scheduleInfo.getBlockHandlerStrategyType();
-
-                ScheduleJob scheduleJob = map.remove(scheduleId);
+                ScheduleJob scheduleJob = map.remove(scheduleInfo.getScheduleId());
                 if (scheduleJob != null) {
-                    Long id = scheduleJob.getId();
-                    String blockStrategy = scheduleJob.getBlockStrategy();
-                    //更新下次执行时间
-                    if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
-                        Long lastTime = scheduleJob.getLastTime();
-                        scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), id);
-                        //判断是否更新阻塞策略
-                        if (!blockHandlerStrategyType.getCode().equals(blockStrategy)) {
-                            if (scheduleJobService.updateBlockHandlerStrategyType(id, blockStrategy, blockHandlerStrategyType.getCode())) {
-                                scheduleExecutePool.release(id, blockStrategy);
-                            }
-                        }
-                    }
+                    this.updateSchedule(scheduleJob, scheduleInfo);
                 } else {
                     this.append(scheduleInfo, applicationName);
                 }
@@ -237,13 +218,37 @@ public class ScheduleCenter implements Initialize {
         });
     }
 
+    /**
+     * 更新调度信息
+     *
+     * @param scheduleJob
+     * @param scheduleInfo
+     */
+    private void updateSchedule(ScheduleJob scheduleJob, ScheduleInfo scheduleInfo) {
+        Long id = scheduleJob.getId();
+        String cron = scheduleInfo.getCron();
+        String blockStrategy = scheduleJob.getBlockStrategy();
+        BlockHandlerStrategyTypeEnum blockHandlerStrategyType = scheduleInfo.getBlockHandlerStrategyType();
+
+        if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
+            Long lastTime = scheduleJob.getLastTime();
+            scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), id);
+            //判断是否更新阻塞策略
+            if (!blockHandlerStrategyType.getCode().equals(blockStrategy)) {
+                if (scheduleJobService.updateBlockHandlerStrategyType(id, blockStrategy, blockHandlerStrategyType.getCode())) {
+                    scheduleExecutePool.release(id, blockStrategy);
+                }
+            }
+        }
+    }
+
 
     /**
      * 刷新定时器信息
      *
      * @param scheduleJob
      */
-    private void updateScheduleJobInfo(ScheduleJob scheduleJob, Long lastTime) {
+    private void refreshScheduleNextTime(ScheduleJob scheduleJob, Long lastTime) {
         Long id = scheduleJob.getId();
         String cron = scheduleJob.getCron();
         if (StrUtil.isEmpty(cron)) {

@@ -35,9 +35,10 @@
         where id = #{id}
     </update>
 
-    <update id="updateNextExecuteTime">
+    <update id="updateNextExecuteTimeAndCron">
         update schedule_job
         set next_time=#{nextTime},
+            cron=#{cron},
             update_date=now()
         where id = #{id}
     </update>

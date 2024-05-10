@@ -75,7 +75,7 @@ public class ScheduleBootstrap implements Bootstrap {
                 scheduleHeartbeat.setApplicationId(configLoad.getId());
                 scheduleHeartbeat.setApplicationName(configLoad.getApplicationName());
                 scheduleHeartbeat.setScheduleRunInfoList(scheduleExecutor.getRunInfo());
-                transmitSupport.send(scheduleHeartbeat);
+                transmitSupport.broadcast(scheduleHeartbeat);
             } catch (Exception ignore) {
 
             }
