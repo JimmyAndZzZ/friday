@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum JobRunStatusEnum {
+public enum ScheduleRunStatusEnum {
 
     RUNNING("0"),
     SUCCESS("1"),

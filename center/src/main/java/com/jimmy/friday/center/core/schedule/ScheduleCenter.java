@@ -1,10 +1,8 @@
 package com.jimmy.friday.center.core.schedule;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -13,7 +11,7 @@ import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
-import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleStatusEnum;
 import com.jimmy.friday.center.Schedule;
@@ -95,6 +93,8 @@ public class ScheduleCenter implements Initialize {
                     }
                 }
             }
+            //校验运行状态
+            schedule.checkRunning();
         }), 0, 60, TimeUnit.SECONDS);
         //超时扫描
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> stripedLock.tryLock(RedisConstants.Schedule.SCHEDULE_TIMEOUT_JOB_LOCK, 300L, TimeUnit.SECONDS, () -> {
@@ -102,7 +102,7 @@ public class ScheduleCenter implements Initialize {
             if (CollUtil.isNotEmpty(scheduleJobLogs)) {
                 for (ScheduleJobLog scheduleJobLog : scheduleJobLogs) {
                     scheduleJobLog.setEndDate(System.currentTimeMillis());
-                    scheduleJobLog.setRunStatus(JobRunStatusEnum.TIMEOUT.getCode());
+                    scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.TIMEOUT.getCode());
                     scheduleJobLog.setErrorMessage("运行超时");
                     //乐观锁
                     if (scheduleJobLogService.fail(scheduleJobLog)) {

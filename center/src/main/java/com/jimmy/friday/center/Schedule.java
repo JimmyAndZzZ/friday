@@ -1,10 +1,12 @@
 package com.jimmy.friday.center;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
-import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
 import com.jimmy.friday.boot.message.schedule.ScheduleInterrupt;
 import com.jimmy.friday.boot.message.schedule.ScheduleInvoke;
 import com.jimmy.friday.center.core.AttachmentCache;
@@ -75,17 +77,17 @@ public class Schedule {
 
         attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + scheduleJobLog.getJobId());
 
-        if (!JobRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
+        if (!ScheduleRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
             log.error("调度结束，更新无效,{}", traceId);
             return;
         }
 
         if (isSuccess) {
-            scheduleJobLog.setRunStatus(JobRunStatusEnum.SUCCESS.getCode());
+            scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.SUCCESS.getCode());
             scheduleJobLog.setEndDate(endDate);
             scheduleJobLogService.updateById(scheduleJobLog);
         } else {
-            scheduleJobLog.setRunStatus(JobRunStatusEnum.ERROR.getCode());
+            scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.ERROR.getCode());
             scheduleJobLog.setErrorMessage(errorMessage);
             scheduleJobLog.setEndDate(endDate);
             scheduleJobLogService.fail(scheduleJobLog);
@@ -98,6 +100,23 @@ public class Schedule {
 
     public void release(Long id) {
         attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
+    }
+
+    public void checkRunning() {
+        Iterable<String> keys = attachmentCache.keys(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + "*");
+        if (CollUtil.isNotEmpty(keys)) {
+            for (String key : keys) {
+                String attachment = attachmentCache.attachment(key);
+                if (StrUtil.isEmpty(attachment)) {
+                    continue;
+                }
+
+                ScheduleJobLog scheduleJobLog = scheduleJobLogService.queryByTraceId(Convert.toLong(attachment, -1L));
+                if (scheduleJobLog == null || !ScheduleRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
+                    attachmentCache.remove(key);
+                }
+            }
+        }
     }
 
     public void submit(ScheduleJob scheduleJob) {
@@ -120,7 +139,7 @@ public class Schedule {
         scheduleJobLog.setRunParam(runParam);
         scheduleJobLog.setExecutorId(select.getId());
         scheduleJobLog.setStartDate(System.currentTimeMillis());
-        scheduleJobLog.setRunStatus(JobRunStatusEnum.RUNNING.getCode());
+        scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.RUNNING.getCode());
         scheduleJobLog.setJobCode(scheduleJob.getCode());
         scheduleJobLog.setTraceId(traceId);
         //计算超时时间
@@ -142,7 +161,7 @@ public class Schedule {
         } catch (Exception e) {
             log.error("调度执行失败:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName, e);
 
-            scheduleJobLog.setRunStatus(JobRunStatusEnum.ERROR.getCode());
+            scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.ERROR.getCode());
             scheduleJobLog.setErrorMessage(e.getMessage());
             scheduleJobLogService.updateById(scheduleJobLog);
 
