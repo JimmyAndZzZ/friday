@@ -74,10 +74,6 @@ public class StripedLock implements Close {
     }
 
     public void tryLock(String key, Long time, TimeUnit timeUnit, Runnable runnable) {
-        if(RedisConstants.Schedule.SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK.equals(key)){
-            System.out.println(123);
-        }
-
         if (this.tryLock(key, time, timeUnit)) {
             try {
                 lockKeys.add(key);
