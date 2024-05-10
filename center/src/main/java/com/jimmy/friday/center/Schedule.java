@@ -107,7 +107,7 @@ public class Schedule {
         //服务
         ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
         if (select == null) {
-            log.error("执行引擎为空id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
+            log.error("执行引擎为空,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
             return;
         }
         //保存运行流水
