@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.boot.exception.ConnectionException;
@@ -45,7 +45,7 @@ public class TransactionSession {
 
     private final Map<Long, CountDownLatch> waitAckMap = Maps.newConcurrentMap();
 
-    private final Map<Long, AckTypeEnum> confirmAckMap = Maps.newConcurrentMap();
+    private final Map<Long, ConfirmTypeEnum> confirmAckMap = Maps.newConcurrentMap();
 
     private final Map<TransactionTypeEnum, TransactionConnectionProxy> proxyMap = new HashMap<>();
 
@@ -72,10 +72,10 @@ public class TransactionSession {
         beansOfType.values().forEach(bean -> proxyMap.put(bean.type(), bean));
     }
 
-    public void notify(Long traceId, AckTypeEnum ackTypeEnum) {
+    public void notify(Long traceId, ConfirmTypeEnum confirmTypeEnum) {
         CountDownLatch countDownLatch = waitAckMap.remove(traceId);
         if (countDownLatch != null) {
-            confirmAckMap.put(traceId, ackTypeEnum);
+            confirmAckMap.put(traceId, confirmTypeEnum);
             countDownLatch.countDown();
         }
     }
@@ -410,13 +410,13 @@ public class TransactionSession {
                 return false;
             }
 
-            AckTypeEnum ackTypeEnum = confirmAckMap.remove(id);
-            if (ackTypeEnum == null) {
+            ConfirmTypeEnum confirmTypeEnum = confirmAckMap.remove(id);
+            if (confirmTypeEnum == null) {
                 log.error("服务端响应为空,transactionId:{}", transactionId);
                 return false;
             }
 
-            if (ackTypeEnum.equals(AckTypeEnum.ERROR)) {
+            if (confirmTypeEnum.equals(ConfirmTypeEnum.ERROR)) {
                 log.error("服务端处理失败,transactionId:{}", transactionId);
                 return false;
             }

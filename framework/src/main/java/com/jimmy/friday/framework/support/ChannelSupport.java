@@ -5,9 +5,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.base.Listen;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
-import com.jimmy.friday.boot.message.gateway.*;
 import com.jimmy.friday.boot.message.gateway.*;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.framework.core.ConfigLoad;
@@ -28,7 +27,7 @@ public class ChannelSupport {
 
     private final Map<String, ChannelSubInfo> infoMap = new ConcurrentHashMap<>();
 
-    private final Map<Long, ChannelAck> confirmEventMap = new ConcurrentHashMap<>();
+    private final Map<Long, ChannelPushConfirm> confirmEventMap = new ConcurrentHashMap<>();
 
     private final Map<Long, CountDownLatch> countDownLatchMap = new ConcurrentHashMap<>();
 
@@ -167,12 +166,12 @@ public class ChannelSupport {
         }
     }
 
-    public void notify(ChannelAck channelAck) {
-        Long id = channelAck.getId();
+    public void notify(ChannelPushConfirm channelPushConfirm) {
+        Long id = channelPushConfirm.getId();
 
         CountDownLatch remove = countDownLatchMap.remove(id);
         if (remove != null) {
-            confirmEventMap.put(id, channelAck);
+            confirmEventMap.put(id, channelPushConfirm);
             remove.countDown();
         }
     }
@@ -195,15 +194,15 @@ public class ChannelSupport {
                 throw new GatewayException("等待ACK超时");
             }
 
-            ChannelAck channelAck = confirmEventMap.get(id);
-            if (channelAck == null) {
+            ChannelPushConfirm channelPushConfirm = confirmEventMap.get(id);
+            if (channelPushConfirm == null) {
                 throw new GatewayException("ACK响应为空");
             }
 
-            AckTypeEnum ackType = channelAck.getAckType();
+            ConfirmTypeEnum ackType = channelPushConfirm.getAckType();
 
-            if (Objects.requireNonNull(ackType) == AckTypeEnum.ERROR) {
-                throw new GatewayException(StrUtil.emptyToDefault(channelAck.getErrorMessage(), "ACK失败"));
+            if (Objects.requireNonNull(ackType) == ConfirmTypeEnum.ERROR) {
+                throw new GatewayException(StrUtil.emptyToDefault(channelPushConfirm.getErrorMessage(), "ACK失败"));
             }
         } catch (InterruptedException interruptedException) {
             throw new GatewayException("等待ACK被中断");

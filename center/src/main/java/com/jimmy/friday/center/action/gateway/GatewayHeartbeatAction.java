@@ -1,14 +1,14 @@
 package com.jimmy.friday.center.action.gateway;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
-import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.Heartbeat;
 import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
+import com.jimmy.friday.center.support.TransmitSupport;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,6 +21,9 @@ public class GatewayHeartbeatAction implements Action<Heartbeat> {
     private final Map<Long, Heartbeat> result = Maps.newConcurrentMap();
 
     private final Map<Long, CountDownLatch> confirm = Maps.newConcurrentMap();
+
+    @Autowired
+    private TransmitSupport transmitSupport;
 
     @Override
     public void action(Heartbeat heartbeat, ChannelHandlerContext channelHandlerContext) {
@@ -45,8 +48,7 @@ public class GatewayHeartbeatAction implements Action<Heartbeat> {
                 return null;
             }
 
-            channel.writeAndFlush(new Event(EventTypeEnum.GATEWAY_HEARTBEAT, JSON.toJSONString(heartbeat)));
-
+            transmitSupport.transmit(heartbeat, channel);
             countDownLatch.await(60, TimeUnit.SECONDS);
             //等待超时
             if (countDownLatch.getCount() != 0L) {

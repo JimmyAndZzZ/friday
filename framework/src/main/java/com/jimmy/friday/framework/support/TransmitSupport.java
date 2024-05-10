@@ -2,23 +2,32 @@ package com.jimmy.friday.framework.support;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.base.Message;
+import com.jimmy.friday.boot.core.Event;
+import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.exception.ConnectionException;
 import com.jimmy.friday.boot.exception.GatewayException;
+import com.jimmy.friday.boot.exception.TransmitException;
 import com.jimmy.friday.boot.other.ConfigConstants;
 import com.jimmy.friday.framework.netty.client.Client;
 import com.jimmy.friday.framework.core.ConfigLoad;
+import com.jimmy.friday.framework.other.AckEvent;
+import com.jimmy.friday.framework.utils.JsonUtil;
+import io.netty.channel.ChannelOutboundInvoker;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TransmitSupport implements ApplicationContextAware {
+public class TransmitSupport implements ApplicationContextAware, ApplicationListener<AckEvent> {
+
+    private final Map<String, CountDownLatch> confirm = Maps.newConcurrentMap();
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
@@ -72,15 +81,28 @@ public class TransmitSupport implements ApplicationContextAware {
     }
 
     public void send(Message message) {
+        EventTypeEnum type = message.type();
+        Event event = new Event(type, JsonUtil.toString(message));
+
         if (master.getConnectSuccess()) {
-            master.send(message);
+            if (type.getIsNeedAck()) {
+                this.sendWithAck(event, master);
+            } else {
+                master.send(event);
+            }
+
             return;
         }
 
         if (CollUtil.isNotEmpty(backup)) {
             for (Client client : backup) {
                 if (client.getConnectSuccess()) {
-                    client.send(message);
+                    if (type.getIsNeedAck()) {
+                        this.sendWithAck(event, client);
+                    } else {
+                        client.send(event);
+                    }
+                    
                     return;
                 }
             }
@@ -90,16 +112,54 @@ public class TransmitSupport implements ApplicationContextAware {
     }
 
     public void broadcast(Message message) {
+        Event event = new Event(message.type(), JsonUtil.toString(message));
+
         if (master.getConnectSuccess()) {
-            master.send(message);
+            master.send(event);
         }
 
         if (CollUtil.isNotEmpty(backup)) {
             for (Client client : backup) {
                 if (client.getConnectSuccess()) {
-                    client.send(message);
+                    client.send(event);
                 }
             }
+        }
+    }
+
+    @Override
+    public void onApplicationEvent(AckEvent event) {
+        String id = event.getId();
+        CountDownLatch remove = confirm.remove(id);
+        if (remove != null) {
+            remove.countDown();
+        }
+    }
+
+    /**
+     * ack发送
+     *
+     * @param event
+     * @param client
+     */
+    private void sendWithAck(Event event, Client client) {
+        String id = event.getId();
+
+        try {
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            confirm.put(id, countDownLatch);
+
+            client.send(event);
+            //等待回调
+            countDownLatch.await(60, TimeUnit.SECONDS);
+
+            if (countDownLatch.getCount() != 0L) {
+                throw new TransmitException("消息确认超时");
+            }
+        } catch (InterruptedException interruptedException) {
+            throw new TransmitException("发送被中断");
+        } finally {
+            confirm.remove(id);
         }
     }
 }

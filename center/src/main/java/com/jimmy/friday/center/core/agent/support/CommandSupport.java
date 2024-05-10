@@ -16,6 +16,7 @@ import com.jimmy.friday.center.base.agent.Handler;
 import com.jimmy.friday.center.core.agent.CommandSession;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.other.CommandParser;
+import com.jimmy.friday.center.support.TransmitSupport;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class CommandSupport implements Initialize {
 
     @Autowired
     private CommandSession commandSession;
+
+    @Autowired
+    private TransmitSupport transmitSupport;
 
     public void notify(AgentCommand agentCommand) {
         Long traceId = agentCommand.getTraceId();
@@ -88,7 +92,7 @@ public class CommandSupport implements Initialize {
             agentCommand.setCommand(cmd.getCommand());
             agentCommand.setTraceId(traceId);
             agentCommand.setParam(cmd.getParam());
-            channel.writeAndFlush(new Event(EventTypeEnum.AGENT_COMMAND, JSON.toJSONString(agentCommand)));
+            transmitSupport.transmit(agentCommand, channel);
 
             countDownLatch.await(120, TimeUnit.SECONDS);
             //等待超时

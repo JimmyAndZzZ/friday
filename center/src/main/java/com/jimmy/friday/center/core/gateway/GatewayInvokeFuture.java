@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.message.gateway.GatewayInvoke;
+import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import io.netty.channel.Channel;
 
@@ -27,10 +28,13 @@ public class GatewayInvokeFuture extends CompletableFuture<GatewayInvoke> {
 
     private final GatewayInvoke gatewayInvoke;
 
-    public GatewayInvokeFuture(GatewayInvoke gatewayInvoke, Channel channel, long timeout) {
+    private final TransmitSupport transmitSupport;
+
+    public GatewayInvokeFuture(GatewayInvoke gatewayInvoke, Channel channel, long timeout, TransmitSupport transmitSupport) {
         this.timeout = timeout;
         this.channel = channel;
         this.gatewayInvoke = gatewayInvoke;
+        this.transmitSupport = transmitSupport;
         this.traceId = gatewayInvoke.getTraceId();
         FUTURES.put(traceId, this);
         SERVICE_ID_MAP.put(traceId, gatewayInvoke.getApplicationId());
@@ -52,8 +56,7 @@ public class GatewayInvokeFuture extends CompletableFuture<GatewayInvoke> {
     @Override
     public GatewayInvoke get(long timeout, TimeUnit unit) {
         try {
-            //发送netty
-            channel.writeAndFlush(new Event(EventTypeEnum.GATEWAY_INVOKE, JsonUtil.toString(this.gatewayInvoke)));
+            transmitSupport.transmit(this.gatewayInvoke,channel);
             return super.get(timeout, unit);
         } catch (InterruptedException e) {
             gatewayInvoke.setIsSuccess(false);

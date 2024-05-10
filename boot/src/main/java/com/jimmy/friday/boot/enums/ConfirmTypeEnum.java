@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AckTypeEnum {
+public enum ConfirmTypeEnum {
 
     SUCCESS,
     ERROR

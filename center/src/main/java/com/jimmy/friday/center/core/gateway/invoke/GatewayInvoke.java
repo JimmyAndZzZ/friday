@@ -13,6 +13,7 @@ import com.jimmy.friday.center.core.gateway.GatewayInvokeFuture;
 import com.jimmy.friday.center.core.gateway.GatewaySession;
 import com.jimmy.friday.center.event.SuspectedFailEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
+import com.jimmy.friday.center.support.TransmitSupport;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,13 @@ import java.util.Map;
 public class GatewayInvoke extends BaseInvoke {
 
     @Autowired
-    private GatewayHeartbeatAction gatewayHeartbeatAction;
+    private TransmitSupport transmitSupport;
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private GatewayHeartbeatAction gatewayHeartbeatAction;
 
     @Override
     public boolean heartbeat(Service service) {
@@ -71,7 +75,11 @@ public class GatewayInvoke extends BaseInvoke {
 
         int i = 0;
         while (true) {
-            com.jimmy.friday.boot.message.gateway.GatewayInvoke response = new GatewayInvokeFuture(message, channel, method.getTimeout()).get();
+            com.jimmy.friday.boot.message.gateway.GatewayInvoke response = new GatewayInvokeFuture(
+                    message,
+                    channel,
+                    method.getTimeout(),
+                    transmitSupport).get();
 
             if (i >= retry) {
                 return this.responseHandler(response);
