@@ -3,10 +3,10 @@ package com.jimmy.friday.center.action.transaction;
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
-import com.jimmy.friday.boot.message.transaction.TransactionAck;
+import com.jimmy.friday.boot.message.transaction.TransactionConfirm;
 import com.jimmy.friday.boot.message.transaction.TransactionNotify;
 import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
 import com.jimmy.friday.center.base.Action;
@@ -20,8 +20,6 @@ import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,10 +50,10 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
         String id = transactionSubmit.getId();
         TransactionStatusEnum transactionStatus = transactionSubmit.getTransactionStatus();
 
-        TransactionAck transactionAck = new TransactionAck();
-        transactionAck.setTraceId(transactionSubmit.getTraceId());
-        transactionAck.setTransactionId(id);
-        transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
+        TransactionConfirm transactionConfirm = new TransactionConfirm();
+        transactionConfirm.setTraceId(transactionSubmit.getTraceId());
+        transactionConfirm.setTransactionId(id);
+        transactionConfirm.setConfirmTypeEnum(ConfirmTypeEnum.SUCCESS);
 
         stripedLock.readWriteLockWrite(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + id, 120L, TimeUnit.SECONDS, new Runnable() {
             @Override
@@ -94,10 +92,10 @@ public class TransactionSubmitAction implements Action<TransactionSubmit> {
                         c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_NOTIFY, JsonUtil.toString(transactionNotify)));
                     }
                 } catch (Exception e) {
-                    transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
+                    transactionConfirm.setConfirmTypeEnum(ConfirmTypeEnum.ERROR);
                     throw e;
                 } finally {
-                    channelHandlerContext.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
+                    channelHandlerContext.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_CONFIRM, JsonUtil.toString(transactionConfirm)));
                 }
             }
         });

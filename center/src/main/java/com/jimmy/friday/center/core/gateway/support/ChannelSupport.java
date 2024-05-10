@@ -6,20 +6,19 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.jimmy.friday.boot.core.Event;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
-import com.jimmy.friday.boot.enums.EventTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.ChannelReceive;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.center.base.Initialize;
-import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.core.KafkaManager;
+import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.entity.GatewayAccount;
 import com.jimmy.friday.center.entity.GatewayPushChannelSub;
 import com.jimmy.friday.center.event.ReceiveConfirmEvent;
 import com.jimmy.friday.center.service.GatewayAccountService;
 import com.jimmy.friday.center.service.GatewayPushChannelSubService;
+import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.protocol.core.InputMessage;
 import io.netty.channel.Channel;
@@ -53,6 +52,9 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
 
     @Autowired
     private KafkaManager kafkaManager;
+
+    @Autowired
+    private TransmitSupport transmitSupport;
 
     @Autowired
     private ChannelSubManager channelSubManager;
@@ -166,9 +168,9 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
                 throw new GatewayException("ACK响应为空");
             }
 
-            AckTypeEnum ackType = receiveConfirmEvent.getAckType();
+            ConfirmTypeEnum ackType = receiveConfirmEvent.getAckType();
 
-            if (Objects.requireNonNull(ackType) == AckTypeEnum.ERROR) {
+            if (Objects.requireNonNull(ackType) == ConfirmTypeEnum.ERROR) {
                 throw new GatewayException(StrUtil.emptyToDefault(receiveConfirmEvent.getErrorMessage(), "ACK失败"));
             }
         } catch (InterruptedException interruptedException) {
@@ -210,8 +212,7 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
 
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatchMap.put(id, countDownLatch);
-
-            channel.writeAndFlush(new Event(EventTypeEnum.CHANNEL_RECEIVE, JsonUtil.toString(channelReceive)));
+            transmitSupport.transmit(channelReceive, channel);
 
             this.await(id);
 

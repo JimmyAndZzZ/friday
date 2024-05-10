@@ -10,6 +10,7 @@ import com.jimmy.friday.boot.message.agent.AgentRegister;
 import com.jimmy.friday.center.event.LoseConnectionEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;
 import com.jimmy.friday.center.support.RemindSupport;
+import com.jimmy.friday.center.support.TransmitSupport;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class AgentSupport implements ApplicationListener<LoseConnectionEvent> {
 
     @Autowired
     private RemindSupport remindSupport;
+
+    @Autowired
+    private TransmitSupport transmitSupport;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -74,8 +78,7 @@ public class AgentSupport implements ApplicationListener<LoseConnectionEvent> {
                 CountDownLatch downLatch = new CountDownLatch(1);
                 this.countDownLatchMap.put(traceId, downLatch);
                 //发送心跳包
-                Event event = new Event(EventTypeEnum.AGENT_HEARTBEAT, JSON.toJSONString(new AgentHeartbeat(traceId)));
-                channel.writeAndFlush(event);
+                transmitSupport.transmit(new AgentHeartbeat(traceId), channel);
 
                 downLatch.await(heartbeatTimeout, TimeUnit.SECONDS);
                 if (downLatch.getCount() != 0L) {

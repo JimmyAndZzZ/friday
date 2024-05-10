@@ -3,8 +3,6 @@ package com.jimmy.friday.center.support;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.base.Message;
 import com.jimmy.friday.boot.core.Event;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
-import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.exception.TransmitException;
 import com.jimmy.friday.center.event.AckEvent;
 import com.jimmy.friday.center.netty.ChannelHandlerPool;

@@ -5,7 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jimmy.friday.boot.base.Listen;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.*;
 import com.jimmy.friday.boot.other.GlobalConstants;
@@ -199,9 +199,9 @@ public class ChannelSupport {
                 throw new GatewayException("ACK响应为空");
             }
 
-            AckTypeEnum ackType = channelPushConfirm.getAckType();
+            ConfirmTypeEnum ackType = channelPushConfirm.getAckType();
 
-            if (Objects.requireNonNull(ackType) == AckTypeEnum.ERROR) {
+            if (Objects.requireNonNull(ackType) == ConfirmTypeEnum.ERROR) {
                 throw new GatewayException(StrUtil.emptyToDefault(channelPushConfirm.getErrorMessage(), "ACK失败"));
             }
         } catch (InterruptedException interruptedException) {

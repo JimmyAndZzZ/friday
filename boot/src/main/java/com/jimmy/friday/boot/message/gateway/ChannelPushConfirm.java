@@ -1,7 +1,7 @@
 package com.jimmy.friday.boot.message.gateway;
 
 import com.jimmy.friday.boot.base.Message;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ public class ChannelPushConfirm implements Message {
 
     private Long id;
 
-    private AckTypeEnum ackType;
+    private ConfirmTypeEnum ackType;
 
     private String errorMessage;
 
@@ -21,14 +21,14 @@ public class ChannelPushConfirm implements Message {
     public static ChannelPushConfirm success(Long id) {
         ChannelPushConfirm channelPushConfirm = new ChannelPushConfirm();
         channelPushConfirm.setId(id);
-        channelPushConfirm.setAckType(AckTypeEnum.SUCCESS);
+        channelPushConfirm.setAckType(ConfirmTypeEnum.SUCCESS);
         return channelPushConfirm;
     }
 
     public static ChannelPushConfirm fail(Long id, String errorMessage) {
         ChannelPushConfirm channelPushConfirm = new ChannelPushConfirm();
         channelPushConfirm.setId(id);
-        channelPushConfirm.setAckType(AckTypeEnum.ERROR);
+        channelPushConfirm.setAckType(ConfirmTypeEnum.ERROR);
         channelPushConfirm.setErrorMessage(errorMessage);
         return channelPushConfirm;
     }

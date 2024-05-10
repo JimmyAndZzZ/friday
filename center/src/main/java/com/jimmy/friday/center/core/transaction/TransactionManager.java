@@ -3,10 +3,10 @@ package com.jimmy.friday.center.core.transaction;
 import cn.hutool.core.collection.CollUtil;
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
-import com.jimmy.friday.boot.enums.AckTypeEnum;
+import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
-import com.jimmy.friday.boot.message.transaction.TransactionAck;
+import com.jimmy.friday.boot.message.transaction.TransactionConfirm;
 import com.jimmy.friday.boot.message.transaction.TransactionRefund;
 import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.StripedLock;
@@ -17,8 +17,6 @@ import com.jimmy.friday.center.utils.JsonUtil;
 import com.jimmy.friday.center.utils.RedisConstants;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,10 +50,10 @@ public class TransactionManager {
             return;
         }
 
-        TransactionAck transactionAck = new TransactionAck();
-        transactionAck.setTraceId(traceId);
-        transactionAck.setTransactionId(transactionId);
-        transactionAck.setAckTypeEnum(AckTypeEnum.SUCCESS);
+        TransactionConfirm transactionConfirm = new TransactionConfirm();
+        transactionConfirm.setTraceId(traceId);
+        transactionConfirm.setTransactionId(transactionId);
+        transactionConfirm.setConfirmTypeEnum(ConfirmTypeEnum.SUCCESS);
 
         stripedLock.readWriteLockRead(RedisConstants.Transaction.TRANSACTION_READ_WRITE_LOCK + transactionId, 120L, TimeUnit.SECONDS, new Runnable() {
             @Override
@@ -93,10 +91,10 @@ public class TransactionManager {
 
                     attachmentCache.attach(RedisConstants.Transaction.TRANSACTION_FACTS + transactionId, transactionFacts.getId().toString(), transactionFacts);
                 } catch (Exception e) {
-                    transactionAck.setAckTypeEnum(AckTypeEnum.ERROR);
+                    transactionConfirm.setConfirmTypeEnum(ConfirmTypeEnum.ERROR);
                     throw e;
                 } finally {
-                    c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_ACK, JsonUtil.toString(transactionAck)));
+                    c.writeAndFlush(new Event(EventTypeEnum.TRANSACTION_CONFIRM, JsonUtil.toString(transactionConfirm)));
                 }
             }
         });

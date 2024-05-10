@@ -28,7 +28,7 @@ public enum EventTypeEnum {
     TRANSACTION_NOTIFY("transactionNotify", "事务通知", false),
     TRANSACTION_SUBMIT("transactionSubmit", "事务提交", false),
     TRANSACTION_SUBMIT_ACK("transactionSubmitAck", "事务提交确认", false),
-    TRANSACTION_ACK("transactionAck", "事务确认", false),
+    TRANSACTION_CONFIRM("transactionConfirm", "事务确认", false),
     TRANSACTION_TIMEOUT("transactionTimeout", "事务超时", false),
     TRANSACTION_COMPENSATION("transactionCompensation", "事务补偿", false),
     TRANSACTION_REFUND("transactionRefund", "事务退回", false),
