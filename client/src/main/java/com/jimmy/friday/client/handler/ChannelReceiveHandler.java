@@ -2,7 +2,7 @@ package com.jimmy.friday.client.handler;
 
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.message.gateway.ChannelAck;
+import com.jimmy.friday.boot.message.gateway.ChannelPushConfirm;
 import com.jimmy.friday.boot.message.gateway.ChannelReceive;
 import com.jimmy.friday.client.base.Handler;
 import com.jimmy.friday.client.support.ChannelSupport;
@@ -16,7 +16,7 @@ public class ChannelReceiveHandler implements Handler {
         String message = event.getMessage();
         ChannelReceive channelReceive = JsonUtil.parseObject(message, ChannelReceive.class);
 
-        ctx.writeAndFlush(new Event(EventTypeEnum.CHANNEL_ACK, JsonUtil.toString(ChannelAck.success(channelReceive.getId()))));
+        ctx.writeAndFlush(new Event(EventTypeEnum.CHANNEL_PUSH_CONFIRM, JsonUtil.toString(ChannelPushConfirm.success(channelReceive.getId()))));
         ChannelSupport.receive(channelReceive);
     }
 }

@@ -72,8 +72,8 @@ public class GatewayConfig {
         }
 
         @Bean
-        public ChannelAckProcess channelAckProcess(ChannelSupport channelSupport) {
-            return new ChannelAckProcess(channelSupport);
+        public ChannelPushConfirmProcess channelAckProcess(ChannelSupport channelSupport) {
+            return new ChannelPushConfirmProcess(channelSupport);
         }
     }
 }

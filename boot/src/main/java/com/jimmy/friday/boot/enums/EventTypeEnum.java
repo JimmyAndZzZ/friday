@@ -38,7 +38,7 @@ public enum EventTypeEnum {
     CHANNEL_SUB("channelSub", "频道订阅", false),
     CHANNEL_CANCEL_SUB("channelCancelSub", "频道取消订阅", false),
     CHANNEL_RECEIVE("channelReceive", "频道接收", false),
-    CHANNEL_ACK("channelAck", "频道消息确认", false),
+    CHANNEL_PUSH_CONFIRM("channelPushConfirm", "频道消息确认", false),
     SCHEDULE_REGISTER("scheduleRegister", "调度注册", false),
     SCHEDULE_INVOKE("scheduleInvoke", "调度运行", false),
     SCHEDULE_APPEND("scheduleAppend", "调度增加", true),

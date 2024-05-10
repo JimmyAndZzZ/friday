@@ -2,7 +2,7 @@ package com.jimmy.friday.center.action.gateway;
 
 import com.jimmy.friday.boot.core.Event;
 import com.jimmy.friday.boot.enums.EventTypeEnum;
-import com.jimmy.friday.boot.message.gateway.ChannelAck;
+import com.jimmy.friday.boot.message.gateway.ChannelPushConfirm;
 import com.jimmy.friday.boot.message.gateway.ChannelPush;
 import com.jimmy.friday.center.base.Action;
 import com.jimmy.friday.center.core.gateway.support.ChannelSupport;
@@ -29,10 +29,10 @@ public class ChannelPushAction implements Action<ChannelPush> {
             //消息推送
             channelSupport.push(message, serviceName);
             //ack
-            channelHandlerContext.write(new Event(EventTypeEnum.CHANNEL_ACK, JsonUtil.toString(ChannelAck.success(id))));
+            channelHandlerContext.write(new Event(EventTypeEnum.CHANNEL_PUSH_CONFIRM, JsonUtil.toString(ChannelPushConfirm.success(id))));
         } catch (Exception e) {
             log.error("消息推送失败", e);
-            channelHandlerContext.write(new Event(EventTypeEnum.CHANNEL_ACK, JsonUtil.toString(ChannelAck.fail(id, "消息推送失败"))));
+            channelHandlerContext.write(new Event(EventTypeEnum.CHANNEL_PUSH_CONFIRM, JsonUtil.toString(ChannelPushConfirm.fail(id, "消息推送失败"))));
         }
     }
 
