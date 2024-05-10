@@ -14,6 +14,7 @@ import com.jimmy.friday.framework.schedule.ScheduleCenter;
 import com.jimmy.friday.framework.schedule.ScheduleExecutor;
 import com.jimmy.friday.framework.support.TransmitSupport;
 import com.jimmy.friday.framework.utils.ClassUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -24,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class ScheduleBootstrap implements Bootstrap {
 
     private ConfigLoad configLoad;
@@ -68,11 +70,15 @@ public class ScheduleBootstrap implements Bootstrap {
     @Override
     public void bootstrapAfter() throws Exception {
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-            ScheduleHeartbeat scheduleHeartbeat = new ScheduleHeartbeat();
-            scheduleHeartbeat.setApplicationId(configLoad.getId());
-            scheduleHeartbeat.setApplicationName(configLoad.getApplicationName());
-            scheduleHeartbeat.setScheduleRunInfoList(scheduleExecutor.getRunInfo());
-            transmitSupport.send(scheduleHeartbeat);
+            try {
+                ScheduleHeartbeat scheduleHeartbeat = new ScheduleHeartbeat();
+                scheduleHeartbeat.setApplicationId(configLoad.getId());
+                scheduleHeartbeat.setApplicationName(configLoad.getApplicationName());
+                scheduleHeartbeat.setScheduleRunInfoList(scheduleExecutor.getRunInfo());
+                transmitSupport.send(scheduleHeartbeat);
+            } catch (Exception ignore) {
+
+            }
         }, 0, 15, TimeUnit.SECONDS);
     }
 

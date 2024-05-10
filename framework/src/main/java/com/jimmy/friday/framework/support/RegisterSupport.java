@@ -149,12 +149,16 @@ public class RegisterSupport {
         }
         //服务重载推送
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-            List<Service> services = this.getServices();
-            if (CollUtil.isNotEmpty(services)) {
-                ServiceReload serviceReload = new ServiceReload();
-                serviceReload.setId(configLoad.getId());
-                serviceReload.setServices(services);
-                transmitSupport.broadcast(serviceReload);
+            try {
+                List<Service> services = this.getServices();
+                if (CollUtil.isNotEmpty(services)) {
+                    ServiceReload serviceReload = new ServiceReload();
+                    serviceReload.setId(configLoad.getId());
+                    serviceReload.setServices(services);
+                    transmitSupport.broadcast(serviceReload);
+                }
+            } catch (Exception ignore) {
+
             }
         }, 1, 3, TimeUnit.MINUTES);
     }
