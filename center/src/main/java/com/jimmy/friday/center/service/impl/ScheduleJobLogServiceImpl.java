@@ -2,7 +2,7 @@ package com.jimmy.friday.center.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
+import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
 import com.jimmy.friday.center.dao.ScheduleJobLogDao;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
 import com.jimmy.friday.center.service.ScheduleJobLogService;
@@ -27,7 +27,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogDao, Sc
     public List<ScheduleJobLog> queryNotFinish(Long executorId) {
         QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("executor_id", executorId);
-        queryWrapper.eq("run_status", JobRunStatusEnum.RUNNING.getCode());
+        queryWrapper.eq("run_status", ScheduleRunStatusEnum.RUNNING.getCode());
         queryWrapper.or(w -> w.isNull("timeout_date").or().ge("timeout_date", System.currentTimeMillis() + NOT_FINISH_TIMEOUT_DATE_DELAY));
         return this.list(queryWrapper);
     }
@@ -35,7 +35,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogDao, Sc
     @Override
     public List<ScheduleJobLog> queryNoTimeout() {
         QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("run_status", JobRunStatusEnum.RUNNING.getCode());
+        queryWrapper.eq("run_status", ScheduleRunStatusEnum.RUNNING.getCode());
         queryWrapper.isNull("timeout_date");
         queryWrapper.le("start_date", System.currentTimeMillis() - NO_TIMEOUT_START_DATE_DELAY);
         return this.list(queryWrapper);
@@ -56,7 +56,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogDao, Sc
     @Override
     public List<ScheduleJobLog> queryTimeout() {
         QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("run_status", JobRunStatusEnum.RUNNING.getCode());
+        queryWrapper.eq("run_status", ScheduleRunStatusEnum.RUNNING.getCode());
         queryWrapper.lt("timeout_date", System.currentTimeMillis());
         return this.list(queryWrapper);
     }

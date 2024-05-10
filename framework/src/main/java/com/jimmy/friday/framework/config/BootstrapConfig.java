@@ -16,8 +16,8 @@ public class BootstrapConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public AckProcess ackProcess(ApplicationContext applicationContext) {
-        return new AckProcess(applicationContext);
+    public AckProcess ackProcess(TransmitSupport transmitSupport) {
+        return new AckProcess(transmitSupport);
     }
 
     @Bean

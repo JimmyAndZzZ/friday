@@ -24,7 +24,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     void removeByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
-    List<ScheduleJob> queryByApplicationName(String applicationName);
+    List<ScheduleJob> queryByApplicationName(String applicationName, ScheduleSourceEnum scheduleSourceEnum);
 
     ScheduleJob queryByCodeAndApplicationName(String code, String applicationName);
 
@@ -34,7 +34,7 @@ public interface ScheduleJobService extends IService<ScheduleJob> {
 
     boolean needExecute(Long id, Long nextTime);
 
-    void removeByCodeAndApplicationName(String code, String applicationName);
+    ScheduleJob removeByCodeAndApplicationName(String code, String applicationName);
 
     List<ScheduleJob> queryExecuteJobs(Long time, Integer size);
 }

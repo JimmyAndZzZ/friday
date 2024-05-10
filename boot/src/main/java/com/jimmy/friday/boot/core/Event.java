@@ -16,7 +16,7 @@ public class Event implements Serializable {
     private String message;
 
     public Event(EventTypeEnum type, String message) {
-        super();
+        this();
         this.message = message;
         this.type = type.getCode();
     }

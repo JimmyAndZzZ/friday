@@ -8,6 +8,7 @@ import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Close;
 import com.jimmy.friday.center.base.Obtain;
+import com.jimmy.friday.center.utils.RedisConstants;
 import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
