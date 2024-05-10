@@ -54,12 +54,12 @@ public class Client {
         this.applicationContext = applicationContext;
     }
 
-    public void send(Message message) {
+    public void send(Event event) {
         if (!connectSuccess) {
             throw new ConnectionException();
         }
 
-        this.channel.writeAndFlush(new Event(message.type(), JsonUtil.toString(message)));
+        this.channel.writeAndFlush(event);
     }
 
 
