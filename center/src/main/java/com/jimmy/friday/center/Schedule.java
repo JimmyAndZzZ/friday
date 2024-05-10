@@ -102,10 +102,12 @@ public class Schedule {
         String runParam = scheduleJob.getRunParam();
         String applicationName = scheduleJob.getApplicationName();
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
+
+        log.info("准备执行定时器,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
         //服务
         ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
         if (select == null) {
-            log.error("执行引擎为空,applicationName:{}", applicationName);
+            log.error("执行引擎为空id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
             return;
         }
         //保存运行流水
@@ -134,7 +136,7 @@ public class Schedule {
 
             this.invoke(invoke, select.getApplicationId());
         } catch (Exception e) {
-            log.error("调度分配失败", e);
+            log.error("调度执行失败:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName, e);
 
             scheduleJobLog.setRunStatus(JobRunStatusEnum.ERROR.getCode());
             scheduleJobLog.setErrorMessage(e.getMessage());

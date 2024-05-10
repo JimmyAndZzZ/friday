@@ -1,20 +1,21 @@
 package com.jimmy.friday.center.core.schedule;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.core.schedule.ScheduleRunInfo;
+import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
 import com.jimmy.friday.boot.enums.schedule.JobRunStatusEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleSourceEnum;
 import com.jimmy.friday.boot.enums.schedule.ScheduleStatusEnum;
-import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.base.Initialize;
 import com.jimmy.friday.center.core.StripedLock;
@@ -149,7 +150,7 @@ public class ScheduleCenter implements Initialize {
                                 } else {
                                     scheduleTimeRing.push(scheduleJobInfo);
 
-                                    this.updateScheduleJobInfo(scheduleJobInfo, System.currentTimeMillis());
+                                    this.updateScheduleJobInfo(scheduleJobInfo, nextTime);
                                 }
                             }
                         });
@@ -160,6 +161,7 @@ public class ScheduleCenter implements Initialize {
             }
         });
 
+        thread.setName("schedule-scan-thread");
         thread.setDaemon(true);
         thread.start();
     }
