@@ -232,7 +232,7 @@ public class ScheduleCenter implements Initialize {
 
         if (ScheduleStatusEnum.OPEN.getCode().equals(scheduleJob.getStatus()) && !cron.equals(scheduleJob.getCron()) && !YesOrNoEnum.YES.getCode().equals(scheduleJob.getIsManual())) {
             Long lastTime = scheduleJob.getLastTime();
-            scheduleJobService.updateNextExecuteTime(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), id);
+            scheduleJobService.updateNextExecuteTimeAndCron(this.generateNextTime(cron, lastTime != null ? lastTime : System.currentTimeMillis()), cron, id);
             //判断是否更新阻塞策略
             if (!blockHandlerStrategyType.getCode().equals(blockStrategy)) {
                 if (scheduleJobService.updateBlockHandlerStrategyType(id, blockStrategy, blockHandlerStrategyType.getCode())) {
