@@ -19,7 +19,7 @@ public class ScheduleInfo implements Serializable {
 
     private String cron;
 
-    private Integer timeout;
+    private Long timeout;
 
     private Integer retry;
 

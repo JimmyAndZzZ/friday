@@ -59,7 +59,7 @@ public class ScheduleCenter {
                          String cron,
                          Job job,
                          BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
-                         Integer timeout,
+                         Long timeout,
                          Integer retry) {
         if (StrUtil.isEmpty(scheduleId)) {
             throw new ScheduleException("定时器唯一标识未定义");
@@ -108,7 +108,7 @@ public class ScheduleCenter {
                          String scheduleId,
                          String cron,
                          BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
-                         Integer timeout,
+                         Long timeout,
                          Integer retry) {
         if (StrUtil.isEmpty(cron)) {
             throw new ScheduleException("cron表达式未定义");

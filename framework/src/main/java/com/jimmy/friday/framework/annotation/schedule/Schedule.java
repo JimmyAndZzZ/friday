@@ -13,7 +13,7 @@ public @interface Schedule {
 
     String cron();
 
-    int timeout() default 0;
+    long timeout() default 0L;
 
     int retry() default 0;
 

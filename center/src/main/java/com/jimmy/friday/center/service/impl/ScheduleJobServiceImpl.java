@@ -55,7 +55,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
 
     @Override
     public ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName) {
-        new Date()
+        Date now = new Date();
         String scheduleId = scheduleInfo.getScheduleId();
         BlockHandlerStrategyTypeEnum blockHandlerStrategyType = scheduleInfo.getBlockHandlerStrategyType();
 
@@ -76,8 +76,8 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
                     scheduleJob.setTimeout(scheduleInfo.getTimeout());
                     scheduleJob.setCron(scheduleInfo.getCron());
                     scheduleJob.setRetryCount(scheduleInfo.getRetry());
-                    scheduleJob.setCreateDate(new Date());
-                    scheduleJob.setUpdateDate(new Date());
+                    scheduleJob.setCreateDate(now);
+                    scheduleJob.setUpdateDate(now);
                     scheduleJob.setCode(scheduleId);
                     scheduleJob.setApplicationName(applicationName);
                     scheduleJob.setIsManual(YesOrNoEnum.NO.getCode());

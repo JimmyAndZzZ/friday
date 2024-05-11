@@ -26,7 +26,7 @@ public class Schedule {
 
         private Integer retry;
 
-        private Integer timeout;
+        private Long timeout;
 
         private String scheduleId;
 
@@ -42,7 +42,7 @@ public class Schedule {
             return this;
         }
 
-        public AppendBuild setTimeout(Integer timeout) {
+        public AppendBuild setTimeout(Long timeout) {
             this.timeout = timeout;
             return this;
         }
@@ -63,7 +63,13 @@ public class Schedule {
         }
 
         public void append() {
-            Boot.getApplicationContext().getBean(ScheduleCenter.class).register(scheduleId, cron, job, blockHandlerStrategyType);
+            Boot.getApplicationContext().getBean(ScheduleCenter.class).register(
+                    scheduleId,
+                    cron,
+                    job,
+                    blockHandlerStrategyType,
+                    timeout,
+                    retry);
         }
     }
 
