@@ -12,4 +12,6 @@ public class ScheduleContext implements Serializable {
     private Long traceId;
 
     private String param;
+
+    private Integer currentShardingNum;
 }

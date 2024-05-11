@@ -50,6 +50,8 @@ public class ScheduleJob {
 
     private String source;
 
+    private Integer shardingNum;
+
     public ScheduleJob clear() {
         this.description = null;
         return this;

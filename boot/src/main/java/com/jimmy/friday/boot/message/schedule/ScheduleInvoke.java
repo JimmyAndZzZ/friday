@@ -20,6 +20,8 @@ public class ScheduleInvoke implements Message {
 
     private Integer retry;
 
+    private Integer shardingNum;
+
     @Override
     public EventTypeEnum type() {
         return EventTypeEnum.SCHEDULE_INVOKE;

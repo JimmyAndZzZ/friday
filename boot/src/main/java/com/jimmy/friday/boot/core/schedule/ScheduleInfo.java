@@ -23,6 +23,8 @@ public class ScheduleInfo implements Serializable {
 
     private Integer retry;
 
+    private Integer shardingNum;
+
     private BlockHandlerStrategyTypeEnum blockHandlerStrategyType = BlockHandlerStrategyTypeEnum.SERIAL;
 
     private ScheduleSourceEnum scheduleSource;

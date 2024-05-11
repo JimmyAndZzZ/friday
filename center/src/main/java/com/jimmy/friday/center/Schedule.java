@@ -2,8 +2,10 @@ package com.jimmy.friday.center;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
@@ -21,6 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -125,10 +131,16 @@ public class Schedule {
         Long id = scheduleJob.getId();
         Long timeout = scheduleJob.getTimeout();
         String runParam = scheduleJob.getRunParam();
+        Integer shardingNum = scheduleJob.getShardingNum();
         String applicationName = scheduleJob.getApplicationName();
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
 
         log.info("准备执行定时器,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
+        //分片执行
+        if (shardingNum > 0) {
+            this.shardingInvoke(scheduleJob);
+            return;
+        }
         //服务
         ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
         if (select == null) {
@@ -144,6 +156,8 @@ public class Schedule {
         scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.RUNNING.getCode());
         scheduleJobLog.setJobCode(scheduleJob.getCode());
         scheduleJobLog.setTraceId(traceId);
+        scheduleJobLog.setShardingNum(0);
+        scheduleJobLog.setCurrentShadingNum(0);
         //计算超时时间
         if (timeout != null && timeout > 0) {
             scheduleJobLog.setTimeoutDate(System.currentTimeMillis() + timeout * 1000);
@@ -152,9 +166,11 @@ public class Schedule {
         scheduleJobLogService.save(scheduleJobLog);
 
         ScheduleInvoke invoke = new ScheduleInvoke();
-        invoke.setScheduleId(scheduleJob.getCode());
-        invoke.setTraceId(traceId);
         invoke.setParam(runParam);
+        invoke.setTraceId(traceId);
+        invoke.setTimeout(invoke.getTimeout());
+        invoke.setScheduleId(scheduleJob.getCode());
+        invoke.setRetry(scheduleJob.getRetryCount());
 
         try {
             attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id, traceId.toString(), timeout, TimeUnit.SECONDS);
@@ -168,6 +184,71 @@ public class Schedule {
             scheduleJobLogService.updateById(scheduleJobLog);
 
             attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
+        }
+    }
+
+    public void shardingInvoke(ScheduleJob scheduleJob) {
+        Long id = scheduleJob.getId();
+        Long timeout = scheduleJob.getTimeout();
+        String runParam = scheduleJob.getRunParam();
+        Integer shardingNum = scheduleJob.getShardingNum();
+        String applicationName = scheduleJob.getApplicationName();
+        Map<Long, ScheduleExecutor> executorMap = Maps.newHashMap();
+        //遍历分片数
+        for (int i = 1; i < shardingNum; i++) {
+            Long traceId = IdUtil.getSnowflake(1, 1).nextId();
+
+            ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
+            if (select == null) {
+                if (MapUtil.isEmpty(executorMap)) {
+                    log.error("执行引擎为空,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
+                    return;
+                }
+
+                Collection<ScheduleExecutor> values = executorMap.values();
+                select = CollUtil.get(values, new Random().nextInt(values.size()));
+            }
+            //保留上次结果
+            executorMap.put(select.getId(), select);
+            //保存运行流水
+            ScheduleJobLog scheduleJobLog = new ScheduleJobLog();
+            scheduleJobLog.setJobId(id);
+            scheduleJobLog.setRunParam(runParam);
+            scheduleJobLog.setExecutorId(select.getId());
+            scheduleJobLog.setStartDate(System.currentTimeMillis());
+            scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.RUNNING.getCode());
+            scheduleJobLog.setJobCode(scheduleJob.getCode());
+            scheduleJobLog.setTraceId(traceId);
+            scheduleJobLog.setShardingNum(shardingNum);
+            scheduleJobLog.setCurrentShadingNum(i);
+            //计算超时时间
+            if (timeout != null && timeout > 0) {
+                scheduleJobLog.setTimeoutDate(System.currentTimeMillis() + timeout * 1000);
+            }
+
+            scheduleJobLogService.save(scheduleJobLog);
+
+            ScheduleInvoke invoke = new ScheduleInvoke();
+            invoke.setParam(runParam);
+            invoke.setTraceId(traceId);
+            invoke.setShardingNum(shardingNum);
+            invoke.setTimeout(invoke.getTimeout());
+            invoke.setScheduleId(scheduleJob.getCode());
+            invoke.setRetry(scheduleJob.getRetryCount());
+
+            try {
+                attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id, traceId.toString(), timeout, TimeUnit.SECONDS);
+
+                this.invoke(invoke, select.getApplicationId());
+            } catch (Exception e) {
+                log.error("调度执行失败:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName, e);
+
+                scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.ERROR.getCode());
+                scheduleJobLog.setErrorMessage(e.getMessage());
+                scheduleJobLogService.updateById(scheduleJobLog);
+
+                attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
+            }
         }
     }
 
