@@ -57,6 +57,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     public ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName) {
         Date now = new Date();
         String scheduleId = scheduleInfo.getScheduleId();
+        Integer shardingNum = scheduleInfo.getShardingNum();
         BlockHandlerStrategyTypeEnum blockHandlerStrategyType = scheduleInfo.getBlockHandlerStrategyType();
 
         ScheduleJob scheduleJob = this.queryByCodeAndApplicationName(scheduleId, applicationName);
@@ -84,6 +85,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
                     scheduleJob.setStatus(ScheduleStatusEnum.OPEN.getCode());
                     scheduleJob.setBlockStrategy(blockHandlerStrategyType.getCode());
                     scheduleJob.setSource(scheduleInfo.getScheduleSource().getCode());
+                    scheduleJob.setShardingNum(shardingNum);
                     this.save(scheduleJob);
                     return scheduleJob;
                 }

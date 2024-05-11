@@ -55,13 +55,6 @@ public class Schedule {
             return;
         }
 
-        ScheduleJob byId = scheduleJobService.getById(jobId);
-        if (byId == null) {
-            log.error("定时器不存在,{}", jobId);
-            this.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:定时器不存在");
-            return;
-        }
-
         this.callback(traceId, System.currentTimeMillis(), false, "调度被中断,原因:外部中断");
 
         ScheduleInterrupt scheduleInterrupt = new ScheduleInterrupt();
@@ -77,7 +70,26 @@ public class Schedule {
             return;
         }
 
-        attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + scheduleJobLog.getJobId());
+        Long jobId = scheduleJobLog.getJobId();
+        Integer currentShardingNum = scheduleJobLog.getCurrentShardingNum();
+
+        ScheduleJob byId = scheduleJobService.getById(jobId);
+        if (byId == null) {
+            log.error("定时器不存在,{}", jobId);
+
+            scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.ERROR.getCode());
+            scheduleJobLog.setErrorMessage("调度被中断,原因:定时器不存在");
+            scheduleJobLog.setEndDate(endDate);
+            scheduleJobLogService.fail(scheduleJobLog);
+            return;
+        }
+
+        String redisKey = RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + jobId;
+        if (currentShardingNum != null) {
+            redisKey = redisKey + ":" + currentShardingNum;
+        }
+
+        attachmentCache.remove(redisKey);
 
         if (!ScheduleRunStatusEnum.RUNNING.getCode().equals(scheduleJobLog.getRunStatus())) {
             log.error("调度结束，更新无效,{}", traceId);
@@ -96,11 +108,17 @@ public class Schedule {
         }
     }
 
-    public boolean isRunning(Long id) {
-        return StrUtil.isNotEmpty(attachmentCache.attachment(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id));
+    public boolean isRunning(Long id, Integer shardingNum) {
+        String redisKey = RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id;
+        if (shardingNum != null) {
+            redisKey = redisKey + ":" + shardingNum;
+        }
+
+        return StrUtil.isNotEmpty(attachmentCache.attachment(redisKey));
     }
 
     public void release(Long id) {
+        attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_SHARDING_NUM + id);
         attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
     }
 
@@ -121,15 +139,16 @@ public class Schedule {
         }
     }
 
-    public void submit(ScheduleJob scheduleJob) {
+    public void submit(ScheduleJob scheduleJob, Integer currentShardingNum) {
         Long id = scheduleJob.getId();
         Long timeout = scheduleJob.getTimeout();
         String runParam = scheduleJob.getRunParam();
+        Integer shardingNum = scheduleJob.getShardingNum();
         String applicationName = scheduleJob.getApplicationName();
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
 
         log.info("准备执行定时器,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
-        //服务
+        //选择执行器
         ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
         if (select == null) {
             log.error("执行引擎为空,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
@@ -144,6 +163,8 @@ public class Schedule {
         scheduleJobLog.setRunStatus(ScheduleRunStatusEnum.RUNNING.getCode());
         scheduleJobLog.setJobCode(scheduleJob.getCode());
         scheduleJobLog.setTraceId(traceId);
+        scheduleJobLog.setShardingNum(shardingNum);
+        scheduleJobLog.setCurrentShardingNum(currentShardingNum != null ? currentShardingNum : 0);
         //计算超时时间
         if (timeout != null && timeout > 0) {
             scheduleJobLog.setTimeoutDate(System.currentTimeMillis() + timeout * 1000);
@@ -152,12 +173,20 @@ public class Schedule {
         scheduleJobLogService.save(scheduleJobLog);
 
         ScheduleInvoke invoke = new ScheduleInvoke();
-        invoke.setScheduleId(scheduleJob.getCode());
-        invoke.setTraceId(traceId);
         invoke.setParam(runParam);
+        invoke.setTraceId(traceId);
+        invoke.setTimeout(timeout);
+        invoke.setScheduleId(scheduleJob.getCode());
+        invoke.setRetry(scheduleJob.getRetryCount());
+
+        String redisKey = RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id;
+        if (currentShardingNum != null) {
+            invoke.setShardingNum(currentShardingNum);
+            redisKey = redisKey + ":" + currentShardingNum;
+        }
 
         try {
-            attachmentCache.attachString(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id, traceId.toString(), timeout, TimeUnit.SECONDS);
+            attachmentCache.attachString(redisKey, traceId.toString(), timeout, TimeUnit.SECONDS);
 
             this.invoke(invoke, select.getApplicationId());
         } catch (Exception e) {
@@ -167,7 +196,7 @@ public class Schedule {
             scheduleJobLog.setErrorMessage(e.getMessage());
             scheduleJobLogService.updateById(scheduleJobLog);
 
-            attachmentCache.remove(RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id);
+            attachmentCache.remove(redisKey);
         }
     }
 

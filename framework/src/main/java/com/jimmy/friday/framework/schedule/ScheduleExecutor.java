@@ -68,16 +68,25 @@ public class ScheduleExecutor {
     }
 
     public void interrupt(Long traceId) {
+        log.info("准备中断调度,traceId:{}", traceId);
+
         RunningInfo runningInfo = runningInfoMap.remove(traceId);
         if (runningInfo == null) {
             log.error("traceId:{}中断失败，调度不存在", traceId);
             return;
         }
 
-        runningInfo.getExecutorService().shutdownNow();
+        Future<ScheduleInvokeResult> future = runningInfo.getFuture();
+        if (future != null) {
+            try {
+                future.cancel(true);
+            } catch (CancellationException ignore) {
+
+            }
+        }
     }
 
-    public void invoke(Long traceId, String scheduleId, String param, Integer timeout, Integer retry) {
+    public void invoke(Long traceId, String scheduleId, String param, Long timeout, Integer retry, Integer shardingNum) {
         ScheduleInfo scheduleInfo = scheduleCenter.getScheduleInfo(scheduleId);
         if (scheduleInfo == null) {
             ScheduleResult scheduleResult = new ScheduleResult();
@@ -95,18 +104,19 @@ public class ScheduleExecutor {
         RunningInfo put = runningInfoMap.putIfAbsent(traceId, runningInfo);
         if (put != null) {
             log.error("traceId:{}调度正在运行，此次调度作废", traceId);
-
-            runningInfo.close();
             return;
         }
 
-        Future<ScheduleInvokeResult> future = runningInfo.getExecutorService().submit(() -> {
+        CompletableFuture<ScheduleInvokeResult> future = CompletableFuture.supplyAsync(() -> {
             ScheduleContext scheduleContext = new ScheduleContext();
             scheduleContext.setScheduleId(scheduleId);
             scheduleContext.setParam(param);
+            scheduleContext.setCurrentShardingNum(shardingNum);
             scheduleContext.setTraceId(traceId);
             return execute(scheduleInfo, scheduleContext);
         });
+
+        runningInfo.setFuture(future);
         //执行定时器
         try {
             ScheduleInvokeResult scheduleInvokeResult = timeout != null ? future.get(timeout, TimeUnit.SECONDS) : future.get();
@@ -125,10 +135,7 @@ public class ScheduleExecutor {
         } catch (TimeoutException e) {
             this.runFailSubmit(traceId, scheduleId, "运行超时");
         } finally {
-            RunningInfo remove = runningInfoMap.remove(traceId);
-            if (remove != null) {
-                remove.close();
-            }
+            runningInfoMap.remove(traceId);
         }
     }
 
@@ -140,6 +147,8 @@ public class ScheduleExecutor {
      * @param errorMessage
      */
     private void runFailSubmit(Long traceId, String scheduleId, String errorMessage) {
+        log.error("调度执行失败,traceId:{},scheduleId:{},异常原因:{}", traceId, scheduleId, errorMessage);
+
         ScheduleResult scheduleResult = new ScheduleResult();
         scheduleResult.setId(scheduleId);
         scheduleResult.setTraceId(traceId);
@@ -263,16 +272,11 @@ public class ScheduleExecutor {
 
         private String scheduleId;
 
-        private ExecutorService executorService;
+        private CompletableFuture<ScheduleInvokeResult> future;
 
         public RunningInfo(String scheduleId) {
             this.scheduleId = scheduleId;
             this.startDate = System.currentTimeMillis();
-            this.executorService = Executors.newSingleThreadExecutor();
-        }
-
-        public void close() {
-            executorService.shutdownNow();
         }
     }
 }

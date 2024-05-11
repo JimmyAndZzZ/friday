@@ -16,8 +16,8 @@ public class CoverPrevious implements Block {
     private Schedule schedule;
 
     @Override
-    public void block(ScheduleJob scheduleJob) {
-        schedule.submit(scheduleJob);
+    public void block(ScheduleJob scheduleJob, Integer currentShardingNum) {
+        schedule.submit(scheduleJob, currentShardingNum);
     }
 
     @Override

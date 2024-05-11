@@ -30,10 +30,17 @@ public class Schedule {
 
         private String scheduleId;
 
+        private Integer shardingNum = 0;
+
         private BlockHandlerStrategyTypeEnum blockHandlerStrategyType = BlockHandlerStrategyTypeEnum.SERIAL;
 
         public AppendBuild setScheduleId(String scheduleId) {
             this.scheduleId = scheduleId;
+            return this;
+        }
+
+        public AppendBuild setShardingNum(Integer shardingNum) {
+            this.shardingNum = shardingNum;
             return this;
         }
 
@@ -69,7 +76,8 @@ public class Schedule {
                     job,
                     blockHandlerStrategyType,
                     timeout,
-                    retry);
+                    retry,
+                    shardingNum);
         }
     }
 

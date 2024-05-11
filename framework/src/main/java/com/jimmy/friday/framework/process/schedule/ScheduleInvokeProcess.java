@@ -21,7 +21,8 @@ public class ScheduleInvokeProcess implements Process<ScheduleInvoke> {
                 scheduleInvoke.getScheduleId(),
                 scheduleInvoke.getParam(),
                 scheduleInvoke.getTimeout(),
-                scheduleInvoke.getRetry());
+                scheduleInvoke.getRetry(),
+                scheduleInvoke.getShardingNum());
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
 
 @Slf4j
 @ChannelHandler.Sharable
@@ -29,6 +29,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
     private final Map<EventTypeEnum, Class<?>> classMap = new HashMap<>();
 
     private final Map<EventTypeEnum, Process<?>> processMap = new HashMap<>();
+
+    private final ExecutorService executorService = new ThreadPoolExecutor(10, 60,
+            60L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>());
 
     private Client client;
 
@@ -92,7 +96,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Event> {
         }
 
         try {
-            ctx.executor().execute(() -> {
+            executorService.execute(() -> {
                 if (eventTypeEnum.getIsNeedAck()) {
                     Ack ack = new Ack();
                     ack.setId(event.getId());

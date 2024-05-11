@@ -215,6 +215,7 @@ public class ScheduleSession implements Initialize {
 
         ScheduleExecutor route = this.route(executors);
         route.setId(this.scheduleExecutorService.query(route.getApplicationName(), route.getIp()).getId());
+        this.setLastInvokeTime(route.getApplicationId(), System.currentTimeMillis());
         return route;
     }
 

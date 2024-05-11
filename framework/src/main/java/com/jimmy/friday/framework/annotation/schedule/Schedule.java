@@ -18,4 +18,6 @@ public @interface Schedule {
     int retry() default 0;
 
     BlockHandlerStrategyTypeEnum BlockHandlerStrategyType() default BlockHandlerStrategyTypeEnum.SERIAL;
+
+    int shardingNum() default 0;
 }

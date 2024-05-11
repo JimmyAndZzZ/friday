@@ -12,7 +12,7 @@ import java.util.Date;
  * (ScheduleJobLog)表实体类
  *
  * @author makejava
- * @since 2024-05-06 15:10:28
+ * @since 2024-05-11 14:12:21
  */
 @Data
 public class ScheduleJobLog  {
@@ -39,5 +39,9 @@ public class ScheduleJobLog  {
     private Long endDate;
 
     private String jobCode;
+
+    private Integer shardingNum;
+
+    private Integer currentShardingNum;
 }
 

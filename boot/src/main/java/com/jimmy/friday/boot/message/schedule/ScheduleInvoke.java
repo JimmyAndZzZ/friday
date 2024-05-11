@@ -16,9 +16,11 @@ public class ScheduleInvoke implements Message {
 
     private String param;
 
-    private Integer timeout;
+    private Long timeout;
 
     private Integer retry;
+
+    private Integer shardingNum;
 
     @Override
     public EventTypeEnum type() {

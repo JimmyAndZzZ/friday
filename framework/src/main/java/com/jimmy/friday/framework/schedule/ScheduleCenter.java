@@ -60,7 +60,8 @@ public class ScheduleCenter {
                          Job job,
                          BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
                          Long timeout,
-                         Integer retry) {
+                         Integer retry,
+                         Integer shardingNum) {
         if (StrUtil.isEmpty(scheduleId)) {
             throw new ScheduleException("定时器唯一标识未定义");
         }
@@ -85,6 +86,7 @@ public class ScheduleCenter {
         scheduleInfo.setSpringBeanId(springBeanId);
         scheduleInfo.setBlockHandlerStrategyType(blockHandlerStrategyType);
         scheduleInfo.setScheduleSource(ScheduleSourceEnum.MANUAL);
+        scheduleInfo.setShardingNum(shardingNum);
 
         if (scheduleInfoMap.put(scheduleId, scheduleInfo) != null) {
             throw new ScheduleException(scheduleId + "定时器重复定义");
@@ -109,7 +111,8 @@ public class ScheduleCenter {
                          String cron,
                          BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
                          Long timeout,
-                         Integer retry) {
+                         Integer retry,
+                         Integer shardingNum) {
         if (StrUtil.isEmpty(cron)) {
             throw new ScheduleException("cron表达式未定义");
         }
@@ -129,6 +132,7 @@ public class ScheduleCenter {
         scheduleInfo.setMethodName(methodName);
         scheduleInfo.setClassName(className);
         scheduleInfo.setCron(cron);
+        scheduleInfo.setShardingNum(shardingNum);
         scheduleInfo.setBlockHandlerStrategyType(blockHandlerStrategyType);
         scheduleInfo.setScheduleSource(ScheduleSourceEnum.ANNOTATION);
 

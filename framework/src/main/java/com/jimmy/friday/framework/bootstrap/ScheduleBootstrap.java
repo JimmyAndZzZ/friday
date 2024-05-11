@@ -139,7 +139,8 @@ public class ScheduleBootstrap implements Bootstrap {
                         cron,
                         annotation.BlockHandlerStrategyType(),
                         annotation.timeout(),
-                        annotation.retry());
+                        annotation.retry(),
+                        annotation.shardingNum());
             }
         }
     }
