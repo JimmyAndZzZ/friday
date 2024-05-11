@@ -54,6 +54,7 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogDao, Sc
             queryWrapper.eq("run_status", scheduleRunStatusEnum.getCode());
         }
 
+        queryWrapper.orderByDesc("start_date");
         return this.page(new Page<>(pageNo, pageSize), queryWrapper);
     }
 

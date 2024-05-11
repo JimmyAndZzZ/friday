@@ -41,6 +41,7 @@
         <spring.context.support.version>1.0.11</spring.context.support.version>
         <resilience4j.version>1.7.1</resilience4j.version>
         <io.vavr.version>0.10.4</io.vavr.version>
+        <swagger.bootstrap.version>1.9.6</swagger.bootstrap.version>
     </properties>
 
     <modules>
@@ -55,6 +56,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>swagger-bootstrap-ui</artifactId>
+                <version>${swagger.bootstrap.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.vavr</groupId>
                 <artifactId>vavr</artifactId>

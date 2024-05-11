@@ -42,7 +42,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     @Override
     public IPage<ScheduleJob> page(String applicationName, Integer pageNo, Integer pageSize) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("applicationName", applicationName);
+        queryWrapper.eq("application_name", applicationName);
         queryWrapper.orderByDesc("create_date");
 
         return this.page(new Page<>(pageNo, pageSize), queryWrapper);
