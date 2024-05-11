@@ -2,10 +2,8 @@ package com.jimmy.friday.center;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jimmy.friday.boot.core.schedule.ScheduleExecutor;
 import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
@@ -23,10 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -154,7 +148,7 @@ public class Schedule {
         Long traceId = IdUtil.getSnowflake(1, 1).nextId();
 
         log.info("准备执行定时器,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
-        //服务
+        //选择执行器
         ScheduleExecutor select = scheduleSession.select(applicationName, Sets.newHashSet());
         if (select == null) {
             log.error("执行引擎为空,id:{},code:{},applicationName:{}", id, scheduleJob.getCode(), applicationName);
@@ -181,7 +175,7 @@ public class Schedule {
         ScheduleInvoke invoke = new ScheduleInvoke();
         invoke.setParam(runParam);
         invoke.setTraceId(traceId);
-        invoke.setTimeout(invoke.getTimeout());
+        invoke.setTimeout(timeout);
         invoke.setScheduleId(scheduleJob.getCode());
         invoke.setRetry(scheduleJob.getRetryCount());
 
