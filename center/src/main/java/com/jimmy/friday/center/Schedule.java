@@ -187,6 +187,7 @@ public class Schedule {
 
         String redisKey = RedisConstants.Schedule.SCHEDULE_JOB_RUNNING_FLAG + id;
         if (currentShardingNum != null) {
+            invoke.setShardingNum(currentShardingNum);
             redisKey = redisKey + ":" + currentShardingNum;
         }
 

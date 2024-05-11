@@ -77,7 +77,7 @@ public class ScheduleExecutor {
         runningInfo.getExecutorService().shutdownNow();
     }
 
-    public void invoke(Long traceId, String scheduleId, String param, Integer timeout, Integer retry) {
+    public void invoke(Long traceId, String scheduleId, String param, Integer timeout, Integer retry, Integer shardingNum) {
         ScheduleInfo scheduleInfo = scheduleCenter.getScheduleInfo(scheduleId);
         if (scheduleInfo == null) {
             ScheduleResult scheduleResult = new ScheduleResult();
@@ -104,6 +104,7 @@ public class ScheduleExecutor {
             ScheduleContext scheduleContext = new ScheduleContext();
             scheduleContext.setScheduleId(scheduleId);
             scheduleContext.setParam(param);
+            scheduleContext.setCurrentShardingNum(shardingNum);
             scheduleContext.setTraceId(traceId);
             return execute(scheduleInfo, scheduleContext);
         });
