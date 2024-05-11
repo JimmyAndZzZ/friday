@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
+import com.jimmy.friday.center.Schedule;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
 import com.jimmy.friday.center.service.ScheduleExecutorService;
@@ -18,10 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -34,6 +32,9 @@ import java.util.stream.Collectors;
 public class ScheduleController {
 
     @Autowired
+    private Schedule schedule;
+
+    @Autowired
     private ScheduleJobService scheduleJobService;
 
     @Autowired
@@ -42,16 +43,26 @@ public class ScheduleController {
     @Autowired
     private ScheduleExecutorService scheduleExecutorService;
 
+    @PostMapping("/interrupt/{jobLogId}")
+    @ApiOperation("中断正在运行的定时器")
+    public Result<?> interrupt(@PathVariable("jobLogId") Long jobLogId) {
+        ScheduleJobLog byId = scheduleJobLogService.getById(jobLogId);
+        if (byId == null) {
+            return Result.error("运行日志不存在");
+        }
+
+        if (!ScheduleRunStatusEnum.RUNNING.getCode().equals(byId.getRunStatus())) {
+            return Result.error("当前任务未在运行中");
+        }
+
+        schedule.interrupt(byId);
+        return Result.ok();
+    }
+
     @GetMapping("/queryLogList")
     @ApiOperation("获取定时器运行日志列表")
-    public Result<?> queryLogList(@RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date startDate,
-                                  @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date endDate,
-                                  @RequestParam(value = "jobId") Long jobId,
-                                  @RequestParam(value = "scheduleRunStatus", required = false) ScheduleRunStatusEnum scheduleRunStatus,
-                                  @RequestParam(value = "pageNo") Integer pageNo,
-                                  @RequestParam(value = "pageSize") Integer pageSize) {
+    public Result<?> queryLogList(@RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date startDate, @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date endDate, @RequestParam(value = "jobId") Long jobId, @RequestParam(value = "scheduleRunStatus", required = false) ScheduleRunStatusEnum scheduleRunStatus, @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize) {
         IPage<ScheduleJobLog> page = scheduleJobLogService.page(startDate, endDate, jobId, scheduleRunStatus, pageNo, pageSize);
-
 
         PageInfoVO<JobLogVO> pageInfoVO = new PageInfoVO<>();
         pageInfoVO.setSize(page.getSize());
