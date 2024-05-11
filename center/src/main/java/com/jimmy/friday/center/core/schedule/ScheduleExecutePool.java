@@ -78,7 +78,7 @@ public class ScheduleExecutePool implements Close, Initialize {
 
             Integer shardingNum = scheduleJob.getShardingNum();
             if (shardingNum == null || shardingNum == 0) {
-                blockMap.get(blockHandlerStrategyTypeEnum).block(scheduleJob, null);
+                blockMap.get(blockHandlerStrategyTypeEnum).block(scheduleJob, 0);
             } else {
                 for (int i = 0; i < shardingNum; i++) {
                     blockMap.get(blockHandlerStrategyTypeEnum).block(scheduleJob, i);
