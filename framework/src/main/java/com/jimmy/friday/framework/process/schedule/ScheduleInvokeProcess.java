@@ -16,7 +16,12 @@ public class ScheduleInvokeProcess implements Process<ScheduleInvoke> {
 
     @Override
     public void process(ScheduleInvoke scheduleInvoke, ChannelHandlerContext ctx) {
-        scheduleExecutor.invoke(scheduleInvoke.getTraceId(), scheduleInvoke.getScheduleId(), scheduleInvoke.getParam());
+        scheduleExecutor.invoke(
+                scheduleInvoke.getTraceId(),
+                scheduleInvoke.getScheduleId(),
+                scheduleInvoke.getParam(),
+                scheduleInvoke.getTimeout(),
+                scheduleInvoke.getRetry());
     }
 
     @Override
