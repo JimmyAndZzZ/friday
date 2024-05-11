@@ -16,10 +16,19 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 @ChannelHandler.Sharable
 public class AgentClientHandler extends SimpleChannelInboundHandler<Event> {
 
     private AgentClient agentClient;
+
+    private final ExecutorService executorService = new ThreadPoolExecutor(10, 60,
+            60L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>());
 
     public AgentClientHandler(AgentClient agentClient) {
         super();
@@ -37,7 +46,7 @@ public class AgentClientHandler extends SimpleChannelInboundHandler<Event> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
-        ctx.executor().execute(() -> {
+        executorService.execute(() -> {
             String type = event.getType();
             String message = event.getMessage();
 
@@ -90,6 +99,5 @@ public class AgentClientHandler extends SimpleChannelInboundHandler<Event> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
-        ctx.close();
     }
 }
