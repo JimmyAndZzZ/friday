@@ -23,9 +23,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Slf4j
 public class ScheduleExecutor {
@@ -79,7 +77,7 @@ public class ScheduleExecutor {
         runningInfo.getExecutorService().shutdownNow();
     }
 
-    public void invoke(Long traceId, String scheduleId, String param) {
+    public void invoke(Long traceId, String scheduleId, String param, Integer timeout, Integer retry) {
         ScheduleInfo scheduleInfo = scheduleCenter.getScheduleInfo(scheduleId);
         if (scheduleInfo == null) {
             ScheduleResult scheduleResult = new ScheduleResult();
@@ -101,27 +99,54 @@ public class ScheduleExecutor {
             runningInfo.close();
             return;
         }
-        //执行定时器
-        runningInfo.getExecutorService().submit(() -> {
-            try {
-                ScheduleContext scheduleContext = new ScheduleContext();
-                scheduleContext.setScheduleId(scheduleId);
-                scheduleContext.setParam(param);
-                scheduleContext.setTraceId(traceId);
 
-                ScheduleInvokeResult execute = execute(scheduleInfo, scheduleContext);
-
-                ScheduleResult scheduleResult = new ScheduleResult();
-                scheduleResult.setId(scheduleId);
-                scheduleResult.setTraceId(traceId);
-                scheduleResult.setIsSuccess(execute.getIsSuccess());
-                scheduleResult.setErrorMessage(execute.getErrorMessage());
-                scheduleResult.setEndDate(execute.getEndDate());
-                transmitSupport.send(scheduleResult);
-            } finally {
-                runningInfoMap.remove(traceId);
-            }
+        Future<ScheduleInvokeResult> future = runningInfo.getExecutorService().submit(() -> {
+            ScheduleContext scheduleContext = new ScheduleContext();
+            scheduleContext.setScheduleId(scheduleId);
+            scheduleContext.setParam(param);
+            scheduleContext.setTraceId(traceId);
+            return execute(scheduleInfo, scheduleContext);
         });
+        //执行定时器
+        try {
+            ScheduleInvokeResult scheduleInvokeResult = timeout != null ? future.get(timeout, TimeUnit.SECONDS) : future.get();
+
+            ScheduleResult scheduleResult = new ScheduleResult();
+            scheduleResult.setId(scheduleId);
+            scheduleResult.setTraceId(traceId);
+            scheduleResult.setIsSuccess(scheduleInvokeResult.getIsSuccess());
+            scheduleResult.setErrorMessage(scheduleInvokeResult.getErrorMessage());
+            scheduleResult.setEndDate(scheduleInvokeResult.getEndDate());
+            transmitSupport.send(scheduleResult);
+        } catch (InterruptedException e) {
+            this.runFailSubmit(traceId, scheduleId, "运行被中断");
+        } catch (ExecutionException e) {
+            this.runFailSubmit(traceId, scheduleId, "执行失败");
+        } catch (TimeoutException e) {
+            this.runFailSubmit(traceId, scheduleId, "运行超时");
+        } finally {
+            RunningInfo remove = runningInfoMap.remove(traceId);
+            if (remove != null) {
+                remove.close();
+            }
+        }
+    }
+
+    /**
+     * 运行失败提交
+     *
+     * @param traceId
+     * @param scheduleId
+     * @param errorMessage
+     */
+    private void runFailSubmit(Long traceId, String scheduleId, String errorMessage) {
+        ScheduleResult scheduleResult = new ScheduleResult();
+        scheduleResult.setId(scheduleId);
+        scheduleResult.setTraceId(traceId);
+        scheduleResult.setIsSuccess(false);
+        scheduleResult.setErrorMessage(errorMessage);
+        scheduleResult.setEndDate(System.currentTimeMillis());
+        transmitSupport.send(scheduleResult);
     }
 
     /**
