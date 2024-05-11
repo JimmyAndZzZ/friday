@@ -1,5 +1,6 @@
 package com.jimmy.friday.center.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.enums.schedule.BlockHandlerStrategyTypeEnum;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public interface ScheduleJobService extends IService<ScheduleJob> {
 
+    IPage<ScheduleJob> page(String applicationName, Integer pageNo, Integer pageSize);
     boolean updateBlockHandlerStrategyType(Long id, String expect, String update);
 
     ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName);

@@ -3,6 +3,8 @@ package com.jimmy.friday.center.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.boot.core.schedule.ScheduleInfo;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
@@ -36,6 +38,15 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
 
     @Autowired
     private AttachmentCache attachmentCache;
+
+    @Override
+    public IPage<ScheduleJob> page(String applicationName, Integer pageNo, Integer pageSize) {
+        QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("applicationName", applicationName);
+        queryWrapper.orderByDesc("create_date");
+
+        return this.page(new Page<>(pageNo, pageSize), queryWrapper);
+    }
 
     @Override
     public boolean updateBlockHandlerStrategyType(Long id, String expect, String update) {

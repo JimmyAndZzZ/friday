@@ -1,13 +1,19 @@
 package com.jimmy.friday.center.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
 import com.jimmy.friday.center.dao.ScheduleJobLogDao;
+import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
 import com.jimmy.friday.center.service.ScheduleJobLogService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +28,34 @@ public class ScheduleJobLogServiceImpl extends ServiceImpl<ScheduleJobLogDao, Sc
     private static final int NOT_FINISH_TIMEOUT_DATE_DELAY = 5000;
 
     private static final int NO_TIMEOUT_START_DATE_DELAY = 30000;
+
+    @Override
+    public IPage<ScheduleJobLog> page(Date startDate,
+                                      Date endDate,
+                                      Long jobId,
+                                      ScheduleRunStatusEnum scheduleRunStatusEnum,
+                                      Integer pageNo,
+                                      Integer pageSize) {
+
+        QueryWrapper<ScheduleJobLog> queryWrapper = new QueryWrapper<>();
+        if (startDate != null) {
+            queryWrapper.ge("start_date", startDate.getTime());
+        }
+
+        if (endDate != null) {
+            queryWrapper.le("start_date", endDate.getTime());
+        }
+
+        if (jobId != null) {
+            queryWrapper.eq("job_id", jobId);
+        }
+
+        if (scheduleRunStatusEnum != null) {
+            queryWrapper.eq("run_status", scheduleRunStatusEnum.getCode());
+        }
+
+        return this.page(new Page<>(pageNo, pageSize), queryWrapper);
+    }
 
     @Override
     public List<ScheduleJobLog> queryNotFinish(Long executorId) {
