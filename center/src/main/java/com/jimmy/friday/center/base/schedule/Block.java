@@ -5,7 +5,7 @@ import com.jimmy.friday.center.entity.ScheduleJob;
 
 public interface Block {
 
-    void block(ScheduleJob scheduleJob);
+    void block(ScheduleJob scheduleJob, Integer currentShardingNum);
 
     BlockHandlerStrategyTypeEnum type();
 

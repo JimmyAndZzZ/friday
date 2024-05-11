@@ -42,6 +42,8 @@ public interface RedisConstants {
         String SCHEDULE_NO_TIMEOUT_JOB_SCAN_LOCK = "friday:schedule:no:timeout:job:scan:lock";
 
         String SCHEDULE_JOB_CODE_ID_MAPPER = "friday:schedule:job:code:id:mapper:";
+
+        String SCHEDULE_JOB_RUNNING_SHARDING_NUM = "friday:schedule:job:running:sharding:num:";
     }
 
     interface Gateway {

@@ -16,13 +16,13 @@ public class DiscardSubsequent implements Block {
     private Schedule schedule;
 
     @Override
-    public void block(ScheduleJob scheduleJob) {
-        if (schedule.isRunning(scheduleJob.getId())) {
+    public void block(ScheduleJob scheduleJob, Integer currentShardingNum) {
+        if (schedule.isRunning(scheduleJob.getId(), currentShardingNum)) {
             log.error("调度未结束，此次调度丢弃,{}", scheduleJob.getId());
             return;
         }
 
-        schedule.submit(scheduleJob);
+        schedule.submit(scheduleJob, currentShardingNum);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class Serial implements Block {
     }
 
     @Override
-    public void block(ScheduleJob scheduleJob) {
+    public void block(ScheduleJob scheduleJob, Integer currentShardingNum) {
         Long id = scheduleJob.getId();
         //放入队列
         queueMap.computeIfAbsent(id, i -> new ConcurrentLinkedQueue<>());
@@ -45,7 +45,7 @@ public class Serial implements Block {
                         break;
                     }
 
-                    if (schedule.isRunning(scheduleJob.getId())) {
+                    if (schedule.isRunning(scheduleJob.getId(), currentShardingNum)) {
                         ThreadUtil.sleep(1000);
                         continue;
                     }
@@ -56,7 +56,7 @@ public class Serial implements Block {
                         continue;
                     }
 
-                    schedule.submit(poll);
+                    schedule.submit(poll, currentShardingNum);
                 }
             });
 

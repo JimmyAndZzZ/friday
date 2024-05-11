@@ -42,6 +42,6 @@ public class ScheduleJobLog  {
 
     private Integer shardingNum;
 
-    private Integer currentShadingNum;
+    private Integer currentShardingNum;
 }
 
