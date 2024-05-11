@@ -12,14 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScheduleService {
 
-    //@Schedule(id = "sharding", cron = "0/30 * * * * ?", shardingNum = 3)
     public ScheduleInvokeResult sharding(ScheduleContext scheduleContext) {
         log.info("sharding:{}", scheduleContext.getCurrentShardingNum());
         return ScheduleInvokeResult.ok();
     }
 
-    @Schedule(id = "timeout", cron = "0/2 * * * * ?", timeout = 10)
+    @Schedule(id = "timeout123", cron = "0/2 * * * * ?", timeout = 100)
     public ScheduleInvokeResult timeout(ScheduleContext scheduleContext) {
+        log.info("收到啦！！！！！");
+
         while (true) {
             ThreadUtil.sleep(100);
 
