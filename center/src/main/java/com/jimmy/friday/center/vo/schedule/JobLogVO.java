@@ -1,9 +1,6 @@
 package com.jimmy.friday.center.vo.schedule;
 
 
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -25,19 +22,18 @@ public class JobLogVO implements Serializable {
 
     private Long traceId;
 
-    private Long executorId;
-
     private Date startDate;
 
     private String runStatus;
 
     private String errorMessage;
-//超时时间
+    //超时时间
     private Date timeoutDate;
-//运行参数
+    //运行参数
     private String runParam;
 
     private Date endDate;
 
+    private ExecutorVO executor;
 }
 

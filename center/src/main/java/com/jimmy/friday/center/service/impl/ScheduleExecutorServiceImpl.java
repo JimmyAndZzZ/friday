@@ -33,6 +33,13 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
     private AttachmentCache attachmentCache;
 
     @Override
+    public List<ScheduleExecutor> queryByApplicationName(String applicationName) {
+        QueryWrapper<ScheduleExecutor> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("application_name", applicationName);
+        return this.list(queryWrapper);
+    }
+
+    @Override
     public List<String> getApplicationList() {
         QueryWrapper<ScheduleExecutor> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("DISTINCT application_name as application_name");

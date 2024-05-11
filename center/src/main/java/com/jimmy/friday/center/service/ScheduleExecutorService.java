@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface ScheduleExecutorService extends IService<ScheduleExecutor> {
 
+    List<ScheduleExecutor> queryByApplicationName(String applicationName);
+
     List<String> getApplicationList();
 
     ScheduleExecutor query(String applicationName, String ip);

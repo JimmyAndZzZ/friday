@@ -46,6 +46,8 @@ public class Schedule {
         Long jobId = scheduleJobLog.getJobId();
         Long traceId = scheduleJobLog.getTraceId();
 
+        log.info("准备中断定时器调度,jobId:{},traceId:{}", jobId, traceId);
+
         String applicationIdByExecutorId = scheduleSession.getApplicationIdByExecutorId(scheduleJobLog.getExecutorId());
         if (applicationIdByExecutorId == null) {
             log.error("调度执行器未连接,{}", scheduleJobLog.getExecutorId());
