@@ -19,21 +19,21 @@ spring:
     database: 0
     cluster:
       nodes:
-        - 192.168.10.30:7000
-        - 192.168.10.30:7001
-        - 192.168.10.30:7002
-        - 192.168.10.30:7003
-        - 192.168.10.30:7004
-        - 192.168.10.30:7005
+        - 127.0.0.1:7000
+        - 127.0.0.1:7001
+        - 127.0.0.1:7002
+        - 127.0.0.1:7003
+        - 127.0.0.1:7004
+        - 127.0.0.1:7005
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.5.215:8848
+        server-addr: 127.0.0.1
         namespace: 4c2b45d3-7be5-42c3-bfb5-8428b70d6e07
-        group: DEV_GROUP
+        group: GROUP
     consul:
       host: localhost
       port: 8600
@@ -55,9 +55,9 @@ spring:
       max-file-size:  200MB
       max-request-size:  200MB
   rabbitmq:
-    host: 192.168.5.216
+    host: 127.0.0.1
     username: admin
-    password: 123456
+    password: admin
     port: 5672
     virtual-host: /
     listener:
@@ -75,8 +75,8 @@ spring:
     publisher-returns: true             #发送方的return与confirm模式保证信息发出成功
     publisher-confirms: true            #发送方的return与confirm模式保证信息发出成功
   datasource:
-    url: jdbc:mysql://192.168.5.215:3306/zl_test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
-    username: dev
+    url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&rewriteBatchedStatements=true
+    username: root
     password: 123456
     driver-class-name: com.mysql.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
@@ -87,7 +87,6 @@ spring:
     hikari.max-lifetime: 1800000
     hikari.connection-timeout: 30000
     hikari.connection-test-query: SELECT 1
-
 dubbo:
   protocol:
     port: 20890
@@ -98,8 +97,8 @@ dubbo:
     qos:
       port: 22222
       enable: true
-    name: ss-gateway-consumer
-    id: ss-gateway-consumer
+    name: center-consumer
+    id: center-consumer
 
 #mybatis
 mybatis-plus:
@@ -107,7 +106,7 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     refresh: true
     db-config:
@@ -122,8 +121,8 @@ mybatis-plus:
 friday:
   center:
     temp-path: /tmp
-    kafka-server: 192.168.5.217:9092
+    kafka-server: 127.0.0.1:9092
     protocol-type: kafka
     protocol:
-      ip: 192.168.5.217
+      ip: 127.0.0.1
       port: 9092
