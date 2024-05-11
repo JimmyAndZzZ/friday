@@ -78,7 +78,11 @@ public class ScheduleExecutor {
 
         Future<ScheduleInvokeResult> future = runningInfo.getFuture();
         if (future != null) {
-            future.cancel(true);
+            try {
+                future.cancel(true);
+            } catch (CancellationException ignore) {
+
+            }
         }
     }
 
