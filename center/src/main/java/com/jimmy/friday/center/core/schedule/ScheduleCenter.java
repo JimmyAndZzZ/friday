@@ -142,8 +142,6 @@ public class ScheduleCenter implements Initialize {
                             if (scheduleJobService.needExecute(id, nextTime)) {
                                 // 超过轮训周期
                                 if (nowTime > nextTime + PRE_READ_MS) {
-                                    scheduleExecutePool.execute(scheduleJobInfo);
-
                                     this.refreshScheduleNextTime(scheduleJobInfo, System.currentTimeMillis());
                                 } else if (nowTime > nextTime) {
                                     scheduleExecutePool.execute(scheduleJobInfo);

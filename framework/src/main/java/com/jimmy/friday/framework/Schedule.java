@@ -20,16 +20,30 @@ public class Schedule {
 
     public static class AppendBuild {
 
-        private String scheduleId;
+        private Job job;
 
         private String cron;
 
-        private Job job;
+        private Integer retry;
+
+        private Long timeout;
+
+        private String scheduleId;
 
         private BlockHandlerStrategyTypeEnum blockHandlerStrategyType = BlockHandlerStrategyTypeEnum.SERIAL;
 
         public AppendBuild setScheduleId(String scheduleId) {
             this.scheduleId = scheduleId;
+            return this;
+        }
+
+        public AppendBuild setRetry(Integer retry) {
+            this.retry = retry;
+            return this;
+        }
+
+        public AppendBuild setTimeout(Long timeout) {
+            this.timeout = timeout;
             return this;
         }
 
@@ -49,7 +63,13 @@ public class Schedule {
         }
 
         public void append() {
-            Boot.getApplicationContext().getBean(ScheduleCenter.class).register(scheduleId, cron, job, blockHandlerStrategyType);
+            Boot.getApplicationContext().getBean(ScheduleCenter.class).register(
+                    scheduleId,
+                    cron,
+                    job,
+                    blockHandlerStrategyType,
+                    timeout,
+                    retry);
         }
     }
 

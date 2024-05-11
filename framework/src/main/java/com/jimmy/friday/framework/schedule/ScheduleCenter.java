@@ -55,7 +55,12 @@ public class ScheduleCenter {
         transmitSupport.send(scheduleDelete);
     }
 
-    public void register(String scheduleId, String cron, Job job, BlockHandlerStrategyTypeEnum blockHandlerStrategyType) {
+    public void register(String scheduleId,
+                         String cron,
+                         Job job,
+                         BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
+                         Long timeout,
+                         Integer retry) {
         if (StrUtil.isEmpty(scheduleId)) {
             throw new ScheduleException("定时器唯一标识未定义");
         }
@@ -74,6 +79,8 @@ public class ScheduleCenter {
         scheduleInfo.setScheduleId(scheduleId);
         scheduleInfo.setMethodName("run");
         scheduleInfo.setClassName(JobProxy.class.getTypeName());
+        scheduleInfo.setRetry(retry);
+        scheduleInfo.setTimeout(timeout);
         scheduleInfo.setCron(cron);
         scheduleInfo.setSpringBeanId(springBeanId);
         scheduleInfo.setBlockHandlerStrategyType(blockHandlerStrategyType);
@@ -96,7 +103,13 @@ public class ScheduleCenter {
         transmitSupport.send(scheduleAppend);
     }
 
-    public void register(String className, String methodName, String scheduleId, String cron, BlockHandlerStrategyTypeEnum blockHandlerStrategyType) {
+    public void register(String className,
+                         String methodName,
+                         String scheduleId,
+                         String cron,
+                         BlockHandlerStrategyTypeEnum blockHandlerStrategyType,
+                         Long timeout,
+                         Integer retry) {
         if (StrUtil.isEmpty(cron)) {
             throw new ScheduleException("cron表达式未定义");
         }
@@ -111,6 +124,8 @@ public class ScheduleCenter {
 
         ScheduleInfo scheduleInfo = new ScheduleInfo();
         scheduleInfo.setScheduleId(scheduleId);
+        scheduleInfo.setRetry(retry);
+        scheduleInfo.setTimeout(timeout);
         scheduleInfo.setMethodName(methodName);
         scheduleInfo.setClassName(className);
         scheduleInfo.setCron(cron);
