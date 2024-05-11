@@ -80,8 +80,6 @@ public class ScheduleExecutor {
         if (future != null) {
             future.cancel(true);
         }
-
-        runningInfo.getExecutorService().shutdownNow();
     }
 
     public void invoke(Long traceId, String scheduleId, String param, Long timeout, Integer retry, Integer shardingNum) {
@@ -102,12 +100,10 @@ public class ScheduleExecutor {
         RunningInfo put = runningInfoMap.putIfAbsent(traceId, runningInfo);
         if (put != null) {
             log.error("traceId:{}调度正在运行，此次调度作废", traceId);
-
-            runningInfo.close();
             return;
         }
 
-        Future<ScheduleInvokeResult> future = runningInfo.getExecutorService().submit(() -> {
+        CompletableFuture<ScheduleInvokeResult> future = CompletableFuture.supplyAsync(() -> {
             ScheduleContext scheduleContext = new ScheduleContext();
             scheduleContext.setScheduleId(scheduleId);
             scheduleContext.setParam(param);
@@ -135,10 +131,7 @@ public class ScheduleExecutor {
         } catch (TimeoutException e) {
             this.runFailSubmit(traceId, scheduleId, "运行超时");
         } finally {
-            RunningInfo remove = runningInfoMap.remove(traceId);
-            if (remove != null) {
-                remove.close();
-            }
+            runningInfoMap.remove(traceId);
         }
     }
 
@@ -275,18 +268,11 @@ public class ScheduleExecutor {
 
         private String scheduleId;
 
-        private ExecutorService executorService;
-
-        private Future<ScheduleInvokeResult> future;
+        private CompletableFuture<ScheduleInvokeResult> future;
 
         public RunningInfo(String scheduleId) {
             this.scheduleId = scheduleId;
             this.startDate = System.currentTimeMillis();
-            this.executorService = Executors.newSingleThreadExecutor();
-        }
-
-        public void close() {
-            executorService.shutdownNow();
         }
     }
 }
