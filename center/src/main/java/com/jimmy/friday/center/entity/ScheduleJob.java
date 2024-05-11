@@ -34,7 +34,7 @@ public class ScheduleJob {
     //阻塞处理策略
     private String blockStrategy;
     //超时时间
-    private Long timeout;
+    private Integer timeout;
     //重试次数
     private Integer retryCount;
 

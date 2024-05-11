@@ -13,5 +13,9 @@ public @interface Schedule {
 
     String cron();
 
+    int timeout() default 0;
+
+    int retry() default 0;
+
     BlockHandlerStrategyTypeEnum BlockHandlerStrategyType() default BlockHandlerStrategyTypeEnum.SERIAL;
 }

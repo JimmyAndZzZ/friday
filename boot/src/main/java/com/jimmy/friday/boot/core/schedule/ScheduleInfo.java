@@ -19,6 +19,10 @@ public class ScheduleInfo implements Serializable {
 
     private String cron;
 
+    private Integer timeout;
+
+    private Integer retry;
+
     private BlockHandlerStrategyTypeEnum blockHandlerStrategyType = BlockHandlerStrategyTypeEnum.SERIAL;
 
     private ScheduleSourceEnum scheduleSource;

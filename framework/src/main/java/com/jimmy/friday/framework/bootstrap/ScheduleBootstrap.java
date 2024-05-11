@@ -132,7 +132,14 @@ public class ScheduleBootstrap implements Bootstrap {
                     throw new ScheduleException("方法:" + method.getName() + "返回类型不符合，需要返回ScheduleResult");
                 }
 
-                scheduleCenter.register(beanClassName, method.getName(), annotation.id(), cron, annotation.BlockHandlerStrategyType());
+                scheduleCenter.register(
+                        beanClassName,
+                        method.getName(),
+                        annotation.id(),
+                        cron,
+                        annotation.BlockHandlerStrategyType(),
+                        annotation.timeout(),
+                        annotation.retry());
             }
         }
     }
