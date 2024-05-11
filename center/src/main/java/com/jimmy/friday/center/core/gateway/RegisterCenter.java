@@ -276,6 +276,7 @@ public class RegisterCenter {
         if (exist != null) {
             exist.setApplicationId(service.getApplicationId());
             exist.setStatus(ServiceStatusEnum.ALIVE);
+            exist.setMethods(service.getMethods());
 
             this.suspected.remove(service.getApplicationId());
             return false;
@@ -322,6 +323,8 @@ public class RegisterCenter {
                 exist.getReferenceCount().set(0);
                 exist.setApplicationId(service.getApplicationId());
                 exist.setStatus(ServiceStatusEnum.ALIVE);
+                exist.setMethods(service.getMethods());
+
                 this.registerService(service, id);
                 this.gatewayCircuitBreakerManager.remove(serviceId);
                 this.suspected.remove(service.getApplicationId());

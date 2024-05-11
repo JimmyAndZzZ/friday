@@ -1,7 +1,9 @@
 package com.jimmy.friday.center.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.jimmy.friday.boot.enums.schedule.ScheduleExecutorStatusEnum;
 import com.jimmy.friday.boot.enums.YesOrNoEnum;
 import com.jimmy.friday.center.base.Obtain;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * (ScheduleExecutor)表服务实现类
@@ -27,6 +31,14 @@ public class ScheduleExecutorServiceImpl extends ServiceImpl<ScheduleExecutorDao
 
     @Autowired
     private AttachmentCache attachmentCache;
+
+    @Override
+    public List<String> getApplicationList() {
+        QueryWrapper<ScheduleExecutor> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("DISTINCT application_name as application_name");
+        List<ScheduleExecutor> list = this.list(queryWrapper);
+        return CollUtil.isNotEmpty(list) ? list.stream().map(ScheduleExecutor::getApplicationName).collect(Collectors.toList()) : Lists.newArrayList();
+    }
 
     @Override
     public ScheduleExecutor getById(Serializable id) {
