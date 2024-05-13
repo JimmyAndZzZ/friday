@@ -283,7 +283,7 @@ public class ScheduleCenter implements Initialize {
             scheduleJob.setLastTime(scheduleJob.getNextTime());
             scheduleJob.setNextTime(nextTime);
 
-            scheduleJobService.updateExecuteTime(scheduleJob.getNextTime(), nextTime, id);
+            scheduleJobService.updateExecuteTime(scheduleJob.getLastTime(), nextTime, id);
         } else {
             log.error("定时器:{},获取下次执行时间失败", id);
 
