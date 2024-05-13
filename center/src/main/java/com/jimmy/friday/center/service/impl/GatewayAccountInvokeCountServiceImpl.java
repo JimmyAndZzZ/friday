@@ -98,9 +98,9 @@ public class GatewayAccountInvokeCountServiceImpl extends ServiceImpl<GatewayAcc
 
             List<GatewayAccount> list = gatewayAccountService.list();
             for (GatewayAccount gatewayAccount : list) {
-                String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                String s = attachmentCache.attachment(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getAppId());
                 if (StrUtil.isNotEmpty(s)) {
-                    attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getUid());
+                    attachmentCache.remove(RedisConstants.Gateway.TODAY_INVOKE_COUNT + gatewayAccount.getAppId());
 
                     Integer anInt = Convert.toInt(s);
                     if (anInt != null) {

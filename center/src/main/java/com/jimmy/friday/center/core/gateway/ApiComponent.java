@@ -184,7 +184,7 @@ public class ApiComponent {
         Assert.state(StrUtil.isNotEmpty(timestamp), ExceptionEnum.MISS_PARAMETER, "时间戳为空");
         Assert.state(Math.abs(now.getTime() - Convert.toLong(timestamp, 0L)) < GlobalConstants.Center.TIMESTAMP_MAX_DIFFERENCE, ExceptionEnum.ERROR_PARAMETER, "时间戳与当前时间超过5分钟");
 
-        return SecureUtil.md5(StrUtil.format("appId:{};secretKey:{};timestamp:{}", gatewayAccount.getUid(), gatewayAccount.getSeckey(), timestamp));
+        return SecureUtil.md5(StrUtil.format("appId:{};secretKey:{};timestamp:{}", gatewayAccount.getAppId(), gatewayAccount.getAppSecret(), timestamp));
     }
 
     /**
