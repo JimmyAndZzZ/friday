@@ -20,9 +20,9 @@ public class GatewayAccount {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String uid;
+    private String appId;
 
-    private String seckey;
+    private String appSecret;
 
     private Date createDate;
 

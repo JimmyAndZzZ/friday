@@ -42,8 +42,8 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
         gatewayAccount.setStatus(YesOrNoEnum.YES.getCode());
         gatewayAccount.setTitle(name);
         gatewayAccount.setCreateDate(new Date());
-        gatewayAccount.setUid(ShortUUID.uuid());
-        gatewayAccount.setSeckey(IdUtil.simpleUUID());
+        gatewayAccount.setAppId(ShortUUID.uuid());
+        gatewayAccount.setAppSecret(IdUtil.simpleUUID());
         gatewayAccount.setBalance(new BigDecimal(0));
         this.save(gatewayAccount);
         return gatewayAccount;
@@ -65,7 +65,7 @@ public class GatewayAccountServiceImpl extends ServiceImpl<GatewayAccountDao, Ga
     public String getAppIdById(Long id) {
         return attachmentCache.attachment(RedisConstants.Gateway.GATEWAY_ACCOUNT_APP_ID_CACHE, id.toString(), String.class, () -> {
             GatewayAccount byId = GatewayAccountServiceImpl.super.getById(id);
-            return byId != null ? byId.getUid() : null;
+            return byId != null ? byId.getAppId() : null;
         });
     }
 
