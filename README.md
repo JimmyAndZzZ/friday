@@ -49,3 +49,41 @@
 | APP_ID                      | 是    | framework | test                                             | 客户端请求appId                                                                                                                             |
 | WEIGHT                      | 否    | framework | 1                                                | 当前服务权重                                                                                                                                 |
 | OFFSET_PATH                 | 否    | framework | /data/gateway/offset/                            | 推送消息offset文件路径                                                                                                                         |
+
+----
+
+### 接入指南
+
+#### framework
+- jar引入，pom引入framework的jar包
+----
+- 配置文件路径指定
+> 示例：在启动方法中增加参数：-Dfriday.config.path=/tmp/friday.properties
+----
+- 启动方法增加注解：
+  - 网关：@EnableGateway
+  - 分布式定时器：@EnableSchedule
+  - 分布式事务：@EnableTransactional
+----
+
+- 参考demo
+  - provider: demo-gateway、demo-http、demo-dubbo
+  - consumer: demo-consumer、demo-consumer-simple
+  - schedule: demo-schedule
+  - transaction: demo-consumer
+----
+
+#### agent
+
+- 引入agent和指定配置文件路径
+> 示例：在启动方法中增加参数：-javaagent:/data/friday/agent.jar,-Dfriday.config.path=/tmp/friday.properties
+
+- 参考demo
+  demo-agent
+
+### 补充
+
+<p> 
+目前只有关于网关和日志收集使用于生产，其他功能仅通过单元测试和mock
+本项目主在交流和练手
+</p>
