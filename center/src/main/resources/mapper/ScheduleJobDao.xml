@@ -19,6 +19,45 @@
         <result property="nextTime" column="next_time" jdbcType="INTEGER"/>
     </resultMap>
 
+    <update id="updateJob" parameterType="com.jimmy.friday.center.entity.ScheduleJob">
+        UPDATE schedule_job
+        <set>
+            is_manual='1',
+            update_date=now(),
+
+            <if test="nextTime != null">
+                next_time = #{nextTime},
+            </if>
+
+            <if test="cron != null and cron != ''">
+                cron = #{cron},
+            </if>
+            <if test="description != null and description != ''">
+                `description` = #{description},
+            </if>
+            <if test="runParam != null and runParam != ''">
+                runParam = #{runParam},
+            </if>
+            <if test="blockStrategy != null and blockStrategy != ''">
+                block_strategy = #{blockStrategy},
+            </if>
+            <if test="timeout != null">
+                timeout = #{timeout},
+            </if>
+            <if test="retryCount != null">
+                retry_count = #{retryCount},
+            </if>
+            <if test="status != null and status != ''">
+                `status` = #{status},
+            </if>
+            <if test="shardingNum != null">
+                sharding_num = #{shardingNum},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
     <update id="updateBlockHandlerStrategyType">
         update schedule_job
         set block_strategy=#{update},

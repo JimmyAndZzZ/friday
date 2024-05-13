@@ -17,7 +17,10 @@ import java.util.List;
  */
 public interface ScheduleJobService extends IService<ScheduleJob> {
 
+    boolean updateJob(ScheduleJob scheduleJob);
+
     IPage<ScheduleJob> page(String applicationName, Integer pageNo, Integer pageSize);
+
     boolean updateBlockHandlerStrategyType(Long id, String expect, String update);
 
     ScheduleJob save(ScheduleInfo scheduleInfo, String applicationName);

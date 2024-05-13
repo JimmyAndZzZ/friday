@@ -228,6 +228,15 @@ public class ScheduleCenter implements Initialize {
         });
     }
 
+    public Long generateNextTime(String cron, Long lastTime) {
+        try {
+            Date nextValidTimeAfter = new CronExpression(cron).getNextValidTimeAfter(new Date(lastTime));
+            return nextValidTimeAfter != null ? nextValidTimeAfter.getTime() : null;
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
     /**
      * 更新调度信息
      *
@@ -274,30 +283,13 @@ public class ScheduleCenter implements Initialize {
             scheduleJob.setLastTime(scheduleJob.getNextTime());
             scheduleJob.setNextTime(nextTime);
 
-            scheduleJobService.updateExecuteTime(scheduleJob.getNextTime(), nextTime, id);
+            scheduleJobService.updateExecuteTime(scheduleJob.getLastTime(), nextTime, id);
         } else {
             log.error("定时器:{},获取下次执行时间失败", id);
 
             scheduleJob.setStatus(ScheduleStatusEnum.CLOSE.getCode());
 
             scheduleJobService.updateStatus(ScheduleStatusEnum.CLOSE.getCode(), id);
-        }
-    }
-
-    /**
-     * 获取下次执行时间
-     *
-     * @param cron
-     * @param lastTime
-     * @return
-     * @throws Exception
-     */
-    private Long generateNextTime(String cron, Long lastTime) {
-        try {
-            Date nextValidTimeAfter = new CronExpression(cron).getNextValidTimeAfter(new Date(lastTime));
-            return nextValidTimeAfter != null ? nextValidTimeAfter.getTime() : null;
-        } catch (ParseException e) {
-            return null;
         }
     }
 }

@@ -40,6 +40,11 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     private AttachmentCache attachmentCache;
 
     @Override
+    public boolean updateJob(ScheduleJob scheduleJob) {
+        return baseMapper.updateJob(scheduleJob);
+    }
+
+    @Override
     public IPage<ScheduleJob> page(String applicationName, Integer pageNo, Integer pageSize) {
         QueryWrapper<ScheduleJob> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("application_name", applicationName);

@@ -2,10 +2,13 @@ package com.jimmy.friday.center.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.Maps;
 import com.jimmy.friday.boot.enums.schedule.ScheduleRunStatusEnum;
 import com.jimmy.friday.center.Schedule;
+import com.jimmy.friday.center.core.schedule.ScheduleCenter;
+import com.jimmy.friday.center.core.schedule.ScheduleExecutePool;
 import com.jimmy.friday.center.entity.ScheduleExecutor;
 import com.jimmy.friday.center.entity.ScheduleJob;
 import com.jimmy.friday.center.entity.ScheduleJobLog;
@@ -17,6 +20,7 @@ import com.jimmy.friday.center.vo.Result;
 import com.jimmy.friday.center.vo.schedule.ExecutorVO;
 import com.jimmy.friday.center.vo.schedule.JobLogVO;
 import com.jimmy.friday.center.vo.schedule.JobVO;
+import com.jimmy.friday.center.vo.schedule.UpdateJobVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +41,57 @@ public class ScheduleController {
     private Schedule schedule;
 
     @Autowired
+    private ScheduleCenter scheduleCenter;
+
+    @Autowired
     private ScheduleJobService scheduleJobService;
+
+    @Autowired
+    private ScheduleExecutePool scheduleExecutePool;
 
     @Autowired
     private ScheduleJobLogService scheduleJobLogService;
 
     @Autowired
     private ScheduleExecutorService scheduleExecutorService;
+
+    @PostMapping("/updateJob")
+    @ApiOperation("更新定时器信息")
+    public Result<?> updateJob(@RequestBody UpdateJobVO updateJobVO) {
+        Long id = updateJobVO.getId();
+        String updateCron = updateJobVO.getCron();
+
+        ScheduleJob byId = scheduleJobService.getById(id);
+        if (byId == null) {
+            return Result.error("定时器不存在");
+        }
+
+        String cron = byId.getCron();
+        String blockStrategy = byId.getBlockStrategy();
+
+
+        if (StrUtil.isNotEmpty(cron) && !cron.equals(updateCron)) {
+            Long nextTime = scheduleCenter.generateNextTime(updateCron, System.currentTimeMillis());
+            if (nextTime == null) {
+                return Result.error("cron表达式异常");
+            }
+
+            byId.setNextTime(nextTime);
+        }
+
+        byId.setCron(updateJobVO.getCron());
+        byId.setDescription(updateJobVO.getDescription());
+        byId.setRunParam(updateJobVO.getRunParam());
+        byId.setBlockStrategy(updateJobVO.getBlockStrategy());
+        byId.setTimeout(updateJobVO.getTimeout());
+        byId.setRetryCount(updateJobVO.getRetryCount());
+        byId.setStatus(updateJobVO.getStatus());
+        byId.setShardingNum(updateJobVO.getShardingNum());
+        scheduleJobService.updateJob(byId);
+
+        scheduleExecutePool.release(id, blockStrategy);
+        return Result.ok();
+    }
 
     @PostMapping("/interrupt/{jobLogId}")
     @ApiOperation("中断正在运行的定时器")
@@ -70,12 +118,7 @@ public class ScheduleController {
 
     @GetMapping("/queryLogList")
     @ApiOperation("获取定时器运行日志列表")
-    public Result<?> queryLogList(@RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date startDate,
-                                  @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date endDate,
-                                  @RequestParam(value = "jobId") Long jobId,
-                                  @RequestParam(value = "scheduleRunStatus", required = false) ScheduleRunStatusEnum scheduleRunStatus,
-                                  @RequestParam(value = "pageNo") Integer pageNo,
-                                  @RequestParam(value = "pageSize") Integer pageSize) {
+    public Result<?> queryLogList(@RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date startDate, @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = DatePattern.NORM_DATETIME_PATTERN) Date endDate, @RequestParam(value = "jobId") Long jobId, @RequestParam(value = "scheduleRunStatus", required = false) ScheduleRunStatusEnum scheduleRunStatus, @RequestParam(value = "pageNo") Integer pageNo, @RequestParam(value = "pageSize") Integer pageSize) {
         IPage<ScheduleJobLog> page = scheduleJobLogService.page(startDate, endDate, jobId, scheduleRunStatus, pageNo, pageSize);
 
         PageInfoVO<JobLogVO> pageInfoVO = new PageInfoVO<>();
@@ -131,9 +174,7 @@ public class ScheduleController {
 
     @GetMapping("/queryJobList")
     @ApiOperation("获取定时器列表")
-    public Result<?> queryJobList(@RequestParam("applicationName") String applicationName,
-                                  @RequestParam("pageNo") Integer pageNo,
-                                  @RequestParam("pageSize") Integer pageSize) {
+    public Result<?> queryJobList(@RequestParam("applicationName") String applicationName, @RequestParam("pageNo") Integer pageNo, @RequestParam("pageSize") Integer pageSize) {
         IPage<ScheduleJob> page = scheduleJobService.page(applicationName, pageNo, pageSize);
 
         PageInfoVO<JobVO> pageInfoVO = new PageInfoVO<>();
