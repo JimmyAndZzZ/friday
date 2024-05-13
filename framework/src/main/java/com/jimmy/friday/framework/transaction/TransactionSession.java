@@ -2,17 +2,18 @@ package com.jimmy.friday.framework.transaction;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.Striped;
 import com.jimmy.friday.boot.core.transaction.TransactionFacts;
 import com.jimmy.friday.boot.enums.ConfirmTypeEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionStatusEnum;
 import com.jimmy.friday.boot.enums.transaction.TransactionTypeEnum;
 import com.jimmy.friday.boot.exception.ConnectionException;
+import com.jimmy.friday.boot.exception.TransmitException;
 import com.jimmy.friday.boot.message.transaction.TransactionCompensation;
 import com.jimmy.friday.boot.message.transaction.TransactionRegister;
 import com.jimmy.friday.boot.message.transaction.TransactionSubmit;
@@ -28,18 +29,12 @@ import org.springframework.context.ApplicationContext;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class TransactionSession {
-
-    private final Striped<Lock> stripes = Striped.lock(16);
 
     private final Set<String> process = ConcurrentHashMap.newKeySet();
 
@@ -70,6 +65,28 @@ public class TransactionSession {
     public void initialize() {
         Map<String, TransactionConnectionProxy> beansOfType = this.applicationContext.getBeansOfType(TransactionConnectionProxy.class);
         beansOfType.values().forEach(bean -> proxyMap.put(bean.type(), bean));
+
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+            try {
+                Date now = new Date();
+                String path = configLoad.get(ConfigConstants.TRANSACTION_POINT_ROOT_PATH, TransactionConstants.DEFAULT_FILE_PATH);
+
+                List<File> files = FileUtil.loopFiles(path);
+                if (CollUtil.isNotEmpty(files)) {
+                    for (File file : files) {
+                        if (StrUtil.endWith(file.getName(), TransactionConstants.FILE_SUFFIX_DONE)) {
+                            long l = file.lastModified();
+                            //删除三天后的数据
+                            if (DateUtil.offsetDay(now, -3).getTime() > l) {
+                                FileUtil.del(file);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("扫描过期事务失败", e);
+            }
+        }, 0, 12, TimeUnit.HOURS);
     }
 
     public void notify(Long traceId, ConfirmTypeEnum confirmTypeEnum) {
@@ -89,8 +106,6 @@ public class TransactionSession {
     }
 
     public void submit(String transactionId, TransactionStatusEnum transactionStatus) {
-        Lock lock = stripes.get(transactionId);
-        lock.lock();
         try {
             String path = configLoad.get(ConfigConstants.TRANSACTION_POINT_ROOT_PATH, TransactionConstants.DEFAULT_FILE_PATH);
 
@@ -119,20 +134,17 @@ public class TransactionSession {
             if (!this.await(transactionId, traceId, countDownLatch)) {
                 this.rollback(transactionId);
             }
-        } catch (ConnectionException connectionException) {
+        } catch (ConnectionException | TransmitException connectionException) {
             this.rollback(transactionId);
         } catch (Exception e) {
+            this.rollback(transactionId);
             log.error("事务提交失败", e);
-        } finally {
-            lock.unlock();
         }
     }
 
     public void collectTransaction(TransactionFacts transactionFacts) {
         String transactionId = transactionFacts.getTransactionId();
 
-        Lock lock = stripes.get(transactionId);
-        lock.lock();
         try {
             //服务端已回调
             TransactionStatusEnum transactionStatusEnum = notifyTransactionStatus.get(transactionId);
@@ -168,12 +180,11 @@ public class TransactionSession {
             if (!this.await(transactionId, traceId, countDownLatch)) {
                 this.rollback(transactionId);
             }
-        } catch (ConnectionException connectionException) {
+        } catch (ConnectionException | TransmitException connectionException) {
             this.rollback(transactionId);
         } catch (Exception e) {
+            this.rollback(transactionId);
             log.error("事务上传失败", e);
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -206,36 +217,30 @@ public class TransactionSession {
     }
 
     public void timeout(String transactionId) {
-        Lock lock = stripes.get(transactionId);
-        lock.lock();
-        try {
-            String path = configLoad.get(ConfigConstants.TRANSACTION_POINT_ROOT_PATH, TransactionConstants.DEFAULT_FILE_PATH);
+        String path = configLoad.get(ConfigConstants.TRANSACTION_POINT_ROOT_PATH, TransactionConstants.DEFAULT_FILE_PATH);
 
-            if (FileUtil.exist(path + transactionId + TransactionConstants.FILE_SUFFIX_DONE)) {
-                return;
-            }
-
-            log.info("事务超时处理:{}", transactionId);
-
-            FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_WAIT);
-            FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_LOCK);
-            FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_STATE);
-
-            List<TransactionFacts> list = transactionHolder.remove(transactionId);
-            if (CollUtil.isEmpty(list)) {
-                log.error("当前事务回调上下文为空,{}", transactionId);
-                return;
-            }
-
-            for (TransactionFacts facts : list) {
-                facts.setTransactionStatus(TransactionStatusEnum.FAIL);
-                this.callback(facts);
-            }
-
-            FileUtil.touch(path + transactionId + TransactionConstants.FILE_SUFFIX_DONE);
-        } finally {
-            lock.unlock();
+        if (FileUtil.exist(path + transactionId + TransactionConstants.FILE_SUFFIX_DONE)) {
+            return;
         }
+
+        log.info("事务超时处理:{}", transactionId);
+
+        FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_WAIT);
+        FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_LOCK);
+        FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_STATE);
+
+        List<TransactionFacts> list = transactionHolder.remove(transactionId);
+        if (CollUtil.isEmpty(list)) {
+            log.error("当前事务回调上下文为空,{}", transactionId);
+            return;
+        }
+
+        for (TransactionFacts facts : list) {
+            facts.setTransactionStatus(TransactionStatusEnum.FAIL);
+            this.callback(facts);
+        }
+
+        FileUtil.touch(path + transactionId + TransactionConstants.FILE_SUFFIX_DONE);
     }
 
     public void callback(TransactionFacts facts) {
@@ -245,9 +250,6 @@ public class TransactionSession {
     public void submitNotify(String transactionId, TransactionStatusEnum transactionStatus, List<TransactionFacts> transactionFacts) {
         if (!executorService.isShutdown()) {
             executorService.submit(() -> {
-                Lock lock = stripes.get(transactionId);
-                lock.lock();
-
                 notifyTransactionStatus.put(transactionId, transactionStatus);
 
                 String path = configLoad.get(ConfigConstants.TRANSACTION_POINT_ROOT_PATH, TransactionConstants.DEFAULT_FILE_PATH);
@@ -326,8 +328,6 @@ public class TransactionSession {
                 } finally {
                     FileUtil.del(path + transactionId + TransactionConstants.FILE_SUFFIX_STATE);
                     notifyTransactionStatus.remove(transactionId);
-
-                    lock.unlock();
                 }
             });
         }
