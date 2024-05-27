@@ -33,7 +33,7 @@ public class ServiceDestroyAction implements Action<ServiceDestroy> {
         }
 
         for (Service service : services) {
-            registerSupport.get(service.serviceType()).remove(service, true);
+            registerSupport.get(service.serviceType()).remove(service, true, true);
         }
 
         Map<Long, String> serviceIdAndTraceId = GatewayInvokeFuture.getServiceIdAndTraceId();

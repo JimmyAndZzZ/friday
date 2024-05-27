@@ -106,7 +106,10 @@ public class RegisterCenter {
             }
 
             try {
-                for (Map.Entry<String, Service> entry : serviceMap.entrySet()) {
+                Iterator<Map.Entry<String, Service>> iterator = serviceMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, Service> entry = iterator.next();
+
                     String name = entry.getKey();
                     Service service = entry.getValue();
 
@@ -132,7 +135,8 @@ public class RegisterCenter {
                     Long increment = this.attachmentCache.increment(redisKey);
                     this.attachmentCache.expire(redisKey, 2L, TimeUnit.HOURS);
                     if (increment > 5) {
-                        this.remove(service, false);
+                        this.remove(service, false, false);
+                        iterator.remove();
                     } else if (increment > 0 && increment < 3) {
                         log.info("服务名:{},地址:{},端口:{},服务疑似断开连接", name, service.getIpAddress(), service.getPort());
                         service.setStatus(ServiceStatusEnum.ABNORMAL);
@@ -163,7 +167,7 @@ public class RegisterCenter {
         return this.serviceMap.get(key);
     }
 
-    public void remove(Service remove, boolean isForce) {
+    public void remove(Service remove, boolean isForce, boolean isRemoveService) {
         String name = remove.getName();
         String serviceId = this.getServiceId(remove);
 
@@ -183,7 +187,10 @@ public class RegisterCenter {
 
             log.info("服务名:{},地址:{},端口:{},服务被移除", name, service.getIpAddress(), service.getPort());
 
-            this.serviceMap.remove(serviceId);
+            if (isRemoveService) {
+                this.serviceMap.remove(serviceId);
+            }
+
             this.suspected.remove(service.getApplicationId());
             List<Service> services = serviceList.get(name);
 
