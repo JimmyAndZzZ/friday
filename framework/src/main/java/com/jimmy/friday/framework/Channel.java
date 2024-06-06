@@ -25,8 +25,15 @@ public class Channel {
 
         private String message;
 
+        private String channelName;
+
         public PushBuilder setMessage(String message) {
             this.message = message;
+            return this;
+        }
+
+        public PushBuilder setChannelName(String channelName) {
+            this.channelName = channelName;
             return this;
         }
 

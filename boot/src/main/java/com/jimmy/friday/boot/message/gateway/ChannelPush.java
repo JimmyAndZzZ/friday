@@ -11,7 +11,7 @@ public class ChannelPush implements Message {
 
     private String message;
 
-    private String serviceName;
+    private String channelName;
 
     @Override
     public EventTypeEnum type() {

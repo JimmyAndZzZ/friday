@@ -222,4 +222,12 @@ public class AttachmentCache {
     public void removeList(String mainKey, String value) {
         stringRedisTemplate.opsForSet().remove(mainKey, value);
     }
+
+    public boolean listContain(String mainKey, String value) {
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(mainKey, value));
+    }
+
+    public Set<String> attachmentList(String key) {
+        return stringRedisTemplate.opsForSet().members(key);
+    }
 }

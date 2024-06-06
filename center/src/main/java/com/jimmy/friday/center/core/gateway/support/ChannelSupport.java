@@ -11,6 +11,7 @@ import com.jimmy.friday.boot.exception.GatewayException;
 import com.jimmy.friday.boot.message.gateway.ChannelReceive;
 import com.jimmy.friday.boot.other.GlobalConstants;
 import com.jimmy.friday.center.base.Initialize;
+import com.jimmy.friday.center.core.AttachmentCache;
 import com.jimmy.friday.center.core.KafkaManager;
 import com.jimmy.friday.center.core.gateway.ChannelSubManager;
 import com.jimmy.friday.center.entity.GatewayAccount;
@@ -20,6 +21,7 @@ import com.jimmy.friday.center.service.GatewayAccountService;
 import com.jimmy.friday.center.service.GatewayPushChannelSubService;
 import com.jimmy.friday.center.support.TransmitSupport;
 import com.jimmy.friday.center.utils.JsonUtil;
+import com.jimmy.friday.center.utils.RedisConstants;
 import com.jimmy.friday.protocol.core.InputMessage;
 import io.netty.channel.Channel;
 import lombok.Data;
@@ -30,10 +32,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -52,6 +51,9 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
 
     @Autowired
     private KafkaManager kafkaManager;
+
+    @Autowired
+    private AttachmentCache attachmentCache;
 
     @Autowired
     private TransmitSupport transmitSupport;
@@ -74,6 +76,10 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
     }
 
     public void push(String message, String channelName) {
+        if (!attachmentCache.listContain(RedisConstants.Gateway.GATEWAY_CHANNEL_NAME_LIST, channelName)) {
+            return;
+        }
+
         List<GatewayPushChannelSub> gatewayPushChannelSubs = gatewayPushChannelSubService.queryByChannelName(channelName);
         if (CollUtil.isNotEmpty(gatewayPushChannelSubs)) {
             for (GatewayPushChannelSub gatewayPushChannelSub : gatewayPushChannelSubs) {
@@ -94,8 +100,11 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
     public void register(String appId, String channelName) {
         GatewayAccount gatewayAccount = gatewayAccountService.queryByAppId(appId);
         if (gatewayAccount == null) {
-            throw new GatewayException("appId不存在");
+            log.error("订阅appId不存在");
+            return;
         }
+
+        attachmentCache.attachStringList(RedisConstants.Gateway.GATEWAY_CHANNEL_NAME_LIST, channelName);
 
         GatewayPushChannelSub gatewayPushChannelSub = new GatewayPushChannelSub();
         gatewayPushChannelSub.setChannelName(channelName);
@@ -109,8 +118,28 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
 
     @Override
     public void init(ApplicationContext applicationContext) throws Exception {
+        Set<String> strings = attachmentCache.attachmentList(RedisConstants.Gateway.GATEWAY_CHANNEL_NAME_LIST);
+
         List<GatewayPushChannelSub> list = gatewayPushChannelSubService.list();
         if (CollUtil.isNotEmpty(list)) {
+            Set<String> channelNames = list.stream().map(GatewayPushChannelSub::getChannelName).collect(Collectors.toSet());
+
+            Iterator<String> iterator = channelNames.iterator();
+            while (iterator.hasNext()) {
+                String element = iterator.next();
+
+                if (strings.contains(element)) {
+                    strings.remove(element);
+                    iterator.remove();
+                }
+            }
+
+            if (CollUtil.isNotEmpty(channelNames)) {
+                for (String s : channelNames) {
+                    attachmentCache.attachStringList(RedisConstants.Gateway.GATEWAY_CHANNEL_NAME_LIST, s);
+                }
+            }
+
             Map<Long, List<GatewayPushChannelSub>> collect = list.stream().collect(Collectors.groupingBy(GatewayPushChannelSub::getAccountId));
 
             for (Map.Entry<Long, List<GatewayPushChannelSub>> entry : collect.entrySet()) {
@@ -126,6 +155,12 @@ public class ChannelSupport implements Initialize, ApplicationListener<ReceiveCo
                 for (GatewayPushChannelSub gatewayPushChannelSub : value) {
                     this.receive(gatewayPushChannelSub, appId);
                 }
+            }
+        }
+
+        if (CollUtil.isNotEmpty(strings)) {
+            for (String string : strings) {
+                attachmentCache.removeList(RedisConstants.Gateway.GATEWAY_CHANNEL_NAME_LIST, string);
             }
         }
     }

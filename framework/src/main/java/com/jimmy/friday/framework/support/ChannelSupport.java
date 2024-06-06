@@ -141,16 +141,20 @@ public class ChannelSupport {
         }
     }
 
-    public void push(Long id, String message) {
+    public void push(Long id, String channelName, String message) {
         if (StrUtil.isEmpty(message)) {
             throw new GatewayException("消息体为空");
+        }
+
+        if (StrUtil.isEmpty(channelName)) {
+            throw new GatewayException("频道为空");
         }
 
         try {
             ChannelPush channelPush = new ChannelPush();
             channelPush.setId(id);
             channelPush.setMessage(message);
-            channelPush.setServiceName(configLoad.getApplicationName());
+            channelPush.setChannelName(channelName);
 
             CountDownLatch countDownLatch = new CountDownLatch(1);
             countDownLatchMap.put(id, countDownLatch);

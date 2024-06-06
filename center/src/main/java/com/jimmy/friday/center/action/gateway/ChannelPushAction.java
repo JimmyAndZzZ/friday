@@ -23,11 +23,11 @@ public class ChannelPushAction implements Action<ChannelPush> {
     public void action(ChannelPush channelPush, ChannelHandlerContext channelHandlerContext) {
         Long id = channelPush.getId();
         String message = channelPush.getMessage();
-        String serviceName = channelPush.getServiceName();
+        String channelName = channelPush.getChannelName();
 
         try {
             //消息推送
-            channelSupport.push(message, serviceName);
+            channelSupport.push(message, channelName);
             //ack
             channelHandlerContext.write(new Event(EventTypeEnum.CHANNEL_PUSH_CONFIRM, JsonUtil.toString(ChannelPushConfirm.success(id))));
         } catch (Exception e) {

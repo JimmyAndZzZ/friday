@@ -105,6 +105,8 @@ public interface RedisConstants {
         String GATEWAY_METHOD_LAST_INVOKE_TIME = "friday:gateway:method:last:invoke:time:";
 
         String GATEWAY_SERVICE_CONSUMER = "friday:gateway:service:consumer:";
+
+        String GATEWAY_CHANNEL_NAME_LIST = "ss:gateway:channel:name:list";
     }
 
 
